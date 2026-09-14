@@ -1,0 +1,46 @@
+# Dependências
+**/node_modules/
+
+# Saídas de build e tipos gerados
+**/dist/
+**/.astro/
+**/coverage/
+
+# Caches técnicos
+**/.cache/
+**/.vite/
+**/.turbo/
+**/.sass-cache/
+**/.eslintcache
+**/.stylelintcache
+
+# Logs
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Variáveis de ambiente locais
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Arquivos temporários e resíduos de edição
+**/.tmp/
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+
+# Arquivos do sistema operacional e IDEs locais
+.DS_Store
+Thumbs.db
+Desktop.ini
+**/.idea/

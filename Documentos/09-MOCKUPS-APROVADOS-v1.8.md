@@ -1,0 +1,216 @@
+# Mockups Aprovados — Página de Turma
+
+Versão: 1.8  
+Status: APROVADO — VISÃO COMPLETA DE ATIVIDADES E LISTAS  
+Última atualização: 26/08/2026
+
+## Objetivo
+Registrar as referências visuais específicas aprovadas para a página de turma. Estes mockups complementam a documentação funcional e o Design System.
+
+A implementação deverá respeitar o conteúdo dos documentos aprovados e usar estes mockups como referência visual. Em caso de conflito, prevalece a documentação aprovada mais recente; qualquer alteração visual relevante deve ser documentada antes de ser implementada.
+
+## Desktop
+- Etapa consolidada: **ETAPA 18 — Revisão completa do desktop**.
+- Situação: aprovada na ETAPA 19.
+- Canva — edição: https://www.canva.com/d/rjmWRV0gR1aQ1cY
+- Referência local do projeto: pasta/bundle `etapa18-revisao-desktop`.
+
+## Tablet
+- Etapa consolidada: **ETAPA 20.5 — Tablet — Contato à direita**.
+- Largura de referência do mockup: **834 px**.
+- Canva — edição: https://www.canva.com/d/UJYJQqzaqkgjv5K
+- Referência local do projeto: pasta/bundle `etapa20-5-contato-direita`.
+
+### Particularidades aprovadas
+- frase institucional em três linhas:
+  - Matemática:
+  - Mais do que uma disciplina,
+  - uma ferramenta para a vida!
+- menu principal 3 × 2;
+- menu interno da turma 4 × 2;
+- identificação e avisos empilhados;
+- compromissos verticais;
+- resumos em uma coluna;
+- botão “Falar com o Professor” à direita, com quebra controlada se necessária.
+
+## Celular
+- Etapa consolidada: **ETAPA 21.1 — Mobile — Ajustes do menu e cronograma**.
+- Largura de referência do mockup: **390 px**.
+- Canva — edição: https://www.canva.com/d/7c4vIlm02XEnvdD
+- Referência local do projeto: pasta/bundle `etapa21-1-mobile-ajustes`.
+
+### Particularidades aprovadas
+- layout em uma coluna;
+- menu principal compacto;
+- menu interno compacto com “Menu da turma” e item atual;
+- sem box branco vazio antes de “Próximos compromissos”;
+- compromissos em cards/blocos verticais;
+- “Ver cronograma completo” com quebra controlada quando necessário;
+- área “Falar com o Professor” adaptada para toque;
+- rodapé reorganizado para a largura móvel.
+
+### Estado aberto do menu interno mobile
+- Situação: aprovado em 23/08/2026.
+- Largura de referência: **390 px**.
+- Referência local temporária: `Site/src/pages/validacao-menu-mobile.astro`.
+- a caixa compacta permanece como cabeçalho;
+- a lista vertical das oito visões surge imediatamente abaixo e forma continuação visual do controle;
+- “Início da turma” representa o item ativo na prova visual aprovada;
+- fundo opaco, borda coerente, separadores discretos e linhas adequadas ao toque;
+- chevron voltado para cima no estado aberto;
+- sem drawer, modal, overlay de tela ou select nativo;
+- menu principal, cabeçalho do menu da turma e lista aberta formam uma região sticky superior opaca, sem vazamento visual;
+- desktop e tablet não são alterados por este refinamento.
+
+## Visão completa de Cronogramas
+- Situação: aprovada em 24/08/2026.
+- Referência visual local temporária: `Site/src/pages/validacao-cronogramas.astro`.
+- Larguras de validação: desktop de **1440 px**, tablet de **834 px** e mobile de **390 px**.
+
+### Desktop — 1440 px
+- título “Cronogramas”;
+- seletor com todos os períodos do regime letivo;
+- período corrente destacado e identificado por “Período atual”;
+- Total da etapa apresentado em área separada;
+- tabela principal com as colunas exatas Data/Prazo, Tipo, Descrição/Conteúdo e Valor;
+- Descrição/Conteúdo recebe a maior largura;
+- itens passados permanecem visíveis.
+
+### Tablet — 834 px
+- mesma estrutura do desktop;
+- tabela de quatro colunas preservada;
+- ausência de rolagem horizontal.
+
+### Mobile — 390 px
+- seletor de períodos em grade responsiva sem rolagem horizontal;
+- composição apta a regimes de dois, três ou quatro períodos;
+- a tabela deixa de ser visualmente tabular;
+- cada item passa a bloco vertical;
+- Data/Prazo e Valor ocupam a região superior;
+- Tipo aparece abaixo;
+- Descrição/Conteúdo vem na sequência.
+
+### Item passado
+Conforme a DEC-082 refinada pela DEC-083:
+- Data/Prazo recebe atenuação e `line-through`;
+- Tipo recebe atenuação e `line-through`;
+- Descrição/Conteúdo recebe atenuação e `line-through`;
+- Valor permanece normal, sem `line-through`, e continua integralmente contabilizado.
+
+### Total da etapa
+- é derivado da soma dos valores de todos os itens do período que possuam valor;
+- o estado temporal não interfere no cálculo;
+- item passado continua participando normalmente da soma;
+- não recebe `line-through`.
+
+### Elementos ausentes por decisão
+Não usar:
+- status manual;
+- ícone de concluído;
+- checkbox;
+- tachado no Valor;
+- notas individuais;
+- pontos previstos ou distribuídos;
+- saldo;
+- média;
+- desempenho.
+
+## Visão de Atividades e listas
+- Situação: visão completa aprovada em 26/08/2026.
+- Referência visual local temporária: `Site/src/pages/validacao-atividades-listas.astro`.
+- Larguras de validação: desktop de **1440 px**, tablet de **834 px** e mobile de **390 px**.
+- filtros, cores, borda lateral amarela, divisórias, largura geral da área, selos de Tipo, textos das fixtures e elementos compartilhados permanecem preservados;
+- listagem em uma coluna;
+- registros apresentados do mais recente para o mais antigo pela Publicação;
+- empates resolvidos por título crescente no locale pt-BR;
+- filtros visuais somente de Busca, Assunto e Tipo, ainda sem interatividade definitiva;
+- tipos visuais: Atividade e Lista de exercícios.
+
+### Metadados obrigatoriamente visíveis
+- Assunto, Publicação e Prazo aparecem em todos os registros;
+- o campo Prazo permanece opcional no modelo de conteúdo;
+- quando não houver prazo cadastrado, exibir exatamente `-`;
+- não usar “Sem prazo”, “Não informado” nem omitir o campo.
+
+### Desktop — 1440 px
+- selo de Tipo em linha própria;
+- título à esquerda e os três metadados agrupados à direita na mesma faixa horizontal;
+- título permanece como elemento visual principal;
+- metadados têm peso visual secundário;
+- o grupo de metadados usa três colunas regulares;
+- em cada coluna, rótulo e valor compartilham exatamente o mesmo eixo central;
+- larguras não são determinadas apenas pelo conteúdo.
+
+### Tablet — 834 px
+- mesma organização horizontal do desktop;
+- título e os três metadados permanecem na mesma faixa;
+- o grupo de metadados usa três colunas regulares;
+- em cada coluna, rótulo e valor compartilham exatamente o mesmo eixo central;
+- o hífen do prazo ausente permanece centralizado sob Prazo;
+- ajustes controlados de largura, gaps e tipografia;
+- ausência de overflow horizontal, sobreposição ou texto cortado.
+
+### Mobile — 390 px
+- selo de Tipo em linha própria;
+- título em linha própria;
+- Assunto, Publicação e Prazo imediatamente abaixo;
+- três colunas iguais, cada uma com exatamente um terço da largura disponível;
+- cada bloco ocupa integralmente sua coluna, independentemente do comprimento do conteúdo;
+- rótulos centralizados horizontalmente;
+- valores centralizados horizontalmente;
+- nenhum valor usa alinhamento lateral diferente, inclusive Prazo;
+- o hífen do prazo ausente permanece centralizado no terceiro terço;
+- sem bordas ou aparência de tabela;
+- ausência de overflow horizontal e sobreposição.
+
+### Corpo opcional aprovado
+- fica abaixo do cabeçalho do registro;
+- descrição opcional como texto corrido, sem box interno;
+- ausência de descrição sem elemento nem espaço reservado;
+- Recursos e Gabarito/Resolução aparecem apenas quando aplicáveis;
+- a inclusão do corpo opcional não altera filtros, selo, título, metadados nem responsividade aprovada.
+
+### Recursos
+- título de seção “RECURSOS”;
+- um ou vários nomes apresentados como links independentes;
+- URLs não aparecem em texto bruto;
+- espaçamento claro entre múltiplos recursos;
+- quebra natural responsiva;
+- sem card individual por recurso.
+
+### Gabarito / Resolução disponível
+- título exato “GABARITO / RESOLUÇÃO”;
+- mesmo tratamento visual do título “RECURSOS”;
+- título sem aparência ou comportamento de link;
+- um ou vários nomes de recursos apresentados como links independentes.
+
+### Gabarito / Resolução programado
+Antes da data de liberação, apresentar:
+
+**GABARITO / RESOLUÇÃO**  
+**Disponível em 27 ago**
+
+- a data é fixture exclusiva da referência temporária;
+- não mostrar link nem nome de recurso antes da liberação;
+- informação temporal discreta, atenuada e legível;
+- sem sublinhado, hover ou cursor de link;
+- sem cadeado, ícone, botão desabilitado, campo cinza, badge, alerta, vermelho, verde, texto de bloqueio/indisponibilidade ou contagem regressiva.
+
+A partir da própria data de liberação, a informação temporal dá lugar aos nomes dos recursos liberados como links.
+
+### Vídeos relacionados
+- suporte conceitual preservado no modelo;
+- apresentação visual adiada até a aprovação da visão completa de Vídeos;
+- sem conteúdo, seção ou placeholder nesta referência.
+
+### Ausência de registros na rota real
+- preservar Header, menu global, breadcrumb, identificação da turma, menu interno ativo, sticky e Footer;
+- não renderizar filtros, listagem, mensagem de nenhum resultado, placeholder ou fixture.
+
+## Regra de aceite visual
+Antes de considerar a página de turma concluída, comparar a implementação com as três referências responsivas da página de turma, com o protótipo aprovado do estado aberto do menu interno mobile, com as visões completas de Cronogramas e Atividades e listas em 1440 px, 834 px e 390 px e executar `08-CHECKLIST-DE-ACEITE-v1.9.md`.
+
+
+
+
+

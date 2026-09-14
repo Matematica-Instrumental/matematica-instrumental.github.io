@@ -1,0 +1,570 @@
+---
+export interface VideosViewClassification {
+  area: string;
+  subarea: string;
+  conteudo: string;
+}
+
+export interface VideosViewItem {
+  id: string;
+  titulo: string;
+  descricao: string;
+  url: string;
+  miniaturaUrl: string;
+  duracao: string;
+  prioridade: 'Essencial' | 'Recomendado' | 'Complementar';
+  classificacoes: VideosViewClassification[];
+  provedor: 'YouTube' | 'Vimeo' | 'Outro';
+  tags: string[];
+}
+
+interface Props {
+  itens: VideosViewItem[];
+}
+
+const { itens } = Astro.props;
+
+const areas = [
+  ...new Set(
+    itens.flatMap((video) =>
+      video.classificacoes.map(({ area }) => area),
+    ),
+  ),
+];
+const subareas = [
+  ...new Set(
+    itens.flatMap((video) =>
+      video.classificacoes.map(({ subarea }) => subarea),
+    ),
+  ),
+];
+const conteudos = [
+  ...new Set(
+    itens.flatMap((video) =>
+      video.classificacoes.map(({ conteudo }) => conteudo),
+    ),
+  ),
+];
+const prioridades = [
+  ...new Set(itens.map(({ prioridade }) => prioridade)),
+];
+---
+
+<section class="videos-view" aria-labelledby="videos-view-title">
+  <header class="videos-view__header">
+    <h2 id="videos-view-title">Vídeos</h2>
+  </header>
+
+  <div
+    class="videos-view__filters"
+    role="search"
+    aria-label="Filtros de vídeos"
+  >
+    <label
+      class:list={[
+        'videos-view__filter',
+        'videos-view__filter--search',
+      ]}
+    >
+      <span>Busca</span>
+      <input type="search" name="busca" autocomplete="off" />
+    </label>
+
+    <label class="videos-view__filter">
+      <span>Área</span>
+      <select name="area">
+        <option value="">Todas as áreas</option>
+        {areas.map((area) => <option value={area}>{area}</option>)}
+      </select>
+    </label>
+
+    <label class="videos-view__filter">
+      <span>Subárea</span>
+      <select name="subarea">
+        <option value="">Todas as subáreas</option>
+        {subareas.map((subarea) => <option value={subarea}>{subarea}</option>)}
+      </select>
+    </label>
+
+    <label class="videos-view__filter">
+      <span>Conteúdo</span>
+      <select name="conteudo">
+        <option value="">Todos os conteúdos</option>
+        {conteudos.map((conteudo) => <option value={conteudo}>{conteudo}</option>)}
+      </select>
+    </label>
+
+    <label class="videos-view__filter">
+      <span>Prioridade</span>
+      <select name="prioridade">
+        <option value="">Todas as prioridades</option>
+        {
+          prioridades.map((prioridade) => (
+            <option value={prioridade}>{prioridade}</option>
+          ))
+        }
+      </select>
+    </label>
+  </div>
+
+  <div class="videos-view__library" aria-label="Biblioteca de vídeos">
+    {
+      itens.map((video) => (
+        <article class="videos-view__item" id={video.id}>
+          <figure class="videos-view__thumbnail">
+            <img
+              src={video.miniaturaUrl}
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+
+            <span class="videos-view__play-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M8.6 6.2 18 12l-9.4 5.8z" />
+              </svg>
+            </span>
+
+            <span class="videos-view__duration">
+              <span class="sr-only">Duração: </span>
+              {video.duracao}
+            </span>
+          </figure>
+
+          <div class="videos-view__body">
+            <div class="videos-view__priority">
+              <span>Prioridade</span>
+              <strong>{video.prioridade}</strong>
+            </div>
+
+            <h3>{video.titulo}</h3>
+
+            <p class="videos-view__description">
+              {video.descricao}
+            </p>
+
+            <section class="videos-view__classification-section">
+              <h4>
+                {video.classificacoes.length > 1
+                  ? 'Classificações'
+                  : 'Classificação'}
+              </h4>
+
+              <ol class="videos-view__classifications">
+                {video.classificacoes.map((classificacao) => (
+                  <li class="videos-view__classification">
+                    <span>{classificacao.area}</span>
+                    <span
+                      class="videos-view__classification-arrow"
+                      aria-hidden="true"
+                    >
+                      →
+                    </span>
+                    <span>{classificacao.subarea}</span>
+                    <span
+                      class="videos-view__classification-arrow"
+                      aria-hidden="true"
+                    >
+                      →
+                    </span>
+                    <strong>{classificacao.conteudo}</strong>
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            <a
+              class="videos-view__action"
+              href={video.url}
+              target={/^https?:\/\//i.test(video.url) ? '_blank' : undefined}
+              rel={/^https?:\/\//i.test(video.url)
+                ? 'noopener noreferrer'
+                : undefined}
+              aria-label={`Ver vídeo: ${video.titulo}`}
+            >
+              Ver vídeo
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .videos-view {
+    margin: 24px 0 48px;
+    text-align: left;
+  }
+
+  .videos-view__header {
+    margin-bottom: 18px;
+  }
+
+  .videos-view__header h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 30px;
+    line-height: 1.15;
+    font-weight: 850;
+  }
+
+  .videos-view__filters {
+    margin: 0 0 20px;
+    padding: 18px 20px 20px;
+    display: grid;
+    grid-template-columns:
+      minmax(230px, 1.65fr)
+      repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    border: 1.5px solid rgba(53, 87, 242, 0.20);
+    border-radius: var(--radius-md);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(53, 87, 242, 0.045),
+        rgba(255, 255, 255, 0.98) 52%
+      );
+    box-shadow: var(--shadow-surface-light);
+  }
+
+  .videos-view__filter {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .videos-view__filter > span,
+  .videos-view__priority span,
+  .videos-view__classification-section h4 {
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+
+  .videos-view__filter input,
+  .videos-view__filter select {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 13px;
+    border: 1px solid rgba(53, 87, 242, 0.22);
+    border-radius: var(--radius-control);
+    outline: 0;
+    background: var(--color-surface);
+    color: #354052;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 650;
+  }
+
+  .videos-view__filter input:focus-visible,
+  .videos-view__filter select:focus-visible {
+    border-color: var(--color-primary-bright);
+    box-shadow: 0 0 0 3px rgba(53, 87, 242, 0.13);
+  }
+
+  .videos-view__library {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .videos-view__item {
+    min-width: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1.5px solid rgba(53, 87, 242, 0.24);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .videos-view__thumbnail {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin: 0;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    border-bottom: 1px solid rgba(53, 87, 242, 0.14);
+    background:
+      radial-gradient(
+        circle at 74% 20%,
+        rgba(242, 195, 53, 0.28),
+        transparent 35%
+      ),
+      #edf1ff;
+  }
+
+  .videos-view__thumbnail img {
+    width: 100%;
+    height: 100%;
+    padding: 26px;
+    display: block;
+    object-fit: contain;
+  }
+
+  .videos-view__play-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    background: rgba(19, 36, 74, 0.78);
+    box-shadow: 0 8px 22px rgba(19, 36, 74, 0.22);
+    transform: translate(-50%, -50%);
+  }
+
+  .videos-view__play-mark svg {
+    width: 23px;
+    height: 23px;
+    fill: #fff;
+  }
+
+  .videos-view__duration {
+    position: absolute;
+    right: 12px;
+    bottom: 11px;
+    padding: 5px 8px;
+    border-radius: var(--radius-control);
+    background: rgba(19, 36, 74, 0.88);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 850;
+    letter-spacing: 0.025em;
+  }
+
+  .videos-view__body {
+    min-width: 0;
+    padding: 23px 24px 25px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .videos-view__priority {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .videos-view__priority span {
+    color: var(--color-text-muted);
+    font-size: 10px;
+  }
+
+  .videos-view__priority strong {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.3;
+    font-weight: 800;
+  }
+
+  .videos-view__item h3 {
+    margin: 12px 0 0;
+    color: var(--color-heading);
+    font-size: 21px;
+    line-height: 1.3;
+    font-weight: 850;
+  }
+
+  .videos-view__description {
+    margin: 13px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 15px;
+    line-height: 1.58;
+    font-weight: 500;
+  }
+
+  .videos-view__classification-section {
+    width: 100%;
+    min-width: 0;
+    margin-top: 20px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .videos-view__classification-section h4 {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    letter-spacing: 0.055em;
+  }
+
+  .videos-view__classifications {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .videos-view__classification {
+    min-width: 0;
+    padding: 5px 0 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 8px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .videos-view__classification +
+    .videos-view__classification {
+    padding-top: 10px;
+    border-top: 1px dashed rgba(53, 87, 242, 0.18);
+  }
+
+  .videos-view__classification strong {
+    color: #3f4b60;
+    font-weight: 850;
+  }
+
+  .videos-view__classification-arrow {
+    flex: none;
+    color: #8a94a4;
+    font-weight: 700;
+  }
+
+  .videos-view__action {
+    min-height: 44px;
+    margin-top: auto;
+    padding: 11px 10px 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: var(--radius-control);
+    color: var(--color-primary);
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 850;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  .videos-view__action:hover {
+    background: rgba(53, 87, 242, 0.055);
+  }
+
+  .videos-view__action:focus-visible {
+    outline: 2px solid var(--color-primary-bright);
+    outline-offset: 2px;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .videos-view__filters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .videos-view__filter--search {
+      grid-column: 1 / -1;
+    }
+
+    .videos-view__library {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .videos-view__item {
+      display: grid;
+      grid-template-columns: minmax(270px, 0.82fr) minmax(0, 1.18fr);
+    }
+
+    .videos-view__thumbnail {
+      height: 100%;
+      min-height: 290px;
+      border-right: 1px solid rgba(53, 87, 242, 0.14);
+      border-bottom: 0;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .videos-view {
+      margin-top: 20px;
+    }
+
+    .videos-view__header h2 {
+      font-size: 27px;
+    }
+
+    .videos-view__filters {
+      padding: 17px;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .videos-view__filter--search {
+      grid-column: auto;
+    }
+
+    .videos-view__library {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .videos-view__item {
+      border-radius: var(--radius-lg);
+    }
+
+    .videos-view__thumbnail img {
+      padding: 20px;
+    }
+
+    .videos-view__play-mark {
+      width: 46px;
+      height: 46px;
+    }
+
+    .videos-view__body {
+      padding: 20px 19px 21px;
+    }
+
+    .videos-view__item h3 {
+      font-size: 19px;
+    }
+
+    .videos-view__description {
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .videos-view__classification {
+      gap: 5px 7px;
+      font-size: 13px;
+    }
+
+    .videos-view__action {
+      width: 100%;
+      margin-top: 8px;
+      padding: 11px 10px;
+      justify-content: center;
+    }
+  }
+</style>

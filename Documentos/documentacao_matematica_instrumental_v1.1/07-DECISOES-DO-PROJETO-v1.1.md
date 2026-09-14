@@ -1,0 +1,70 @@
+# Registro de Decisões do Projeto
+
+Versão: 1.1  
+Status: APROVADO  
+Última atualização: 21/08/2026
+
+- DEC-001 — Site independente do ChatGPT.
+- DEC-002 — Hospedagem gratuita.
+- DEC-003 — Arquivos pedagógicos no Google Drive.
+- DEC-004 — Sem cadastro de alunos.
+- DEC-005 — Organização por Segmento → Ano/Série → Turma.
+- DEC-006 — Suporte a anos letivos e arquivamento.
+- DEC-007 — Filtros obrigatórios conforme a área e o volume de conteúdo.
+- DEC-008 — Biblioteca de vídeos reutilizável.
+- DEC-009 — Vídeos com miniatura e player em modal.
+- DEC-010 — Comunicação privada, sem comentários públicos.
+- DEC-011 — E-mail obrigatório no formulário.
+- DEC-012 — Turma automática no formulário.
+- DEC-013 — Conteúdo global não deve ser duplicado por turma.
+- DEC-014 — Usar “Personalidades”.
+- DEC-015 — Área própria de Provas e Resoluções.
+- DEC-016 — Novidades: Novo, Atenção e Destaque.
+- DEC-017 — Prazos automáticos.
+- DEC-018 — Novidades com painel lateral no desktop e layouts adaptados nos demais dispositivos.
+- DEC-019 — Cabeçalho grande com identidade e foto do professor.
+- DEC-020 — Menu abaixo do cabeçalho.
+- DEC-021 — Fundo cinza e boxes diferenciados.
+- DEC-022 — Acesso rápido uniforme.
+- DEC-023 — Segmentos com distinção cromática.
+- DEC-024 — Três linhas de paletas oficiais respeitadas separadamente.
+- DEC-025 — Sistema único de ícones profissionais.
+- DEC-026 — Somente imagens com direito de reprodução compatível.
+- DEC-027 — Astro + GitHub + GitHub Pages + Pages CMS + Drive + Forms.
+- DEC-028 — Mockup aprovado da home é a referência visual oficial.
+- DEC-029 — Página de turma terá navegação própria, mantendo o contexto Segmento → Ano/Série → Turma.
+- DEC-030 — Navegação interna da turma: Início da turma | Cronogramas | Atividades e listas | Para estudar | Trabalhos | Materiais | Vídeos | Links.
+- DEC-031 — Menu principal e menu interno da turma permanecerão acessíveis durante a rolagem; cabeçalho institucional grande não precisa ficar fixo.
+- DEC-032 — Não exibir “ativa/inativa” para turmas; turmas arquivadas usarão mensagem humana de ano letivo encerrado.
+- DEC-033 — Cronogramas será a área de distribuição de pontos da turma.
+- DEC-034 — Cronogramas suportará regimes bimestral, trimestral e semestral, com 4, 3 ou 2 períodos respectivamente.
+- DEC-035 — Todos os períodos letivos serão apresentados na mesma área de Cronogramas e o período corrente será calculado por data.
+- DEC-036 — Tabela de Cronogramas usará Data/Prazo | Tipo | Descrição/Conteúdo | Valor.
+- DEC-037 — Cronogramas não armazenará notas individuais nem campos de pontos previstos/distribuídos.
+- DEC-038 — Itens do Cronograma serão tratados automaticamente como cumpridos/inativos a partir do dia seguinte ao prazo, sem campo manual de situação.
+- DEC-039 — O CMS exibirá aviso administrativo quando a soma dos itens do Cronograma ultrapassar o valor total da etapa.
+- DEC-040 — Atividades e listas terão listagem única, ordenada da publicação mais recente para a mais antiga.
+- DEC-041 — Filtros de Atividades e listas não serão necessários para exibir a lista completa; filtros apenas refinam os resultados.
+- DEC-042 — Atividades e listas poderão conter múltiplos recursos.
+- DEC-043 — Gabarito/resolução de Atividade ou Lista é opcional e pode ter liberação programada; ausência não gera campo vazio.
+- DEC-044 — Para estudar será sempre orientado a um objetivo concreto, como prova, recuperação, concurso, vestibular, ENEM, olimpíada ou equivalente.
+- DEC-045 — Para estudar poderá conter múltiplos recursos, vídeos e leituras.
+- DEC-046 — Para estudar não terá prazo manual; após a data do objetivo, permanecerá acessível com apresentação atenuada.
+- DEC-047 — Trabalhos terão documento próprio contendo todas as orientações.
+- DEC-048 — Trabalhos não terão campos separados de forma de realização, forma de entrega ou etapas.
+- DEC-049 — Trabalhos poderão conter múltiplos recursos adicionais e não terão upload por alunos ou visitantes.
+- DEC-050 — Trabalhos não terão pontuação armazenada em sua área e não exigirão relações com outras áreas.
+- DEC-051 — Novas inserções relevantes das áreas da turma alimentarão automaticamente Novidades sem duplicar o registro original.
+- DEC-052 — Materiais serão organizados por Área → Subárea → Conteúdo.
+- DEC-053 — Cada Material corresponde a um único registro e a um único arquivo/link.
+- DEC-054 — Um Material poderá possuir múltiplas classificações, inclusive em áreas ou subáreas diferentes, sem duplicação do registro.
+- DEC-055 — Materiais não terão prazo.
+- DEC-056 — Filtros de Materiais atenderão aos três níveis Área, Subárea e Conteúdo.
+- DEC-057 — Vídeos usarão classificação Área → Subárea → Conteúdo e poderão possuir múltiplas classificações.
+- DEC-058 — Vídeos manterão prioridades Essencial, Recomendado e Complementar.
+- DEC-059 — Vídeos não usarão campo ativo/inativo e não terão prazo.
+- DEC-060 — Links serão destinados a sites e recursos externos, separados de Materiais e Vídeos.
+- DEC-061 — Links poderão usar finalidade e classificação matemática opcional Área → Subárea → Conteúdo e não terão prazo ou ativo/inativo.
+- DEC-062 — Início da turma funcionará como painel-resumo, com identificação, avisos, próximos compromissos e resumos das demais áreas.
+- DEC-063 — No desktop, a página de turma usará composição inicial aproximada 2/3 + 1/3 e resumos em duas colunas quando houver espaço.
+- DEC-064 — Tablet e celular reorganizarão os componentes; no celular, tabelas deverão ser convertidas para estruturas adequadas à tela.

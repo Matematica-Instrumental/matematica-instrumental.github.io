@@ -1,0 +1,190 @@
+﻿---
+interface Aviso {
+  estado: 'Novo' | 'Atenção' | 'Destaque';
+  referencia: string;
+  texto: string;
+}
+
+interface Props {
+  avisos: Aviso[];
+  verTodosHref?: string;
+}
+
+const {
+  avisos,
+  verTodosHref,
+} = Astro.props;
+
+const estadoClass = {
+  Novo: 'alerts-panel__badge--new',
+  Atenção: 'alerts-panel__badge--attention',
+  Destaque: 'alerts-panel__badge--featured',
+};
+---
+
+<section class="alerts-panel" aria-labelledby="alerts-title">
+  <div class="alerts-panel__header">
+    <h2 id="alerts-title">Avisos da turma</h2>
+
+    {
+      verTodosHref ? (
+        <a href={verTodosHref}>Ver todos</a>
+      ) : (
+        <span class="alerts-panel__all">Ver todos</span>
+      )
+    }
+  </div>
+
+  <div class="alerts-panel__list">
+    {
+      avisos.map((aviso) => (
+        <article class="alerts-panel__item">
+          <div class="alerts-panel__top">
+            <span
+              class:list={[
+                'alerts-panel__badge',
+                estadoClass[aviso.estado],
+              ]}
+            >
+              {aviso.estado}
+            </span>
+
+            <span class="alerts-panel__date">
+              {aviso.referencia}
+            </span>
+          </div>
+
+          <p class="alerts-panel__text">
+            {aviso.texto}
+          </p>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .alerts-panel {
+    height: 280px;
+    padding: 24px;
+    display: block;
+    border: 1.5px solid rgba(53, 87, 242, 0.35);
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(53, 87, 242, 0.12),
+        rgba(3, 32, 166, 0.04)
+      );
+    box-shadow: var(--shadow-surface);
+    text-align: left;
+  }
+
+  .alerts-panel__header {
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .alerts-panel__header h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 20px;
+  }
+
+  .alerts-panel__header a,
+  .alerts-panel__all {
+    color: var(--color-primary-bright);
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .alerts-panel__list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .alerts-panel__item {
+    padding: 10px 12px;
+    border: 1px solid rgba(53, 87, 242, 0.16);
+    border-radius: var(--radius-control);
+    background: rgba(255, 255, 255, 0.76);
+  }
+
+  .alerts-panel__top {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .alerts-panel__badge {
+    padding: 3px 8px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .alerts-panel__badge--new {
+    background: rgba(53, 87, 242, 0.13);
+    color: var(--color-primary);
+  }
+
+  .alerts-panel__badge--attention {
+    background: rgba(255, 212, 82, 0.28);
+    color: #765a00;
+  }
+
+  .alerts-panel__badge--featured {
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .alerts-panel__date {
+    color: #7b8490;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .alerts-panel__text {
+    margin: 0;
+    color: #374151;
+    font-size: 13px;
+    line-height: 1.3;
+    font-weight: 700;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .alerts-panel {
+      min-height: 244px;
+      height: auto;
+      padding: 22px 24px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .alerts-panel {
+      min-height: 248px;
+      height: auto;
+      padding: 20px;
+      border-radius: var(--radius-lg);
+    }
+
+    .alerts-panel__header h2 {
+      font-size: 18px;
+    }
+
+    .alerts-panel__header a,
+    .alerts-panel__all {
+      font-size: 12px;
+    }
+  }
+</style>

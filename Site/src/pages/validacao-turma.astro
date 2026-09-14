@@ -1,0 +1,187 @@
+﻿---
+import TurmaLayout from '../layouts/TurmaLayout.astro';
+import TurmaDashboard from '../components/turma/TurmaDashboard.astro';
+
+const avisos = [
+  {
+    estado: 'Novo',
+    referencia: 'Hoje',
+    texto: 'Nova lista de exercícios disponível.',
+  },
+  {
+    estado: 'Atenção',
+    referencia: 'Próximo prazo',
+    texto: 'Confira o cronograma das próximas avaliações.',
+  },
+  {
+    estado: 'Destaque',
+    referencia: 'Em evidência',
+    texto: 'Roteiro de estudo recomendado para a turma.',
+  },
+] satisfies Array<{
+  estado: 'Novo' | 'Atenção' | 'Destaque';
+  referencia: string;
+  texto: string;
+}>;
+
+const compromissos = [
+  {
+    data: '2026-08-26',
+    tipo: 'Atividade',
+    descricao: 'Função afim — exercícios de aplicação',
+    valor: 2,
+  },
+  {
+    data: '2026-09-02',
+    tipo: 'Prova',
+    descricao: 'Funções e interpretação de gráficos',
+    valor: 6,
+  },
+  {
+    data: '2026-09-09',
+    tipo: 'Trabalho',
+    descricao: 'Aplicações de funções no cotidiano',
+    valor: 2,
+  },
+];
+
+const atividades = [
+  {
+    tipo: 'Lista de exercícios',
+    publicacao: 'Hoje',
+    titulo: 'Função afim — exercícios de aplicação',
+    assunto: 'Funções',
+    prazo: '26 ago',
+  },
+  {
+    tipo: 'Atividade',
+    publicacao: '20 ago',
+    titulo: 'Leitura e interpretação de gráficos',
+    assunto: 'Funções',
+  },
+] satisfies Array<{
+  tipo: 'Atividade' | 'Lista de exercícios';
+  publicacao: string;
+  titulo: string;
+  assunto: string;
+  prazo?: string;
+}>;
+
+const estudos = [
+  {
+    objetivo: 'Prova',
+    publicacao: 'Hoje',
+    titulo: 'Roteiro — Função afim e interpretação gráfica',
+    assunto: 'Funções',
+    dataObjetivo: '28 ago',
+  },
+  {
+    objetivo: 'ENEM',
+    publicacao: '19 ago',
+    titulo: 'Revisão orientada — razão, proporção e porcentagem',
+    assunto: 'Matemática básica',
+  },
+];
+
+const trabalhos = [
+  {
+    publicacao: 'Hoje',
+    titulo: 'Aplicações de funções no cotidiano',
+    assunto: 'Funções',
+    tipoData: 'Entrega',
+    data: '09 set',
+  },
+  {
+    publicacao: '18 ago',
+    titulo: 'Modelagem e consumo consciente de água',
+    assunto: 'Razão e proporcionalidade',
+    tipoData: 'Apresentação',
+    data: '16 set',
+  },
+] satisfies Array<{
+  publicacao: string;
+  titulo: string;
+  assunto: string;
+  tipoData: 'Entrega' | 'Apresentação';
+  data: string;
+}>;
+
+const materiais = [
+  {
+    tipo: 'PDF',
+    publicacao: 'Hoje',
+    titulo: 'Resumo — função afim e interpretação gráfica',
+    caminho: 'Álgebra → Funções → Função afim',
+  },
+  {
+    tipo: 'Arquivo',
+    publicacao: '20 ago',
+    titulo: 'Guia de revisão — razão e proporcionalidade',
+    caminho: 'Aritmética → Razões e proporções → Proporcionalidade',
+  },
+];
+
+const videos = [
+  {
+    prioridade: 'Essencial',
+    duracao: '08:42',
+    titulo: 'Como interpretar o gráfico de uma função afim',
+    caminho: 'Álgebra → Funções → Função afim',
+  },
+  {
+    prioridade: 'Recomendado',
+    duracao: '12:15',
+    titulo: 'Razões, proporções e escalas em problemas',
+    caminho: 'Aritmética → Razões e proporções → Proporcionalidade',
+  },
+] satisfies Array<{
+  prioridade: 'Essencial' | 'Recomendado' | 'Complementar';
+  duracao: string;
+  titulo: string;
+  caminho: string;
+}>;
+
+const links = [
+  {
+    finalidade: 'Explorar gráficos',
+    tipo: 'Calculadora',
+    titulo: 'GeoGebra — Calculadora Gráfica',
+    caminho: 'Álgebra → Funções → Função afim',
+  },
+  {
+    finalidade: 'Praticar problemas',
+    tipo: 'Plataforma',
+    titulo: 'Portal de desafios e problemas de matemática',
+    nota: 'Recurso externo recomendado para aprofundamento.',
+  },
+];
+---
+
+<TurmaLayout
+  title="1º ano — Turma A | Matemática Instrumental"
+  description="Página técnica de validação visual da turma."
+>
+  <TurmaDashboard
+    breadcrumb={{
+      segmento: 'Ensino Médio',
+      anoSerie: '1º ano',
+      turma: 'Turma A',
+    }}
+    identity={{
+      segmento: 'Ensino Médio',
+      anoSerie: '1º ano',
+      turma: 'Turma A',
+      anoLetivo: 2026,
+      descricao: 'Espaço da turma para acompanhar cronogramas, atividades, orientações de estudo, trabalhos e materiais de apoio.',
+    }}
+    alerts={{ avisos }}
+    navigation={{ activeItem: 'Início da turma' }}
+    commitments={{ compromissos }}
+    activities={{ itens: atividades }}
+    study={{ itens: estudos }}
+    works={{ itens: trabalhos }}
+    materials={{ itens: materiais }}
+    videos={{ itens: videos }}
+    links={{ itens: links }}
+  />
+</TurmaLayout>

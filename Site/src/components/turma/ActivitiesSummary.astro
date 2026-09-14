@@ -1,0 +1,196 @@
+﻿---
+interface ActivitySummaryItem {
+  tipo: 'Atividade' | 'Lista de exercícios';
+  publicacao: string;
+  titulo: string;
+  assunto: string;
+  prazo?: string;
+}
+
+interface Props {
+  itens: ActivitySummaryItem[];
+  verTodosHref?: string;
+}
+
+const {
+  itens,
+  verTodosHref,
+} = Astro.props;
+---
+
+<div class="activities-summary">
+  <p class="activities-summary__kicker">
+    Últimas publicações
+  </p>
+
+  {
+    itens.map((item) => (
+      <article class="activities-summary__item">
+        <div class="activities-summary__main">
+          <div class="activities-summary__meta">
+            <span class="activities-summary__type">
+              {item.tipo}
+            </span>
+
+            <span class="activities-summary__publication">
+              {item.publicacao}
+            </span>
+          </div>
+
+          <p class="activities-summary__name">
+            {item.titulo}
+          </p>
+
+          <p class="activities-summary__subject">
+            Assunto: {item.assunto}
+          </p>
+        </div>
+
+        {
+          item.prazo && (
+            <div class="activities-summary__deadline">
+              <span>Prazo</span>
+              <strong>{item.prazo}</strong>
+            </div>
+          )
+        }
+      </article>
+    ))
+  }
+
+  {
+    verTodosHref ? (
+      <a
+        class="activities-summary__link"
+        href={verTodosHref}
+      >
+        Ver todas as atividades e listas →
+      </a>
+    ) : (
+      <span class="activities-summary__link">
+        Ver todas as atividades e listas →
+      </span>
+    )
+  }
+</div>
+
+<style>
+  .activities-summary {
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .activities-summary__kicker {
+    margin: 0 0 1px;
+    color: #697386;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+
+  .activities-summary__item {
+    padding: 6px 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid rgba(53, 87, 242, 0.16);
+    border-radius: var(--radius-control);
+    background: rgba(255, 255, 255, 0.78);
+  }
+
+  .activities-summary__main {
+    min-width: 0;
+  }
+
+  .activities-summary__meta {
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .activities-summary__type {
+    padding: 3px 7px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    background: rgba(53, 87, 242, 0.12);
+    color: var(--color-primary);
+    font-size: 9px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+  }
+
+  .activities-summary__publication {
+    color: #7a8494;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .activities-summary__name {
+    margin: 0;
+    overflow: hidden;
+    color: #2f3b50;
+    font-size: 12px;
+    line-height: 1.25;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .activities-summary__subject {
+    margin: 2px 0 0;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 650;
+  }
+
+  .activities-summary__deadline {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    color: #6d5610;
+    font-size: 9px;
+    line-height: 1.15;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .activities-summary__deadline strong {
+    margin-top: 2px;
+    color: var(--color-primary);
+    font-size: 11px;
+  }
+
+  .activities-summary__link {
+    margin-top: 3px;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    color: var(--color-primary);
+    font-size: 11px;
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  @media (max-width: 767px) {
+    .activities-summary__item {
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .activities-summary__name {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+    }
+  }
+</style>

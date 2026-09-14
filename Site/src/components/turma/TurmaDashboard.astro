@@ -1,0 +1,159 @@
+---
+import type { ComponentProps } from 'astro/types';
+import Breadcrumb from './Breadcrumb.astro';
+import TurmaOverview from './TurmaOverview.astro';
+import TurmaIdentity from './TurmaIdentity.astro';
+import AlertsPanel from './AlertsPanel.astro';
+import TurmaNavigation from './TurmaNavigation.astro';
+import UpcomingCommitments from './UpcomingCommitments.astro';
+import SummaryGrid from './SummaryGrid.astro';
+import SectionSummaryCard from './SectionSummaryCard.astro';
+import ActivitiesSummary from './ActivitiesSummary.astro';
+import StudySummary from './StudySummary.astro';
+import WorksSummary from './WorksSummary.astro';
+import MaterialsSummary from './MaterialsSummary.astro';
+import VideosSummary from './VideosSummary.astro';
+import LinksSummary from './LinksSummary.astro';
+import ContactCTA from './ContactCTA.astro';
+
+interface Props {
+  breadcrumb: ComponentProps<typeof Breadcrumb>;
+  identity: ComponentProps<typeof TurmaIdentity>;
+  alerts?: ComponentProps<typeof AlertsPanel>;
+  navigation: ComponentProps<typeof TurmaNavigation>;
+  commitments?: ComponentProps<typeof UpcomingCommitments>;
+  activities?: ComponentProps<typeof ActivitiesSummary>;
+  study?: ComponentProps<typeof StudySummary>;
+  works?: ComponentProps<typeof WorksSummary>;
+  materials?: ComponentProps<typeof MaterialsSummary>;
+  videos?: ComponentProps<typeof VideosSummary>;
+  links?: ComponentProps<typeof LinksSummary>;
+  contact?: ComponentProps<typeof ContactCTA>;
+}
+
+const {
+  breadcrumb,
+  identity,
+  alerts,
+  navigation,
+  commitments,
+  activities,
+  study,
+  works,
+  materials,
+  videos,
+  links,
+  contact = {},
+} = Astro.props;
+
+const hasSummaries = [
+  activities,
+  study,
+  works,
+  materials,
+  videos,
+  links,
+].some((summary) => (summary?.itens.length ?? 0) > 0);
+---
+
+<Breadcrumb {...breadcrumb} />
+
+{
+  alerts && alerts.avisos.length > 0 ? (
+    <TurmaOverview>
+      <TurmaIdentity
+        slot="identity"
+        {...identity}
+      />
+
+      <AlertsPanel
+        slot="alerts"
+        {...alerts}
+      />
+    </TurmaOverview>
+  ) : (
+    <TurmaIdentity {...identity} />
+  )
+}
+
+<TurmaNavigation {...navigation} />
+
+{
+  commitments && commitments.compromissos.length > 0 && (
+    <UpcomingCommitments {...commitments} />
+  )
+}
+
+{
+  hasSummaries && (
+    <SummaryGrid>
+      {
+        activities && activities.itens.length > 0 && (
+          <SectionSummaryCard
+            title="Atividades e listas"
+            variant="activities"
+          >
+            <ActivitiesSummary {...activities} />
+          </SectionSummaryCard>
+        )
+      }
+
+      {
+        study && study.itens.length > 0 && (
+          <SectionSummaryCard
+            title="Para estudar"
+            variant="study"
+          >
+            <StudySummary {...study} />
+          </SectionSummaryCard>
+        )
+      }
+
+      {
+        works && works.itens.length > 0 && (
+          <SectionSummaryCard
+            title="Trabalhos"
+            variant="works"
+          >
+            <WorksSummary {...works} />
+          </SectionSummaryCard>
+        )
+      }
+
+      {
+        materials && materials.itens.length > 0 && (
+          <SectionSummaryCard
+            title="Materiais"
+            variant="materials"
+          >
+            <MaterialsSummary {...materials} />
+          </SectionSummaryCard>
+        )
+      }
+
+      {
+        videos && videos.itens.length > 0 && (
+          <SectionSummaryCard
+            title="Vídeos"
+            variant="videos"
+          >
+            <VideosSummary {...videos} />
+          </SectionSummaryCard>
+        )
+      }
+
+      {
+        links && links.itens.length > 0 && (
+          <SectionSummaryCard
+            title="Links"
+            variant="links"
+          >
+            <LinksSummary {...links} />
+          </SectionSummaryCard>
+        )
+      }
+    </SummaryGrid>
+  )
+}
+
+<ContactCTA {...contact} />

@@ -1,0 +1,380 @@
+﻿---
+interface Compromisso {
+  data: string;
+  tipo: string;
+  descricao: string;
+  valor?: number;
+}
+
+interface Props {
+  compromissos: Compromisso[];
+  cronogramaHref?: string;
+}
+
+const {
+  compromissos,
+  cronogramaHref,
+} = Astro.props;
+
+const meses = [
+  'jan',
+  'fev',
+  'mar',
+  'abr',
+  'mai',
+  'jun',
+  'jul',
+  'ago',
+  'set',
+  'out',
+  'nov',
+  'dez',
+];
+
+const formatarData = (data: string) => {
+  const [, mes, dia] = data.split('-');
+
+  return {
+    dia,
+    mes: meses[Number(mes) - 1] ?? '',
+  };
+};
+
+const formatarValor = (valor: number) =>
+  `${new Intl.NumberFormat('pt-BR', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(valor)} pts`;
+---
+
+<section
+  class="upcoming-commitments"
+  aria-labelledby="upcoming-commitments-title"
+>
+  <div class="upcoming-commitments__header">
+    <div class="upcoming-commitments__title-wrap">
+      <div class="upcoming-commitments__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="16" rx="2" />
+          <path d="M16 3v4" />
+          <path d="M8 3v4" />
+          <path d="M3 11h18" />
+        </svg>
+      </div>
+
+      <div>
+        <h2 id="upcoming-commitments-title">
+          Próximos compromissos
+        </h2>
+
+        <p class="upcoming-commitments__subtitle">
+          Resumo dos próximos itens do cronograma da turma.
+        </p>
+      </div>
+    </div>
+
+    {
+      cronogramaHref ? (
+        <a
+          class="upcoming-commitments__link"
+          href={cronogramaHref}
+        >
+          <span>Ver cronograma</span>{' '}<span>completo →</span>
+        </a>
+      ) : (
+        <span class="upcoming-commitments__link">
+          <span>Ver cronograma</span>{' '}<span>completo →</span>
+        </span>
+      )
+    }
+  </div>
+
+  <div class="upcoming-commitments__grid">
+    {
+      compromissos.map((compromisso) => {
+        const dataFormatada = formatarData(compromisso.data);
+
+        return (
+          <article class="upcoming-commitments__card">
+            <div class="upcoming-commitments__date">
+              <span class="upcoming-commitments__day">
+                {dataFormatada.dia}
+              </span>
+
+              <span class="upcoming-commitments__month">
+                {dataFormatada.mes}
+              </span>
+            </div>
+
+            <div>
+              <span class="upcoming-commitments__type">
+                {compromisso.tipo}
+              </span>
+
+              <p class="upcoming-commitments__description">
+                {compromisso.descricao}
+              </p>
+            </div>
+
+            {
+              compromisso.valor !== undefined && (
+                <div class="upcoming-commitments__value">
+                  {formatarValor(compromisso.valor)}
+                </div>
+              )
+            }
+          </article>
+        );
+      })
+    }
+  </div>
+</section>
+
+<style>
+  .upcoming-commitments {
+    min-height: 240px;
+    margin-top: 24px;
+    padding: 24px 26px 22px;
+    display: block;
+    border: 1.5px solid rgba(53, 87, 242, 0.28);
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(53, 87, 242, 0.10),
+        rgba(255, 255, 255, 0.94)
+      );
+    box-shadow: 0 8px 24px rgba(30, 45, 70, 0.055);
+    text-align: left;
+  }
+
+  .upcoming-commitments__header {
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .upcoming-commitments__title-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .upcoming-commitments__icon {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: var(--radius-control);
+    background: rgba(53, 87, 242, 0.12);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .upcoming-commitments__icon svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .upcoming-commitments__header h2 {
+    margin: 0 0 4px;
+    color: var(--color-heading);
+    font-size: 22px;
+    line-height: 1.1;
+  }
+
+  .upcoming-commitments__subtitle {
+    margin: 0;
+    color: #657083;
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 600;
+  }
+
+  .upcoming-commitments__link {
+    padding-top: 4px;
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .upcoming-commitments__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .upcoming-commitments__card {
+    min-width: 0;
+    padding: 14px 15px;
+    display: grid;
+    grid-template-columns: 66px 1fr auto;
+    gap: 13px;
+    align-items: center;
+    border: 1px solid rgba(53, 87, 242, 0.16);
+    border-radius: var(--radius-card);
+    background: rgba(255, 255, 255, 0.90);
+  }
+
+  .upcoming-commitments__date {
+    padding-right: 12px;
+    border-right: 1px solid rgba(53, 87, 242, 0.14);
+    text-align: center;
+  }
+
+  .upcoming-commitments__day {
+    display: block;
+    color: var(--color-primary);
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 900;
+  }
+
+  .upcoming-commitments__month {
+    margin-top: 4px;
+    display: block;
+    color: #70798a;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .upcoming-commitments__type {
+    margin-bottom: 5px;
+    padding: 3px 7px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    background: rgba(242, 195, 53, 0.20);
+    color: #6d5610;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .upcoming-commitments__description {
+    margin: 0;
+    color: #354052;
+    font-size: 13px;
+    line-height: 1.28;
+    font-weight: 750;
+  }
+
+  .upcoming-commitments__value {
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .upcoming-commitments {
+      min-height: 0;
+      margin-top: 20px;
+      padding: 22px 24px;
+    }
+
+    .upcoming-commitments__header {
+      margin-bottom: 15px;
+    }
+
+    .upcoming-commitments__grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .upcoming-commitments__card {
+      min-height: 74px;
+      grid-template-columns: 72px 1fr auto;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .upcoming-commitments {
+      min-height: 0;
+      margin-top: 16px;
+      padding: 20px;
+      border-radius: var(--radius-lg);
+    }
+
+    .upcoming-commitments__header {
+      margin-bottom: 14px;
+      gap: 12px;
+    }
+
+    .upcoming-commitments__title-wrap {
+      gap: 10px;
+    }
+
+    .upcoming-commitments__icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .upcoming-commitments__header h2 {
+      font-size: 19px;
+    }
+
+    .upcoming-commitments__subtitle {
+      font-size: 11px;
+    }
+
+    .upcoming-commitments__link {
+      padding-top: 2px;
+      font-size: 11px;
+      line-height: 1.15;
+      text-align: right;
+      white-space: normal;
+    }
+
+    .upcoming-commitments__link span {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .upcoming-commitments__grid {
+      grid-template-columns: 1fr;
+      gap: 9px;
+    }
+
+    .upcoming-commitments__card {
+      min-height: 92px;
+      padding: 12px;
+      grid-template-columns: 58px 1fr;
+      grid-template-rows: auto auto;
+      gap: 8px 11px;
+    }
+
+    .upcoming-commitments__date {
+      padding-right: 10px;
+      grid-row: 1 / 3;
+    }
+
+    .upcoming-commitments__day {
+      font-size: 20px;
+    }
+
+    .upcoming-commitments__description {
+      font-size: 12px;
+    }
+
+    .upcoming-commitments__value {
+      grid-column: 2;
+      grid-row: 2;
+      justify-self: start;
+      font-size: 11px;
+    }
+  }
+</style>

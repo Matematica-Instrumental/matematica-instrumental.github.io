@@ -1,0 +1,274 @@
+﻿---
+type VideoPriority =
+  | 'Essencial'
+  | 'Recomendado'
+  | 'Complementar';
+
+interface VideoSummaryItem {
+  prioridade: VideoPriority;
+  duracao: string;
+  titulo: string;
+  caminho: string;
+  assistirHref?: string;
+}
+
+interface Props {
+  itens: VideoSummaryItem[];
+  verTodosHref?: string;
+}
+
+const {
+  itens,
+  verTodosHref,
+} = Astro.props;
+
+const priorityClass: Record<VideoPriority, string | undefined> = {
+  Essencial: 'videos-summary__priority--essential',
+  Recomendado: 'videos-summary__priority--recommended',
+  Complementar: undefined,
+};
+---
+
+<div class="videos-summary">
+  {
+    itens.map((item) => (
+      <article class="videos-summary__item">
+        <div
+          class="videos-summary__thumbnail"
+          aria-label="Miniatura 16 por 9"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+
+        <div class="videos-summary__main">
+          <div class="videos-summary__meta">
+            <span
+              class:list={[
+                'videos-summary__priority',
+                priorityClass[item.prioridade],
+              ]}
+            >
+              {item.prioridade}
+            </span>
+
+            <span class="videos-summary__duration">
+              {item.duracao}
+            </span>
+          </div>
+
+          <p class="videos-summary__name">
+            {item.titulo}
+          </p>
+
+          <p class="videos-summary__path">
+            {item.caminho}
+          </p>
+        </div>
+
+        {
+          item.assistirHref ? (
+            <a
+              class="videos-summary__open"
+              href={item.assistirHref}
+            >
+              Assistir ↗
+            </a>
+          ) : (
+            <span class="videos-summary__open">
+              Assistir ↗
+            </span>
+          )
+        }
+      </article>
+    ))
+  }
+
+  {
+    verTodosHref ? (
+      <a
+        class="videos-summary__link"
+        href={verTodosHref}
+      >
+        Ver todos os vídeos →
+      </a>
+    ) : (
+      <span class="videos-summary__link">
+        Ver todos os vídeos →
+      </span>
+    )
+  }
+</div>
+
+<style>
+  .videos-summary {
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .videos-summary__item {
+    min-height: 58px;
+    padding: 7px 9px;
+    display: grid;
+    grid-template-columns: 92px 1fr auto;
+    gap: 9px;
+    align-items: center;
+    border: 1px solid rgba(53, 87, 242, 0.15);
+    border-radius: var(--radius-small);
+    background: rgba(255, 255, 255, 0.76);
+  }
+
+  .videos-summary__thumbnail {
+    position: relative;
+    width: 92px;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(53, 87, 242, 0.18);
+    border-radius: var(--radius-thumbnail);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(53, 87, 242, 0.20),
+        rgba(3, 32, 166, 0.11),
+        rgba(255, 212, 82, 0.14)
+      );
+    color: var(--color-primary);
+  }
+
+  .videos-summary__thumbnail::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 2px 7px rgba(3, 32, 166, 0.12);
+  }
+
+  .videos-summary__thumbnail svg {
+    position: relative;
+    z-index: 2;
+    width: 12px;
+    height: 12px;
+    margin-left: 2px;
+    fill: var(--color-primary);
+    stroke: none;
+  }
+
+  .videos-summary__main {
+    min-width: 0;
+  }
+
+  .videos-summary__meta {
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .videos-summary__priority {
+    padding: 3px 7px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    font-size: 9px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .videos-summary__priority--essential {
+    background: rgba(53, 87, 242, 0.13);
+    color: var(--color-primary);
+  }
+
+  .videos-summary__priority--recommended {
+    background: rgba(255, 212, 82, 0.22);
+    color: #765a00;
+  }
+
+  .videos-summary__duration {
+    color: #7a8494;
+    font-size: 10px;
+    font-weight: 750;
+    white-space: nowrap;
+  }
+
+  .videos-summary__name {
+    margin: 0;
+    overflow: hidden;
+    color: #2f3b50;
+    font-size: 12px;
+    line-height: 1.22;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .videos-summary__path {
+    margin: 2px 0 0;
+    overflow: hidden;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1.18;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .videos-summary__open {
+    color: var(--color-primary);
+    font-size: 10px;
+    font-weight: 900;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .videos-summary__link {
+    margin-top: 3px;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    color: var(--color-primary);
+    font-size: 11px;
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  @media (max-width: 767px) {
+    .videos-summary__item {
+      min-height: 74px;
+      grid-template-columns: 72px 1fr;
+      grid-template-rows: auto auto;
+      gap: 8px;
+    }
+
+    .videos-summary__thumbnail {
+      width: 72px;
+      grid-row: 1 / 3;
+    }
+
+    .videos-summary__name,
+    .videos-summary__path {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+    }
+
+    .videos-summary__open {
+      grid-column: 2;
+      justify-self: start;
+    }
+  }
+</style>
+
+

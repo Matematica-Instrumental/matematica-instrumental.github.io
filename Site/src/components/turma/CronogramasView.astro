@@ -1,0 +1,608 @@
+---
+export interface CronogramasViewPeriodo {
+  nome: string;
+  corrente: boolean;
+  selecionado: boolean;
+}
+
+export interface CronogramasViewItem {
+  data: string;
+  tipo: string;
+  descricao: string;
+  valor?: number;
+  passado: boolean;
+}
+
+interface Props {
+  periodos: CronogramasViewPeriodo[];
+  itensCronograma: CronogramasViewItem[];
+  totalEtapa: number;
+}
+
+const {
+  periodos,
+  itensCronograma,
+  totalEtapa,
+} = Astro.props;
+
+const formatarData = (data: string) => {
+  const [ano, mes, dia] = data.split('-');
+
+  return `${dia}/${mes}/${ano}`;
+};
+
+const formatarValor = (valor: number) =>
+  `${new Intl.NumberFormat('pt-BR').format(valor)} pontos`;
+---
+
+<section
+    class="cronogramas-validation"
+    aria-labelledby="cronogramas-validation-title"
+  >
+    <header class="cronogramas-validation__header">
+      <h2 id="cronogramas-validation-title">Cronogramas</h2>
+    </header>
+
+    <div
+      class="cronogramas-validation__periods"
+      aria-label="Períodos letivos"
+    >
+      {
+        periodos.map((periodo) => (
+          <div
+            class:list={[
+              'cronogramas-validation__period',
+              {
+                'cronogramas-validation__period--selected': periodo.selecionado,
+              },
+            ]}
+            aria-current={periodo.corrente ? 'true' : undefined}
+          >
+            <span>{periodo.nome}</span>
+
+            {
+              periodo.corrente && (
+                <small>Período atual</small>
+              )
+            }
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="cronogramas-validation__schedule">
+      <div class="cronogramas-validation__summary">
+        <span>Total da etapa</span>
+        <strong>{formatarValor(totalEtapa)}</strong>
+      </div>
+
+      <div class="cronogramas-validation__table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Data/Prazo</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Descrição/Conteúdo</th>
+              <th scope="col">Valor</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {
+              itensCronograma.map((item) => (
+                <tr
+                  class:list={{
+                    'cronogramas-validation__row--past': item.passado,
+                  }}
+                >
+                  <td
+                    class="cronogramas-validation__date"
+                    data-label="Data/Prazo"
+                  >
+                    <span class="cronogramas-validation__item-content">
+                      {formatarData(item.data)}
+                    </span>
+                  </td>
+                  <td
+                    class="cronogramas-validation__type-cell"
+                    data-label="Tipo"
+                  >
+                    <span class="cronogramas-validation__type">
+                      <span class="cronogramas-validation__item-content">
+                        {item.tipo}
+                      </span>
+                    </span>
+                  </td>
+                  <td
+                    class="cronogramas-validation__description"
+                    data-label="Descrição/Conteúdo"
+                  >
+                    <span class="cronogramas-validation__item-content">
+                      {item.descricao}
+                    </span>
+                  </td>
+                  <td
+                    class="cronogramas-validation__value"
+                    data-label="Valor"
+                  >
+                    <span class="cronogramas-validation__item-content">
+                      {item.valor !== undefined && formatarValor(item.valor)}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+<style>
+  .cronogramas-validation {
+    margin: 24px 0 48px;
+    text-align: left;
+  }
+
+  .cronogramas-validation__header {
+    margin-bottom: 18px;
+  }
+
+  .cronogramas-validation__header h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 30px;
+    line-height: 1.15;
+    font-weight: 850;
+  }
+
+  .cronogramas-validation__periods {
+    margin-bottom: 18px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    overflow: hidden;
+    border: 1.5px solid rgba(53, 87, 242, 0.24);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface-light);
+  }
+
+  .cronogramas-validation__period {
+    position: relative;
+    min-height: 76px;
+    padding: 15px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-right: 1px solid rgba(53, 87, 242, 0.12);
+    color: #586172;
+    font-size: 15px;
+    line-height: 1.2;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .cronogramas-validation__period:last-child {
+    border-right: 0;
+  }
+
+  .cronogramas-validation__period--selected {
+    color: var(--color-primary);
+    background:
+      linear-gradient(
+        180deg,
+        rgba(53, 87, 242, 0.11),
+        rgba(53, 87, 242, 0.04)
+      );
+  }
+
+  .cronogramas-validation__period--selected::after {
+    content: '';
+    position: absolute;
+    right: 12%;
+    bottom: 0;
+    left: 12%;
+    height: 4px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+  }
+
+  .cronogramas-validation__period small {
+    color: var(--color-primary-bright);
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .cronogramas-validation__schedule {
+    overflow: hidden;
+    border: 1.5px solid rgba(53, 87, 242, 0.24);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .cronogramas-validation__summary {
+    min-height: 78px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 18px;
+    border-bottom: 1px solid rgba(53, 87, 242, 0.13);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(53, 87, 242, 0.07),
+        rgba(255, 255, 255, 0.97)
+      );
+  }
+
+  .cronogramas-validation__summary span {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-weight: 750;
+  }
+
+  .cronogramas-validation__summary strong {
+    min-width: 116px;
+    padding: 10px 14px;
+    border: 1px solid rgba(53, 87, 242, 0.20);
+    border-radius: var(--radius-control);
+    background: rgba(53, 87, 242, 0.08);
+    color: var(--color-primary);
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 900;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .cronogramas-validation__table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .cronogramas-validation table {
+    width: 100%;
+    min-width: 860px;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .cronogramas-validation th,
+  .cronogramas-validation td {
+    padding: 17px 20px;
+    border-bottom: 1px solid rgba(53, 87, 242, 0.10);
+    vertical-align: middle;
+  }
+
+  .cronogramas-validation th {
+    background: #f4f6fb;
+    color: var(--color-heading);
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: 0.025em;
+    text-align: left;
+  }
+
+  .cronogramas-validation th:nth-child(1) {
+    width: 170px;
+  }
+
+  .cronogramas-validation th:nth-child(2) {
+    width: 170px;
+  }
+
+  .cronogramas-validation th:nth-child(4) {
+    width: 140px;
+    text-align: right;
+  }
+
+  .cronogramas-validation tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .cronogramas-validation td {
+    color: #354052;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .cronogramas-validation__row--past {
+    background: #f8f9fb;
+  }
+
+  .cronogramas-validation__row--past
+    td:not(.cronogramas-validation__value) {
+    color: #7c8491;
+  }
+
+  .cronogramas-validation__row--past
+    .cronogramas-validation__date
+    .cronogramas-validation__item-content,
+  .cronogramas-validation__row--past
+    .cronogramas-validation__type-cell
+    .cronogramas-validation__item-content,
+  .cronogramas-validation__row--past
+    .cronogramas-validation__description
+    .cronogramas-validation__item-content {
+    opacity: 0.62;
+    text-decoration-line: line-through;
+    text-decoration-thickness: 1px;
+    text-decoration-color: currentColor;
+  }
+
+  .cronogramas-validation__date {
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .cronogramas-validation__type {
+    padding: 5px 9px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    background: rgba(53, 87, 242, 0.08);
+    color: var(--color-primary);
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 850;
+    white-space: nowrap;
+  }
+
+  .cronogramas-validation__row--past
+    .cronogramas-validation__type {
+    background: rgba(107, 116, 131, 0.09);
+    color: #737b87;
+  }
+
+  .cronogramas-validation__description {
+    font-weight: 750;
+  }
+
+  .cronogramas-validation__value {
+    color: var(--color-primary);
+    font-weight: 900;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .cronogramas-validation {
+      margin: 20px 0 40px;
+    }
+
+    .cronogramas-validation__header {
+      margin-bottom: 16px;
+    }
+
+    .cronogramas-validation__header h2 {
+      font-size: 28px;
+    }
+
+    .cronogramas-validation__periods {
+      margin-bottom: 16px;
+    }
+
+    .cronogramas-validation__period {
+      min-height: 72px;
+      padding: 14px 16px;
+      font-size: 14px;
+    }
+
+    .cronogramas-validation__summary {
+      min-height: 72px;
+      padding: 14px 20px;
+      gap: 16px;
+    }
+
+    .cronogramas-validation__summary strong {
+      min-width: 108px;
+      padding: 9px 12px;
+      font-size: 15px;
+    }
+
+    .cronogramas-validation__table-scroll {
+      overflow-x: hidden;
+    }
+
+    .cronogramas-validation table {
+      min-width: 0;
+    }
+
+    .cronogramas-validation th,
+    .cronogramas-validation td {
+      padding: 15px 12px;
+    }
+
+    .cronogramas-validation th {
+      font-size: 11px;
+    }
+
+    .cronogramas-validation th:nth-child(1) {
+      width: 126px;
+    }
+
+    .cronogramas-validation th:nth-child(2) {
+      width: 120px;
+    }
+
+    .cronogramas-validation th:nth-child(4) {
+      width: 104px;
+    }
+
+    .cronogramas-validation td {
+      font-size: 13px;
+    }
+
+    .cronogramas-validation__type {
+      padding: 5px 8px;
+      font-size: 10px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .cronogramas-validation {
+      margin: 16px 0 32px;
+    }
+
+    .cronogramas-validation__header {
+      margin-bottom: 14px;
+    }
+
+    .cronogramas-validation__header h2 {
+      font-size: 24px;
+    }
+
+    .cronogramas-validation__periods {
+      margin-bottom: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-radius: var(--radius-card);
+    }
+
+    .cronogramas-validation__period {
+      min-height: 64px;
+      padding: 12px 10px;
+      gap: 4px;
+      border-right: 0;
+      border-bottom: 1px solid rgba(53, 87, 242, 0.12);
+      font-size: 13px;
+    }
+
+    .cronogramas-validation__period:nth-child(odd) {
+      border-right: 1px solid rgba(53, 87, 242, 0.12);
+    }
+
+    .cronogramas-validation__period:nth-last-child(2):nth-child(odd),
+    .cronogramas-validation__period:last-child:nth-child(even) {
+      border-bottom: 0;
+    }
+
+    .cronogramas-validation__period:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      border-right: 0;
+      border-bottom: 0;
+    }
+
+    .cronogramas-validation__period small {
+      font-size: 9px;
+    }
+
+    .cronogramas-validation__period--selected::after {
+      right: 12%;
+      left: 12%;
+      height: 3px;
+    }
+
+    .cronogramas-validation__schedule {
+      border-radius: var(--radius-lg);
+    }
+
+    .cronogramas-validation__summary {
+      min-height: 66px;
+      padding: 13px 16px;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .cronogramas-validation__summary span {
+      font-size: 12px;
+    }
+
+    .cronogramas-validation__summary strong {
+      min-width: 102px;
+      padding: 9px 11px;
+      font-size: 14px;
+    }
+
+    .cronogramas-validation__table-scroll {
+      overflow-x: hidden;
+    }
+
+    .cronogramas-validation table,
+    .cronogramas-validation tbody {
+      width: 100%;
+      min-width: 0;
+      display: block;
+    }
+
+    .cronogramas-validation thead {
+      display: none;
+    }
+
+    .cronogramas-validation tbody tr {
+      width: 100%;
+      padding: 15px 16px 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'date value'
+        'type type'
+        'description description';
+      gap: 12px 16px;
+      border-bottom: 1px solid rgba(53, 87, 242, 0.10);
+    }
+
+    .cronogramas-validation tbody tr:last-child {
+      border-bottom: 0;
+    }
+
+    .cronogramas-validation th,
+    .cronogramas-validation td {
+      width: auto;
+      padding: 0;
+      display: block;
+      border-bottom: 0;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .cronogramas-validation td::before {
+      content: attr(data-label);
+      margin-bottom: 5px;
+      display: block;
+      color: var(--color-text-muted);
+      font-size: 9px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0.055em;
+      text-decoration: none;
+      text-transform: uppercase;
+      opacity: 1;
+    }
+
+    .cronogramas-validation__date {
+      grid-area: date;
+    }
+
+    .cronogramas-validation td:nth-child(2) {
+      grid-area: type;
+    }
+
+    .cronogramas-validation__description {
+      grid-area: description;
+      line-height: 1.35;
+    }
+
+    .cronogramas-validation__value {
+      grid-area: value;
+      text-align: right;
+    }
+
+    .cronogramas-validation__value::before {
+      text-align: right;
+    }
+
+    .cronogramas-validation__type {
+      padding: 5px 8px;
+      font-size: 10px;
+    }
+  }
+</style>

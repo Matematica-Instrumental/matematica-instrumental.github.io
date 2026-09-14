@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Etapa 21 — Mobile</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background:#efefef; color:#333; }
+  body { width: 1440px; min-height: 2500px; }
+  .page { width: 1440px; min-height: 2500px; background:#efefef; padding-bottom:48px; }
+  .header { height:180px; background:#ffffff; border-bottom:2px solid #b8b8b8; }
+  .header-inner { width:1240px; height:180px; margin:0 auto; display:grid; grid-template-columns:260px 1fr 470px; align-items:center; gap:28px; }
+  .brand-symbol { display:flex; align-items:center; justify-content:flex-start; height:100%; }
+  .brand-symbol img { width:145px; height:auto; display:block; }
+  .brand-name { display:flex; align-items:center; justify-content:center; height:100%; }
+  .brand-name img { width:405px; height:auto; display:block; }
+  .prof-area { display:grid; grid-template-columns:1fr 126px; gap:20px; align-items:center; }
+  .prof-copy { color:#16233c; line-height:1.32; display:flex; align-items:center; justify-content:center; }
+  .phrase { font-size:17px; font-weight:700; margin:0; text-align:center; padding:14px 16px; border-radius:14px; background:linear-gradient(135deg, rgba(242,195,53,.18), rgba(255,212,82,.08)); border:1px solid rgba(166,129,20,.35); }
+  .photo-block { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; }
+  .photo-block img { width:108px; height:108px; border-radius:50%; object-fit:cover; display:block; }
+  .prof-name { font-size:14px; font-weight:700; margin:0; color:#245eaa; text-align:center; line-height:1.2; }
+  .global-menu { height:68px; background:#0320A6; border-bottom:3px solid #F2C335; color:#fff; }
+   .global-menu-inner { width:1340px; height:68px; margin:0 auto; display:flex; flex-direction:row; flex-wrap:nowrap; align-items:stretch; justify-content:space-between; gap:0; }
+   .menu-item { position:relative; display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; justify-content:center; gap:8px; padding:0 12px; color:#fff; font-size:13px; font-weight:700; white-space:nowrap; text-align:center; min-width:0; }
+  .menu-item:nth-child(1) { flex:0.75 1 0; }
+  .menu-item:nth-child(2) { flex:0.80 1 0; }
+  .menu-item:nth-child(3) { flex:1.30 1 0; }
+  .menu-item:nth-child(4) { flex:1.45 1 0; }
+  .menu-item:nth-child(5) { flex:1.50 1 0; }
+  .menu-item:nth-child(6) { flex:1.25 1 0; }
+  .menu-item span { display:block; white-space:nowrap; }
+  .menu-item svg { width:23px; height:23px; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .menu-item.active { background:rgba(53,87,242,.48); }
+  .menu-item.active::after { content:""; position:absolute; left:14px; right:14px; bottom:0; height:4px; background:#FFD452; border-radius:4px 4px 0 0; }
+  .menu-item.contact { color:#FFD452; }
+
+  .shell { width:1240px; margin:0 auto; }
+  .breadcrumb { height:64px; display:flex; align-items:center; gap:10px; font-size:15px; font-weight:600; color:#556070; }
+  .breadcrumb .crumb { color:#3557F2; white-space:nowrap; }
+  .breadcrumb .current { color:#16233c; font-weight:700; white-space:nowrap; }
+  .breadcrumb .sep { color:#9aa3ad; font-size:19px; font-weight:400; line-height:1; }
+  .split { display:grid; grid-template-columns: 2fr 1fr; gap:24px; }
+  .box { background:#fff; border:2px solid #bdbdbd; border-radius:18px; display:flex; align-items:center; justify-content:center; text-align:center; font-weight:700; color:#555; }
+  .hero { height:280px; padding:28px 32px; display:block; text-align:left; position:relative; overflow:hidden; background:linear-gradient(135deg, rgba(255,212,82,.25), rgba(242,195,53,.08)); border:1.5px solid rgba(166,129,20,.45); box-shadow:0 8px 24px rgba(30,45,70,.06); }
+  .hero::before { content:""; position:absolute; left:0; top:0; bottom:0; width:7px; background:#F2C335; }
+  .segment { display:inline-flex; align-items:center; gap:8px; padding:6px 11px; border-radius:999px; background:rgba(242,195,53,.20); color:#705810; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+  .hero h1 { margin:18px 0 6px; color:#16233c; font-size:32px; line-height:1.1; }
+  .school-year { margin:0; color:#665f4b; font-size:15px; font-weight:700; }
+  .hero-desc { margin:16px 0 0; max-width:670px; color:#4b5362; font-size:16px; line-height:1.45; font-weight:500; }
+  .hero-btn { display:inline-flex; align-items:center; gap:8px; padding:11px 16px; border-radius:10px; background:#0320A6; color:#fff; font-size:14px; font-weight:800; }
+  .hero-btn svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+  .notices { height:280px; padding:24px; display:block; text-align:left; background:linear-gradient(135deg, rgba(53,87,242,.12), rgba(3,32,166,.04)); border:1.5px solid rgba(53,87,242,.35); box-shadow:0 8px 24px rgba(30,45,70,.06); }
+  .notice-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .notice-head h2 { margin:0; color:#16233c; font-size:20px; }
+  .notice-head a { color:#3557F2; font-size:13px; font-weight:800; text-decoration:none; }
+  .notice-list { display:flex; flex-direction:column; gap:10px; }
+  .notice-item { background:rgba(255,255,255,.76); border:1px solid rgba(53,87,242,.16); border-radius:11px; padding:10px 12px; }
+  .notice-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:5px; }
+  .badge { display:inline-flex; align-items:center; padding:3px 8px; border-radius:999px; font-size:10px; font-weight:900; letter-spacing:.04em; text-transform:uppercase; }
+  .badge.new { background:rgba(53,87,242,.13); color:#0320A6; }
+  .badge.attention { background:rgba(255,212,82,.28); color:#765a00; }
+  .badge.featured { background:#0320A6; color:#fff; }
+  .notice-date { font-size:11px; color:#7b8490; font-weight:700; }
+  .notice-text { margin:0; color:#374151; font-size:13px; line-height:1.3; font-weight:700; }
+  .local-menu { margin-top:24px; height:72px; background:#ffffff; border:1.5px solid rgba(53,87,242,.28); border-radius:14px; box-shadow:0 7px 20px rgba(30,45,70,.055); overflow:hidden; }
+  .local-menu-inner { width:100%; height:100%; display:grid; grid-template-columns:1.15fr .95fr 1.35fr 1.05fr .85fr .85fr .70fr .62fr; align-items:stretch; }
+  .local-item { position:relative; min-width:0; display:flex; align-items:center; justify-content:center; padding:0 10px; color:#384255; font-size:13px; line-height:1.15; font-weight:750; text-align:center; white-space:nowrap; border-right:1px solid rgba(53,87,242,.10); }
+  .local-item:last-child { border-right:0; }
+  .local-item.active { color:#0320A6; background:linear-gradient(180deg, rgba(53,87,242,.11), rgba(53,87,242,.045)); }
+  .local-item.active::after { content:""; position:absolute; left:18px; right:18px; bottom:0; height:4px; border-radius:4px 4px 0 0; background:#F2C335; }
+  .local-item.active::before { content:""; width:7px; height:7px; border-radius:50%; background:#3557F2; margin-right:7px; flex:none; }
+  .commitments { margin-top:24px; min-height:240px; padding:24px 26px 22px; display:block; text-align:left; background:linear-gradient(135deg, rgba(53,87,242,.10), rgba(255,255,255,.94)); border:1.5px solid rgba(53,87,242,.28); box-shadow:0 8px 24px rgba(30,45,70,.055); }
+  .commit-head { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:18px; }
+  .commit-title-wrap { display:flex; align-items:flex-start; gap:12px; }
+  .commit-icon { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; background:rgba(53,87,242,.12); color:#0320A6; flex:none; }
+  .commit-icon svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .commit-head h2 { margin:0 0 4px; color:#16233c; font-size:22px; line-height:1.1; }
+  .commit-sub { margin:0; color:#657083; font-size:13px; line-height:1.35; font-weight:600; }
+  .commit-link { color:#0320A6; font-size:13px; font-weight:800; text-decoration:none; white-space:nowrap; padding-top:4px; }
+  .commit-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .commit-card { min-width:0; background:rgba(255,255,255,.90); border:1px solid rgba(53,87,242,.16); border-radius:13px; padding:14px 15px; display:grid; grid-template-columns:66px 1fr auto; gap:13px; align-items:center; }
+  .commit-date { text-align:center; border-right:1px solid rgba(53,87,242,.14); padding-right:12px; }
+  .commit-day { display:block; color:#0320A6; font-size:22px; line-height:1; font-weight:900; }
+  .commit-month { display:block; margin-top:4px; color:#70798a; font-size:10px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+  .commit-type { display:inline-flex; align-items:center; margin-bottom:5px; padding:3px 7px; border-radius:999px; background:rgba(242,195,53,.20); color:#6d5610; font-size:9px; font-weight:900; letter-spacing:.05em; text-transform:uppercase; }
+  .commit-desc { margin:0; color:#354052; font-size:13px; line-height:1.28; font-weight:750; }
+  .commit-value { color:#0320A6; font-size:13px; font-weight:900; white-space:nowrap; }
+  .summary-grid { margin-top:24px; display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .summary { height:250px; padding:24px 26px; display:block; text-align:left; position:relative; overflow:hidden; box-shadow:0 7px 20px rgba(30,45,70,.045); }
+  .summary::before { content:""; position:absolute; left:0; top:0; bottom:0; width:5px; }
+  .summary-head { display:flex; align-items:center; justify-content:space-between; padding-bottom:15px; }
+  .summary-title { margin:0; color:#253047; font-size:19px; line-height:1.2; }
+  .summary-marker { width:30px; height:30px; border-radius:9px; }
+  .summary-body { padding-top:18px; display:grid; gap:10px; }
+  .skeleton-line { height:12px; border-radius:999px; }
+  .skeleton-line.long { width:88%; }
+  .skeleton-line.medium { width:68%; }
+  .skeleton-line.short { width:44%; }
+  .summary-foot { margin-top:22px; width:108px; height:14px; border-radius:999px; }
+
+  /* Etapa 10: conteúdo apenas do box Atividades e listas. */
+  .activity-summary-body { padding-top:12px; display:flex; flex-direction:column; gap:9px; }
+  .activity-kicker { margin:0 0 1px; color:#697386; font-size:11px; font-weight:800; letter-spacing:.045em; text-transform:uppercase; }
+  .activity-item { background:rgba(255,255,255,.78); border:1px solid rgba(53,87,242,.16); border-radius:11px; padding:9px 11px; display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; }
+  .activity-main { min-width:0; }
+  .activity-meta { display:flex; align-items:center; gap:7px; margin-bottom:4px; }
+  .activity-type { display:inline-flex; align-items:center; padding:3px 7px; border-radius:999px; background:rgba(53,87,242,.12); color:#0320A6; font-size:9px; line-height:1; font-weight:900; letter-spacing:.035em; text-transform:uppercase; }
+  .activity-pub { color:#7a8494; font-size:10px; font-weight:700; white-space:nowrap; }
+  .activity-name { margin:0; color:#2f3b50; font-size:12px; line-height:1.25; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .activity-subject { margin:3px 0 0; color:#6b7483; font-size:10px; line-height:1.2; font-weight:650; }
+  .activity-deadline { display:flex; flex-direction:column; align-items:flex-end; color:#6d5610; font-size:9px; line-height:1.15; font-weight:800; white-space:nowrap; }
+  .activity-deadline strong { margin-top:2px; color:#0320A6; font-size:11px; }
+  .activity-summary-link { margin-top:3px; display:inline-flex; align-items:center; color:#0320A6; font-size:11px; font-weight:900; text-decoration:none; }
+
+  /* Etapa 10.1: ajuste exclusivo de respiro inferior no primeiro box. */
+  .summary-grid .summary:nth-child(1) { padding-bottom:28px; }
+  .summary-grid .summary:nth-child(1) .summary-head { padding-bottom:10px; }
+  .activity-summary-body { padding-top:8px; gap:6px; }
+  .activity-item { padding:6px 10px; }
+  .activity-meta { margin-bottom:2px; }
+  .activity-subject { margin-top:2px; }
+
+
+  /* Etapa 11: conteúdo exclusivo do segundo box — Para estudar. */
+  .study-summary-body { padding-top:8px; display:flex; flex-direction:column; gap:7px; }
+  .study-item { min-height:58px; padding:7px 10px; border-radius:10px; background:rgba(255,255,255,.72); border:1px solid rgba(166,129,20,.16); display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; }
+  .study-main { min-width:0; }
+  .study-meta { display:flex; align-items:center; gap:7px; margin-bottom:3px; }
+  .study-objective { display:inline-flex; align-items:center; padding:3px 7px; border-radius:999px; background:rgba(255,212,82,.24); color:#6d5610; font-size:9px; line-height:1; font-weight:900; letter-spacing:.035em; text-transform:uppercase; }
+  .study-pub { color:#7a8494; font-size:10px; font-weight:700; white-space:nowrap; }
+  .study-name { margin:0; color:#2f3b50; font-size:12px; line-height:1.25; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .study-subject { margin:2px 0 0; color:#6b7483; font-size:10px; line-height:1.2; font-weight:650; }
+  .study-date { display:flex; flex-direction:column; align-items:flex-end; color:#6d5610; font-size:9px; line-height:1.15; font-weight:800; white-space:nowrap; }
+  .study-date strong { margin-top:2px; color:#A68114; font-size:11px; }
+  .study-summary-link { margin-top:3px; display:inline-flex; align-items:center; color:#A68114; font-size:11px; font-weight:900; text-decoration:none; }
+  .summary-grid .summary:nth-child(2) { padding-bottom:28px; }
+  .summary-grid .summary:nth-child(2) .summary-head { padding-bottom:10px; }
+
+
+  /* Etapa 12: conteúdo exclusivo do terceiro box — Trabalhos. */
+  .work-summary-body { padding-top:8px; display:flex; flex-direction:column; gap:7px; }
+  .work-item { min-height:58px; padding:7px 10px; border-radius:10px; background:rgba(255,255,255,.74); border:1px solid rgba(3,32,166,.14); display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; }
+  .work-main { min-width:0; }
+  .work-meta { display:flex; align-items:center; gap:7px; margin-bottom:3px; }
+  .work-document { display:inline-flex; align-items:center; gap:4px; padding:3px 7px; border-radius:999px; background:rgba(3,32,166,.10); color:#0320A6; font-size:9px; line-height:1; font-weight:900; letter-spacing:.035em; text-transform:uppercase; }
+  .work-document svg { width:10px; height:10px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .work-pub { color:#7a8494; font-size:10px; font-weight:700; white-space:nowrap; }
+  .work-name { margin:0; color:#2f3b50; font-size:12px; line-height:1.25; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .work-subject { margin:2px 0 0; color:#6b7483; font-size:10px; line-height:1.2; font-weight:650; }
+  .work-date { display:flex; flex-direction:column; align-items:flex-end; color:#5c6678; font-size:9px; line-height:1.15; font-weight:800; white-space:nowrap; }
+  .work-date strong { margin-top:2px; color:#0320A6; font-size:11px; }
+  .work-summary-link { margin-top:3px; display:inline-flex; align-items:center; color:#0320A6; font-size:11px; font-weight:900; text-decoration:none; }
+  .summary-grid .summary:nth-child(3) { padding-bottom:28px; }
+  .summary-grid .summary:nth-child(3) .summary-head { padding-bottom:10px; }
+
+
+  /* Etapa 13: conteúdo exclusivo do quarto box — Materiais. */
+  .material-summary-body { padding-top:8px; display:flex; flex-direction:column; gap:7px; }
+  .material-item { min-height:58px; padding:7px 10px; border-radius:10px; background:rgba(255,255,255,.76); border:1px solid rgba(166,129,20,.16); display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; }
+  .material-main { min-width:0; }
+  .material-meta { display:flex; align-items:center; gap:7px; margin-bottom:3px; }
+  .material-type { display:inline-flex; align-items:center; gap:4px; padding:3px 7px; border-radius:999px; background:rgba(242,195,53,.18); color:#765a00; font-size:9px; line-height:1; font-weight:900; letter-spacing:.035em; text-transform:uppercase; }
+  .material-type svg { width:10px; height:10px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .material-pub { color:#7a8494; font-size:10px; font-weight:700; white-space:nowrap; }
+  .material-name { margin:0; color:#2f3b50; font-size:12px; line-height:1.25; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .material-path { margin:2px 0 0; color:#6b7483; font-size:10px; line-height:1.2; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .material-open { color:#A68114; font-size:10px; font-weight:900; white-space:nowrap; }
+  .material-summary-link { margin-top:3px; display:inline-flex; align-items:center; color:#A68114; font-size:11px; font-weight:900; text-decoration:none; }
+  .summary-grid .summary:nth-child(4) { padding-bottom:28px; }
+  .summary-grid .summary:nth-child(4) .summary-head { padding-bottom:10px; }
+
+
+  /* Etapa 14: conteúdo exclusivo do quinto box — Vídeos. */
+  .video-summary-body { padding-top:8px; display:flex; flex-direction:column; gap:7px; }
+  .video-item { min-height:58px; padding:7px 9px; border-radius:10px; background:rgba(255,255,255,.76); border:1px solid rgba(53,87,242,.15); display:grid; grid-template-columns:92px 1fr auto; gap:9px; align-items:center; }
+  .video-thumb { width:92px; aspect-ratio:16/9; border-radius:8px; overflow:hidden; position:relative; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, rgba(53,87,242,.20), rgba(3,32,166,.11), rgba(255,212,82,.14)); border:1px solid rgba(53,87,242,.18); color:#0320A6; flex:none; }
+  .video-thumb::after { content:""; width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,.88); box-shadow:0 2px 7px rgba(3,32,166,.12); position:absolute; }
+  .video-thumb svg { width:12px; height:12px; position:relative; z-index:2; margin-left:2px; fill:#0320A6; stroke:none; }
+  .video-main { min-width:0; }
+  .video-meta { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
+  .video-priority { display:inline-flex; align-items:center; padding:3px 7px; border-radius:999px; font-size:9px; line-height:1; font-weight:900; letter-spacing:.035em; text-transform:uppercase; white-space:nowrap; }
+  .video-priority.essential { background:rgba(53,87,242,.13); color:#0320A6; }
+  .video-priority.recommended { background:rgba(255,212,82,.22); color:#765a00; }
+  .video-duration { color:#7a8494; font-size:10px; font-weight:750; white-space:nowrap; }
+  .video-name { margin:0; color:#2f3b50; font-size:12px; line-height:1.22; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .video-path { margin:2px 0 0; color:#6b7483; font-size:10px; line-height:1.18; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .video-open { color:#0320A6; font-size:10px; font-weight:900; white-space:nowrap; }
+  .video-summary-link { margin-top:3px; display:inline-flex; align-items:center; color:#0320A6; font-size:11px; font-weight:900; text-decoration:none; }
+  .summary-grid .summary:nth-child(5) { padding-bottom:28px; }
+  .summary-grid .summary:nth-child(5) .summary-head { padding-bottom:10px; }
+
+  /* Etapa 15: conteúdo exclusivo do sexto box — Links. */
+  .link-summary-body { padding-top:8px; display:flex; flex-direction:column; gap:7px; }
+  .link-item { min-height:58px; padding:7px 10px; border-radius:10px; background:rgba(255,255,255,.76); border:1px solid rgba(166,129,20,.15); display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; }
+  .link-main { min-width:0; }
+  .link-meta { display:flex; align-items:center; gap:6px; margin-bottom:3px; min-width:0; }
+  .link-purpose { display:inline-flex; align-items:center; padding:3px 7px; border-radius:999px; background:rgba(255,212,82,.22); color:#765a00; font-size:9px; line-height:1; font-weight:900; letter-spacing:.035em; text-transform:uppercase; white-space:nowrap; }
+  .link-type { color:#7a8494; font-size:10px; font-weight:750; white-space:nowrap; }
+  .link-name { margin:0; color:#2f3b50; font-size:12px; line-height:1.22; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .link-path { margin:2px 0 0; color:#6b7483; font-size:10px; line-height:1.18; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .link-note { margin:2px 0 0; color:#6b7483; font-size:10px; line-height:1.18; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .link-open { display:inline-flex; align-items:center; gap:4px; color:#A68114; font-size:10px; font-weight:900; white-space:nowrap; }
+  .link-open svg { width:11px; height:11px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .link-summary-link { margin-top:3px; display:inline-flex; align-items:center; color:#A68114; font-size:11px; font-weight:900; text-decoration:none; }
+  .summary-grid .summary:nth-child(6) { padding-bottom:28px; }
+  .summary-grid .summary:nth-child(6) .summary-head { padding-bottom:10px; }
+
+  /* Etapa 9: diferenciação cromática restrita à Linha 2 da paleta oficial. */
+  .summary-grid .summary:nth-child(1) { background:linear-gradient(135deg, rgba(53,87,242,.105), rgba(255,255,255,.96)); border:1.5px solid rgba(53,87,242,.30); }
+  .summary-grid .summary:nth-child(1)::before { background:#3557F2; }
+  .summary-grid .summary:nth-child(1) .summary-head { border-bottom:1px solid rgba(53,87,242,.20); }
+  .summary-grid .summary:nth-child(1) .summary-marker { background:rgba(53,87,242,.14); border:1.5px solid rgba(53,87,242,.34); }
+  .summary-grid .summary:nth-child(1) .skeleton-line, .summary-grid .summary:nth-child(1) .summary-foot { background:rgba(53,87,242,.13); }
+
+  .summary-grid .summary:nth-child(2) { background:linear-gradient(135deg, rgba(255,212,82,.18), rgba(255,255,255,.96)); border:1.5px solid rgba(242,195,53,.42); }
+  .summary-grid .summary:nth-child(2)::before { background:#F2C335; }
+  .summary-grid .summary:nth-child(2) .summary-head { border-bottom:1px solid rgba(166,129,20,.20); }
+  .summary-grid .summary:nth-child(2) .summary-marker { background:rgba(255,212,82,.22); border:1.5px solid rgba(166,129,20,.34); }
+  .summary-grid .summary:nth-child(2) .skeleton-line, .summary-grid .summary:nth-child(2) .summary-foot { background:rgba(166,129,20,.13); }
+
+  .summary-grid .summary:nth-child(3) { background:linear-gradient(135deg, rgba(3,32,166,.085), rgba(255,255,255,.96)); border:1.5px solid rgba(3,32,166,.27); }
+  .summary-grid .summary:nth-child(3)::before { background:#0320A6; }
+  .summary-grid .summary:nth-child(3) .summary-head { border-bottom:1px solid rgba(3,32,166,.17); }
+  .summary-grid .summary:nth-child(3) .summary-marker { background:rgba(3,32,166,.11); border:1.5px solid rgba(3,32,166,.28); }
+  .summary-grid .summary:nth-child(3) .skeleton-line, .summary-grid .summary:nth-child(3) .summary-foot { background:rgba(3,32,166,.105); }
+
+  .summary-grid .summary:nth-child(4) { background:linear-gradient(135deg, rgba(242,195,53,.115), rgba(255,255,255,.97)); border:1.5px solid rgba(166,129,20,.31); }
+  .summary-grid .summary:nth-child(4)::before { background:#A68114; }
+  .summary-grid .summary:nth-child(4) .summary-head { border-bottom:1px solid rgba(166,129,20,.18); }
+  .summary-grid .summary:nth-child(4) .summary-marker { background:rgba(242,195,53,.16); border:1.5px solid rgba(166,129,20,.30); }
+  .summary-grid .summary:nth-child(4) .skeleton-line, .summary-grid .summary:nth-child(4) .summary-foot { background:rgba(166,129,20,.11); }
+
+  .summary-grid .summary:nth-child(5) { background:linear-gradient(135deg, rgba(53,87,242,.075), rgba(255,212,82,.075), rgba(255,255,255,.97)); border:1.5px solid rgba(53,87,242,.24); }
+  .summary-grid .summary:nth-child(5)::before { background:#3557F2; }
+  .summary-grid .summary:nth-child(5) .summary-head { border-bottom:1px solid rgba(53,87,242,.15); }
+  .summary-grid .summary:nth-child(5) .summary-marker { background:rgba(53,87,242,.11); border:1.5px solid rgba(53,87,242,.27); }
+  .summary-grid .summary:nth-child(5) .skeleton-line, .summary-grid .summary:nth-child(5) .summary-foot { background:rgba(53,87,242,.10); }
+
+  .summary-grid .summary:nth-child(6) { background:linear-gradient(135deg, rgba(255,212,82,.105), rgba(53,87,242,.045), rgba(255,255,255,.97)); border:1.5px solid rgba(166,129,20,.27); }
+  .summary-grid .summary:nth-child(6)::before { background:#F2C335; }
+  .summary-grid .summary:nth-child(6) .summary-head { border-bottom:1px solid rgba(166,129,20,.16); }
+  .summary-grid .summary:nth-child(6) .summary-marker { background:rgba(255,212,82,.16); border:1.5px solid rgba(166,129,20,.27); }
+  .summary-grid .summary:nth-child(6) .skeleton-line, .summary-grid .summary:nth-child(6) .summary-foot { background:rgba(166,129,20,.10); }
+  .contact-cta { margin-top:24px; min-height:150px; padding:24px 30px; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:22px; text-align:left; background:linear-gradient(135deg, rgba(53,87,242,.11), rgba(255,212,82,.11), rgba(255,255,255,.97)); border:1.5px solid rgba(53,87,242,.30); box-shadow:0 8px 24px rgba(30,45,70,.055); }
+  .contact-icon { width:58px; height:58px; border-radius:16px; display:flex; align-items:center; justify-content:center; background:#0320A6; color:#FFD452; box-shadow:0 6px 14px rgba(3,32,166,.13); }
+  .contact-icon svg { width:28px; height:28px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .contact-copy { min-width:0; }
+  .contact-kicker { margin:0 0 5px; color:#3557F2; font-size:11px; font-weight:900; letter-spacing:.09em; text-transform:uppercase; }
+  .contact-title { margin:0 0 5px; color:#16233c; font-size:22px; line-height:1.15; font-weight:850; }
+  .contact-text { margin:0; color:#586172; font-size:14px; line-height:1.4; font-weight:550; }
+  .contact-meta { margin-top:7px; display:flex; align-items:center; gap:7px; color:#6b7280; font-size:12px; font-weight:700; }
+  .contact-meta svg { width:15px; height:15px; fill:none; stroke:#3557F2; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+  .contact-action { min-width:205px; height:46px; padding:0 18px; border-radius:11px; display:inline-flex; align-items:center; justify-content:center; gap:9px; background:#0320A6; color:#fff; font-size:14px; font-weight:850; text-decoration:none; box-shadow:0 7px 16px rgba(3,32,166,.14); }
+  .contact-action svg { width:18px; height:18px; fill:none; stroke:#FFD452; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  /* Etapa 17: rodapé institucional — único componente alterado nesta revisão. */
+  .footer { margin-top:24px; min-height:220px; background:linear-gradient(180deg,#e5e8ec 0%,#dfe3e8 100%); border-top:1px solid #c8ced6; color:#445063; }
+  .footer-inner { width:1240px; margin:0 auto; padding:28px 0 18px; }
+  .footer-main { min-height:132px; display:grid; grid-template-columns:1.45fr .85fr 1fr .85fr; gap:48px; align-items:start; }
+  .footer-brand { display:flex; align-items:center; gap:15px; padding-top:2px; }
+  .footer-brand-symbol { width:64px; height:auto; display:block; flex:none; }
+  .footer-brand-signature { width:225px; height:auto; display:block; }
+  .footer-col h3 { margin:0 0 11px; color:#26334a; font-size:11px; line-height:1; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+  .footer-links { display:flex; flex-direction:column; gap:7px; }
+  .footer-link { color:#556174; font-size:12px; line-height:1.25; font-weight:650; text-decoration:none; }
+  .footer-social { display:flex; gap:10px; align-items:center; }
+  .social-icon { width:34px; height:34px; border-radius:50%; border:1.5px solid rgba(3,32,166,.24); background:rgba(255,255,255,.58); color:#0320A6; display:flex; align-items:center; justify-content:center; }
+  .social-icon svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .social-icon.youtube svg .fill { fill:currentColor; stroke:none; }
+  .footer-bottom { min-height:40px; border-top:1px solid rgba(80,92,110,.18); display:flex; align-items:flex-end; justify-content:center; padding-top:13px; }
+  .footer-copy { margin:0; color:#6a7382; font-size:11px; line-height:1.3; font-weight:600; text-align:center; }
+
+  /* ETAPA 20 — Tablet (834 px): reorganização responsiva sem redesenho. */
+  html, body { background:#efefef; }
+  body { width:834px; min-height:3600px; }
+  .page { width:834px; min-height:3600px; padding-bottom:36px; }
+
+  .header { height:226px; }
+  .header-inner { width:750px; height:226px; grid-template-columns:120px 1fr 122px; grid-template-rows:145px 61px; gap:8px 18px; align-items:center; }
+  .brand-symbol { grid-column:1; grid-row:1; justify-content:flex-start; }
+  .brand-symbol img { width:96px; }
+  .brand-name { grid-column:2; grid-row:1; }
+  .brand-name img { width:315px; }
+  .prof-area { grid-column:3; grid-row:1; display:block; }
+  .prof-copy { grid-column:1 / -1; grid-row:2; width:100%; min-width:0; display:flex; align-items:center; justify-content:center; }
+  .phrase { position:static; transform:none; width:100%; max-width:690px; margin:0 auto; box-sizing:border-box; font-size:13px; line-height:1.28; padding:8px 18px; white-space:normal; overflow-wrap:anywhere; word-break:normal; text-align:center; }
+  .phrase .phrase-line { display:block; white-space:normal; }
+  .photo-block img { width:88px; height:88px; }
+  .prof-name { font-size:12px; }
+
+  .global-menu { height:112px; }
+  .global-menu-inner { width:750px; height:112px; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(2,56px); }
+  .menu-item { font-size:12px; padding:0 8px; border-right:1px solid rgba(255,255,255,.10); border-bottom:1px solid rgba(255,255,255,.10); }
+  .menu-item:nth-child(n) { flex:none; }
+  .menu-item:nth-child(3n) { border-right:0; }
+  .menu-item:nth-child(n+4) { border-bottom:0; }
+  .menu-item svg { width:20px; height:20px; }
+  .menu-item.active::after { left:24px; right:24px; height:3px; }
+
+  .shell { width:750px; }
+  .breadcrumb { min-height:58px; height:auto; padding:14px 0; flex-wrap:wrap; gap:7px 9px; font-size:13px; }
+  .breadcrumb .sep { font-size:17px; }
+
+  .split { grid-template-columns:1fr; gap:18px; }
+  .hero { height:auto; min-height:245px; padding:26px 30px; }
+  .hero h1 { font-size:30px; }
+  .hero-desc { max-width:none; }
+  .notices { height:auto; min-height:244px; padding:22px 24px; }
+
+  .local-menu { margin-top:20px; height:116px; }
+  .local-menu-inner { grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,58px); }
+  .local-item { font-size:12px; padding:0 8px; border-right:1px solid rgba(53,87,242,.10); border-bottom:1px solid rgba(53,87,242,.10); }
+  .local-item:nth-child(4n) { border-right:0; }
+  .local-item:nth-child(n+5) { border-bottom:0; }
+  .local-item.active::after { left:22px; right:22px; height:3px; }
+
+  .commitments { margin-top:20px; min-height:0; padding:22px 24px; }
+  .commit-head { margin-bottom:15px; }
+  .commit-grid { grid-template-columns:1fr; gap:10px; }
+  .commit-card { grid-template-columns:72px 1fr auto; min-height:74px; }
+
+  .summary-grid { margin-top:20px; grid-template-columns:1fr; gap:18px; }
+  .summary { height:250px; }
+
+  .contact-cta { margin-top:20px; min-height:150px; padding:22px 24px; grid-template-columns:auto 1fr auto; gap:16px; align-items:center; }
+  .contact-action { grid-column:3; justify-self:end; align-self:center; min-width:146px; width:146px; min-height:52px; height:auto; padding:9px 12px; text-align:center; white-space:normal; line-height:1.15; }
+  .contact-action span { display:block; white-space:normal; }
+
+  .footer { margin-top:20px; min-height:300px; }
+  .footer-inner { width:750px; padding:26px 0 18px; }
+  .footer-main { min-height:208px; grid-template-columns:1.45fr 1fr; grid-template-rows:auto auto; gap:28px 44px; }
+  .footer-brand-signature { width:200px; }
+  .footer-bottom { margin-top:16px; }
+
+
+  /* ETAPA 21 — Mobile (390 px): adaptação própria para leitura e toque. */
+  .mobile-global-control, .mobile-local-control { display:none; }
+
+  body { width:390px; min-height:5000px; }
+  .page { width:390px; min-height:5000px; padding-bottom:24px; }
+
+  .header { height:238px; }
+  .header-inner { width:354px; height:238px; grid-template-columns:72px 1fr 72px; grid-template-rows:136px 86px; gap:8px 10px; }
+  .brand-symbol { grid-column:1; grid-row:1; justify-content:flex-start; }
+  .brand-symbol img { width:62px; }
+  .brand-name { grid-column:2; grid-row:1; }
+  .brand-name img { width:182px; }
+  .prof-area { grid-column:3; grid-row:1; }
+  .photo-block { gap:5px; }
+  .photo-block img { width:62px; height:62px; }
+  .prof-name { font-size:9px; line-height:1.15; }
+  .prof-copy { grid-column:1 / -1; grid-row:2; width:100%; }
+  .phrase { width:100%; max-width:none; font-size:12px; line-height:1.27; padding:9px 12px; border-radius:12px; }
+  .phrase .phrase-line { display:block; }
+
+  .global-menu { height:58px; }
+  .global-menu-inner { display:none; }
+  .mobile-global-control { width:354px; height:58px; margin:0 auto; display:grid; grid-template-columns:32px 1fr auto 22px; align-items:center; gap:8px; color:#fff; }
+  .mobile-menu-icon, .mobile-menu-chevron { display:flex; align-items:center; justify-content:center; }
+  .mobile-menu-icon svg { width:23px; height:23px; fill:none; stroke:#FFD452; stroke-width:2; stroke-linecap:round; }
+  .mobile-menu-chevron svg { width:18px; height:18px; fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .mobile-menu-label { font-size:13px; font-weight:850; }
+  .mobile-menu-current { font-size:11px; font-weight:800; color:#FFD452; padding:5px 8px; border:1px solid rgba(255,212,82,.32); border-radius:999px; }
+
+  .shell { width:354px; }
+  .breadcrumb { min-height:64px; padding:12px 0; gap:5px 7px; font-size:11px; line-height:1.25; }
+  .breadcrumb .sep { font-size:14px; }
+
+  .split { grid-template-columns:1fr; gap:16px; }
+  .hero { min-height:250px; padding:22px 22px 22px 24px; border-radius:16px; }
+  .hero h1 { margin-top:15px; font-size:26px; }
+  .school-year { font-size:13px; }
+  .hero-desc { margin-top:13px; font-size:14px; line-height:1.4; }
+  .segment { font-size:10px; padding:5px 9px; }
+  .notices { min-height:248px; padding:20px; border-radius:16px; }
+  .notice-head h2 { font-size:18px; }
+  .notice-head a { font-size:12px; }
+
+  .local-menu { margin-top:16px; height:58px; border-radius:13px; }
+  .local-menu-inner { display:none; }
+  .mobile-local-control { height:58px; display:grid; grid-template-columns:1fr auto 20px; grid-template-rows:20px 24px; align-content:center; column-gap:8px; padding:7px 14px; text-align:left; }
+  .mobile-local-kicker { grid-column:1 / -1; color:#727b89; font-size:9px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+  .mobile-local-current { grid-column:1; grid-row:2; color:#0320A6; font-size:13px; font-weight:850; }
+  .mobile-local-chevron { grid-column:3; grid-row:2; display:flex; align-items:center; justify-content:center; }
+  .mobile-local-chevron svg { width:17px; height:17px; fill:none; stroke:#0320A6; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+  .commitments { margin-top:16px; padding:20px; border-radius:16px; }
+  .commit-head { gap:12px; margin-bottom:14px; }
+  .commit-title-wrap { gap:10px; }
+  .commit-icon { width:36px; height:36px; }
+  .commit-head h2 { font-size:19px; }
+  .commit-sub { font-size:11px; }
+  .commit-link { font-size:11px; line-height:1.15; padding-top:2px; white-space:normal; text-align:right; }
+  .commit-link span { display:block; white-space:nowrap; }
+  .commit-grid { grid-template-columns:1fr; gap:9px; }
+  .commit-card { min-height:92px; padding:12px; grid-template-columns:58px 1fr; grid-template-rows:auto auto; gap:8px 11px; }
+  .commit-date { grid-row:1 / 3; padding-right:10px; }
+  .commit-day { font-size:20px; }
+  .commit-desc { font-size:12px; }
+  .commit-value { grid-column:2; grid-row:2; justify-self:start; font-size:11px; }
+
+  .summary-grid { margin-top:16px; grid-template-columns:1fr; gap:16px; }
+  .summary { height:auto; min-height:250px; padding:20px 20px 24px; border-radius:16px; }
+  .summary-title { font-size:18px; }
+  .summary-head { padding-bottom:10px; }
+  .activity-item, .study-item, .work-item, .material-item, .link-item { grid-template-columns:1fr auto; gap:8px; }
+  .activity-name, .study-name, .work-name, .material-name, .link-name { white-space:normal; overflow:visible; text-overflow:clip; }
+  .material-path, .link-path, .link-note { white-space:normal; overflow:visible; text-overflow:clip; }
+  .video-item { min-height:74px; grid-template-columns:72px 1fr; grid-template-rows:auto auto; gap:8px; }
+  .video-thumb { width:72px; grid-row:1 / 3; }
+  .video-name, .video-path { white-space:normal; overflow:visible; text-overflow:clip; }
+  .video-open { grid-column:2; justify-self:start; }
+
+  .contact-cta { margin-top:16px; min-height:0; padding:20px; grid-template-columns:48px 1fr; grid-template-rows:auto auto; gap:12px; border-radius:16px; }
+  .contact-icon { width:48px; height:48px; border-radius:13px; }
+  .contact-title { font-size:20px; }
+  .contact-text { font-size:13px; }
+  .contact-action { grid-column:1 / -1; grid-row:2; justify-self:stretch; width:100%; min-width:0; min-height:46px; height:46px; padding:0 14px; white-space:nowrap; line-height:1; }
+
+  .footer { margin-top:16px; min-height:0; }
+  .footer-inner { width:354px; padding:24px 0 16px; }
+  .footer-main { min-height:0; grid-template-columns:1fr; grid-template-rows:auto; gap:22px; }
+  .footer-brand { justify-content:flex-start; }
+  .footer-brand-symbol { width:52px; }
+  .footer-brand-signature { width:176px; }
+  .footer-col h3 { font-size:12px; }
+  .footer-link { font-size:11px; }
+  .footer-bottom { margin-top:20px; padding-top:12px; }
+  .footer-copy { font-size:10px; }
+
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand-symbol"><img src="simbolo-oficial-colorido.png" alt="Símbolo oficial Matemática Instrumental"></div>
+      <div class="brand-name"><img src="Assinatura-colorida.png" alt="Matemática Instrumental"></div>
+      <div class="prof-copy">
+        <p class="phrase"><span class="phrase-line">Matemática</span><span class="phrase-line">Mais do que uma disciplina,</span><span class="phrase-line">uma ferramenta para a vida!</span></p>
+      </div>
+      <div class="prof-area">
+        <div class="photo-block">
+          <img src="Foto-perfil.jpg" alt="Professor Adriano Lima Teixeira">
+          <p class="prof-name">Prof. Adriano Lima Teixeira</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="global-menu" aria-label="Menu principal do portal">
+    <div class="mobile-global-control" aria-hidden="true">
+      <span class="mobile-menu-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg></span>
+      <span class="mobile-menu-label">Menu principal</span>
+      <span class="mobile-menu-current">Início</span>
+      <span class="mobile-menu-chevron"><svg viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></svg></span>
+    </div>
+    <div class="global-menu-inner">
+      <div class="menu-item active">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-6h5v6"/></svg>
+        <span>Início</span>
+      </div>
+      <div class="menu-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Turmas</span>
+      </div>
+      <div class="menu-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M8 9h2"/></svg>
+        <span>Provas e Resoluções</span>
+      </div>
+      <div class="menu-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M3 11h18"/></svg>
+        <span>Oportunidades e Datas</span>
+      </div>
+      <div class="menu-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>
+        <span>Matemática além da sala</span>
+      </div>
+      <div class="menu-item contact">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 10h8"/><path d="M8 14h5"/></svg>
+        <span>Falar com o Professor</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="shell">
+    <nav class="breadcrumb" aria-label="Navegação hierárquica">
+      <span class="crumb">Início</span><span class="sep">›</span>
+      <span class="crumb">Turmas</span><span class="sep">›</span>
+      <span class="crumb">Ensino Médio</span><span class="sep">›</span>
+      <span class="crumb">1º ano</span><span class="sep">›</span>
+      <span class="current">Turma A</span>
+    </nav>
+
+    <section class="split">
+      <div class="box hero">
+        <span class="segment">Ensino Médio</span>
+        <h1>1º ano — Turma A</h1>
+        <p class="school-year">Ano letivo 2026</p>
+        <p class="hero-desc">Espaço da turma para acompanhar cronogramas, atividades, orientações de estudo, trabalhos e materiais de apoio.</p>
+      </div>
+      <div class="box notices">
+        <div class="notice-head"><h2>Avisos da turma</h2><a href="#">Ver todos</a></div>
+        <div class="notice-list">
+          <div class="notice-item">
+            <div class="notice-top"><span class="badge new">Novo</span><span class="notice-date">Hoje</span></div>
+            <p class="notice-text">Nova lista de exercícios disponível.</p>
+          </div>
+          <div class="notice-item">
+            <div class="notice-top"><span class="badge attention">Atenção</span><span class="notice-date">Próximo prazo</span></div>
+            <p class="notice-text">Confira o cronograma das próximas avaliações.</p>
+          </div>
+          <div class="notice-item">
+            <div class="notice-top"><span class="badge featured">Destaque</span><span class="notice-date">Em evidência</span></div>
+            <p class="notice-text">Roteiro de estudo recomendado para a turma.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="local-menu" aria-label="Menu interno da turma">
+      <div class="local-menu-inner">
+        <div class="local-item active">Início da turma</div>
+        <div class="local-item">Cronogramas</div>
+        <div class="local-item">Atividades e listas</div>
+        <div class="local-item">Para estudar</div>
+        <div class="local-item">Trabalhos</div>
+        <div class="local-item">Materiais</div>
+        <div class="local-item">Vídeos</div>
+        <div class="local-item">Links</div>
+      </div>
+      <div class="mobile-local-control" aria-hidden="true">
+        <span class="mobile-local-kicker">Menu da turma</span>
+        <span class="mobile-local-current">Início da turma</span>
+        <span class="mobile-local-chevron">
+          <svg viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></svg>
+        </span>
+      </div>
+    </nav>
+
+    <section class="box commitments">
+      <div class="commit-head">
+        <div class="commit-title-wrap">
+          <div class="commit-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M3 11h18"/></svg>
+          </div>
+          <div>
+            <h2>Próximos compromissos</h2>
+            <p class="commit-sub">Resumo dos próximos itens do cronograma da turma.</p>
+          </div>
+        </div>
+        <a class="commit-link" href="#"><span>Ver cronograma</span><span>completo →</span></a>
+      </div>
+      <div class="commit-grid">
+        <article class="commit-card">
+          <div class="commit-date"><span class="commit-day">26</span><span class="commit-month">ago</span></div>
+          <div><span class="commit-type">Atividade</span><p class="commit-desc">Função afim — exercícios de aplicação</p></div>
+          <div class="commit-value">2,0 pts</div>
+        </article>
+        <article class="commit-card">
+          <div class="commit-date"><span class="commit-day">02</span><span class="commit-month">set</span></div>
+          <div><span class="commit-type">Prova</span><p class="commit-desc">Funções e interpretação de gráficos</p></div>
+          <div class="commit-value">6,0 pts</div>
+        </article>
+        <article class="commit-card">
+          <div class="commit-date"><span class="commit-day">09</span><span class="commit-month">set</span></div>
+          <div><span class="commit-type">Trabalho</span><p class="commit-desc">Aplicações de funções no cotidiano</p></div>
+          <div class="commit-value">2,0 pts</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="summary-grid" aria-label="Resumos das áreas da turma">
+      <article class="box summary">
+        <div class="summary-head"><h2 class="summary-title">Atividades e listas</h2><span class="summary-marker" aria-hidden="true"></span></div>
+        <div class="activity-summary-body">
+          <p class="activity-kicker">Últimas publicações</p>
+          <div class="activity-item">
+            <div class="activity-main">
+              <div class="activity-meta"><span class="activity-type">Lista de exercícios</span><span class="activity-pub">Hoje</span></div>
+              <p class="activity-name">Função afim — exercícios de aplicação</p>
+              <p class="activity-subject">Assunto: Funções</p>
+            </div>
+            <div class="activity-deadline"><span>Prazo</span><strong>26 ago</strong></div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-main">
+              <div class="activity-meta"><span class="activity-type">Atividade</span><span class="activity-pub">20 ago</span></div>
+              <p class="activity-name">Leitura e interpretação de gráficos</p>
+              <p class="activity-subject">Assunto: Funções</p>
+            </div>
+          </div>
+          <a class="activity-summary-link" href="#">Ver todas as atividades e listas →</a>
+        </div>
+      </article>
+      <article class="box summary">
+        <div class="summary-head"><h2 class="summary-title">Para estudar</h2><span class="summary-marker" aria-hidden="true"></span></div>
+        <div class="study-summary-body">
+          <div class="study-item">
+            <div class="study-main">
+              <div class="study-meta"><span class="study-objective">Prova</span><span class="study-pub">Hoje</span></div>
+              <p class="study-name">Roteiro — Função afim e interpretação gráfica</p>
+              <p class="study-subject">Assunto: Funções</p>
+            </div>
+            <div class="study-date"><span>Data do objetivo</span><strong>28 ago</strong></div>
+          </div>
+          <div class="study-item">
+            <div class="study-main">
+              <div class="study-meta"><span class="study-objective">ENEM</span><span class="study-pub">19 ago</span></div>
+              <p class="study-name">Revisão orientada — razão, proporção e porcentagem</p>
+              <p class="study-subject">Assunto: Matemática básica</p>
+            </div>
+          </div>
+          <a class="study-summary-link" href="#">Ver todos os roteiros de estudo →</a>
+        </div>
+      </article>
+      <article class="box summary">
+        <div class="summary-head"><h2 class="summary-title">Trabalhos</h2><span class="summary-marker" aria-hidden="true"></span></div>
+        <div class="work-summary-body">
+          <div class="work-item">
+            <div class="work-main">
+              <div class="work-meta">
+                <span class="work-document"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Documento</span>
+                <span class="work-pub">Hoje</span>
+              </div>
+              <p class="work-name">Aplicações de funções no cotidiano</p>
+              <p class="work-subject">Assunto: Funções</p>
+            </div>
+            <div class="work-date"><span>Entrega</span><strong>09 set</strong></div>
+          </div>
+          <div class="work-item">
+            <div class="work-main">
+              <div class="work-meta">
+                <span class="work-document"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Documento</span>
+                <span class="work-pub">18 ago</span>
+              </div>
+              <p class="work-name">Modelagem e consumo consciente de água</p>
+              <p class="work-subject">Assunto: Razão e proporcionalidade</p>
+            </div>
+            <div class="work-date"><span>Apresentação</span><strong>16 set</strong></div>
+          </div>
+          <a class="work-summary-link" href="#">Ver todos os trabalhos →</a>
+        </div>
+      </article>
+      <article class="box summary">
+        <div class="summary-head"><h2 class="summary-title">Materiais</h2><span class="summary-marker" aria-hidden="true"></span></div>
+        <div class="material-summary-body">
+          <div class="material-item">
+            <div class="material-main">
+              <div class="material-meta">
+                <span class="material-type"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>PDF</span>
+                <span class="material-pub">Hoje</span>
+              </div>
+              <p class="material-name">Resumo — função afim e interpretação gráfica</p>
+              <p class="material-path">Álgebra → Funções → Função afim</p>
+            </div>
+            <span class="material-open">Abrir ↗</span>
+          </div>
+          <div class="material-item">
+            <div class="material-main">
+              <div class="material-meta">
+                <span class="material-type"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Arquivo</span>
+                <span class="material-pub">20 ago</span>
+              </div>
+              <p class="material-name">Guia de revisão — razão e proporcionalidade</p>
+              <p class="material-path">Aritmética → Razões e proporções → Proporcionalidade</p>
+            </div>
+            <span class="material-open">Abrir ↗</span>
+          </div>
+          <a class="material-summary-link" href="#">Ver todos os materiais →</a>
+        </div>
+      </article>
+      <article class="box summary">
+        <div class="summary-head"><h2 class="summary-title">Vídeos</h2><span class="summary-marker" aria-hidden="true"></span></div>
+        <div class="video-summary-body">
+          <div class="video-item">
+            <div class="video-thumb" aria-label="Miniatura 16 por 9"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-main">
+              <div class="video-meta"><span class="video-priority essential">Essencial</span><span class="video-duration">08:42</span></div>
+              <p class="video-name">Como interpretar o gráfico de uma função afim</p>
+              <p class="video-path">Álgebra → Funções → Função afim</p>
+            </div>
+            <span class="video-open">Assistir ↗</span>
+          </div>
+          <div class="video-item">
+            <div class="video-thumb" aria-label="Miniatura 16 por 9"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></div>
+            <div class="video-main">
+              <div class="video-meta"><span class="video-priority recommended">Recomendado</span><span class="video-duration">12:15</span></div>
+              <p class="video-name">Razões, proporções e escalas em problemas</p>
+              <p class="video-path">Aritmética → Razões e proporções → Proporcionalidade</p>
+            </div>
+            <span class="video-open">Assistir ↗</span>
+          </div>
+          <a class="video-summary-link" href="#">Ver todos os vídeos →</a>
+        </div>
+      </article>
+      <article class="box summary">
+        <div class="summary-head"><h2 class="summary-title">Links</h2><span class="summary-marker" aria-hidden="true"></span></div>
+        <div class="link-summary-body">
+          <div class="link-item">
+            <div class="link-main">
+              <div class="link-meta"><span class="link-purpose">Explorar gráficos</span><span class="link-type">Calculadora</span></div>
+              <p class="link-name">GeoGebra — Calculadora Gráfica</p>
+              <p class="link-path">Álgebra → Funções → Função afim</p>
+            </div>
+            <span class="link-open">Acessar <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7"/><path d="M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg></span>
+          </div>
+          <div class="link-item">
+            <div class="link-main">
+              <div class="link-meta"><span class="link-purpose">Praticar problemas</span><span class="link-type">Plataforma</span></div>
+              <p class="link-name">Portal de desafios e problemas de matemática</p>
+              <p class="link-note">Recurso externo recomendado para aprofundamento.</p>
+            </div>
+            <span class="link-open">Acessar <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7"/><path d="M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg></span>
+          </div>
+          <a class="link-summary-link" href="#">Ver todos os links →</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="box contact-cta" aria-label="Falar com o Professor">
+      <div class="contact-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 10h8"/><path d="M8 14h5"/></svg>
+      </div>
+      <div class="contact-copy">
+        <p class="contact-kicker">Comunicação privada</p>
+        <h2 class="contact-title">Falar com o Professor</h2>
+        <p class="contact-text">Envie uma dúvida, solicitação ou mensagem diretamente ao professor.</p>
+      </div>
+      <a class="contact-action" href="#">
+        <span>Falar com o Professor</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </a>
+    </section>
+  </main>
+
+  <footer class="footer" aria-label="Rodapé institucional">
+    <div class="footer-inner">
+      <div class="footer-main">
+        <div class="footer-brand" aria-label="Matemática Instrumental">
+          <img class="footer-brand-symbol" src="simbolo-oficial-colorido.png" alt="Símbolo Matemática Instrumental">
+          <img class="footer-brand-signature" src="Assinatura-colorida.png" alt="Matemática Instrumental">
+        </div>
+
+        <div class="footer-col">
+          <h3>Navegação</h3>
+          <div class="footer-links">
+            <a class="footer-link" href="#">Início</a>
+            <a class="footer-link" href="#">Turmas</a>
+            <a class="footer-link" href="#">Provas e Resoluções</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h3>Informações</h3>
+          <div class="footer-links">
+            <a class="footer-link" href="#">Oportunidades e Datas</a>
+            <a class="footer-link" href="#">Matemática além da sala</a>
+            <a class="footer-link" href="#">Falar com o Professor</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h3>Siga-nos</h3>
+          <div class="footer-social" aria-label="Redes sociais">
+            <span class="social-icon youtube" aria-label="YouTube">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="4"/><path class="fill" d="M10 9.2 15.5 12 10 14.8z"/></svg>
+            </span>
+            <span class="social-icon" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.4"/><circle cx="17.5" cy="6.7" r=".8"/></svg>
+            </span>
+            <span class="social-icon" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 8H17V4.5h-2.5c-3 0-4.5 1.7-4.5 4.6V11H7v3.5h3V21h4v-6.5h3l.5-3.5H14V9.2c0-.8.2-1.2.5-1.2Z"/></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">Matemática Instrumental — Professor Adriano Lima Teixeira. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>

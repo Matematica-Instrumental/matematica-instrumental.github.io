@@ -1,0 +1,196 @@
+﻿---
+interface WorkSummaryItem {
+  publicacao: string;
+  titulo: string;
+  assunto: string;
+  tipoData: 'Entrega' | 'Apresentação';
+  data: string;
+}
+
+interface Props {
+  itens: WorkSummaryItem[];
+  verTodosHref?: string;
+}
+
+const {
+  itens,
+  verTodosHref,
+} = Astro.props;
+---
+
+<div class="works-summary">
+  {
+    itens.map((item) => (
+      <article class="works-summary__item">
+        <div class="works-summary__main">
+          <div class="works-summary__meta">
+            <span class="works-summary__document">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6" />
+              </svg>
+
+              Documento
+            </span>
+
+            <span class="works-summary__publication">
+              {item.publicacao}
+            </span>
+          </div>
+
+          <p class="works-summary__name">
+            {item.titulo}
+          </p>
+
+          <p class="works-summary__subject">
+            Assunto: {item.assunto}
+          </p>
+        </div>
+
+        <div class="works-summary__date">
+          <span>{item.tipoData}</span>
+          <strong>{item.data}</strong>
+        </div>
+      </article>
+    ))
+  }
+
+  {
+    verTodosHref ? (
+      <a
+        class="works-summary__link"
+        href={verTodosHref}
+      >
+        Ver todos os trabalhos →
+      </a>
+    ) : (
+      <span class="works-summary__link">
+        Ver todos os trabalhos →
+      </span>
+    )
+  }
+</div>
+
+<style>
+  .works-summary {
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .works-summary__item {
+    min-height: 58px;
+    padding: 7px 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid rgba(3, 32, 166, 0.14);
+    border-radius: var(--radius-small);
+    background: rgba(255, 255, 255, 0.74);
+  }
+
+  .works-summary__main {
+    min-width: 0;
+  }
+
+  .works-summary__meta {
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .works-summary__document {
+    padding: 3px 7px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: var(--radius-pill);
+    background: rgba(3, 32, 166, 0.10);
+    color: var(--color-primary);
+    font-size: 9px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+  }
+
+  .works-summary__document svg {
+    width: 10px;
+    height: 10px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .works-summary__publication {
+    color: #7a8494;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .works-summary__name {
+    margin: 0;
+    overflow: hidden;
+    color: #2f3b50;
+    font-size: 12px;
+    line-height: 1.25;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .works-summary__subject {
+    margin: 2px 0 0;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 650;
+  }
+
+  .works-summary__date {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    color: #5c6678;
+    font-size: 9px;
+    line-height: 1.15;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .works-summary__date strong {
+    margin-top: 2px;
+    color: var(--color-primary);
+    font-size: 11px;
+  }
+
+  .works-summary__link {
+    margin-top: 3px;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    color: var(--color-primary);
+    font-size: 11px;
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  @media (max-width: 767px) {
+    .works-summary__item {
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .works-summary__name {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+    }
+  }
+</style>

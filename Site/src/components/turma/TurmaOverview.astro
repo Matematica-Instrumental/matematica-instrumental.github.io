@@ -1,0 +1,36 @@
+﻿<section class="turma-overview">
+  <div class="turma-overview__identity">
+    <slot name="identity" />
+  </div>
+
+  <div class="turma-overview__alerts">
+    <slot name="alerts" />
+  </div>
+</section>
+
+<style>
+  .turma-overview {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+  }
+
+  .turma-overview__identity,
+  .turma-overview__alerts {
+    min-width: 0;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .turma-overview {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .turma-overview {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+</style>

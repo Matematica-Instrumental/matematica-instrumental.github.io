@@ -1,0 +1,184 @@
+﻿---
+interface StudySummaryItem {
+  objetivo: string;
+  publicacao: string;
+  titulo: string;
+  assunto: string;
+  dataObjetivo?: string;
+}
+
+interface Props {
+  itens: StudySummaryItem[];
+  verTodosHref?: string;
+}
+
+const {
+  itens,
+  verTodosHref,
+} = Astro.props;
+---
+
+<div class="study-summary">
+  {
+    itens.map((item) => (
+      <article class="study-summary__item">
+        <div class="study-summary__main">
+          <div class="study-summary__meta">
+            <span class="study-summary__objective">
+              {item.objetivo}
+            </span>
+
+            <span class="study-summary__publication">
+              {item.publicacao}
+            </span>
+          </div>
+
+          <p class="study-summary__name">
+            {item.titulo}
+          </p>
+
+          <p class="study-summary__subject">
+            Assunto: {item.assunto}
+          </p>
+        </div>
+
+        {
+          item.dataObjetivo && (
+            <div class="study-summary__date">
+              <span>Data do objetivo</span>
+              <strong>{item.dataObjetivo}</strong>
+            </div>
+          )
+        }
+      </article>
+    ))
+  }
+
+  {
+    verTodosHref ? (
+      <a
+        class="study-summary__link"
+        href={verTodosHref}
+      >
+        Ver todos os roteiros de estudo →
+      </a>
+    ) : (
+      <span class="study-summary__link">
+        Ver todos os roteiros de estudo →
+      </span>
+    )
+  }
+</div>
+
+<style>
+  .study-summary {
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .study-summary__item {
+    min-height: 58px;
+    padding: 7px 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid rgba(166, 129, 20, 0.16);
+    border-radius: var(--radius-small);
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .study-summary__main {
+    min-width: 0;
+  }
+
+  .study-summary__meta {
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .study-summary__objective {
+    padding: 3px 7px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 212, 82, 0.24);
+    color: #6d5610;
+    font-size: 9px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+  }
+
+  .study-summary__publication {
+    color: #7a8494;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .study-summary__name {
+    margin: 0;
+    overflow: hidden;
+    color: #2f3b50;
+    font-size: 12px;
+    line-height: 1.25;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .study-summary__subject {
+    margin: 2px 0 0;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 650;
+  }
+
+  .study-summary__date {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    color: #6d5610;
+    font-size: 9px;
+    line-height: 1.15;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .study-summary__date strong {
+    margin-top: 2px;
+    color: var(--color-accent-dark);
+    font-size: 11px;
+  }
+
+  .study-summary__link {
+    margin-top: 3px;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    color: var(--color-accent-dark);
+    font-size: 11px;
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  @media (max-width: 767px) {
+    .study-summary__item {
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .study-summary__name {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+    }
+  }
+</style>

@@ -1,0 +1,48 @@
+﻿---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Turma | Matemática Instrumental',
+  description = 'Área da turma — Matemática Instrumental',
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  persistentNavigation
+>
+  <main class="turma-page">
+    <div class="turma-page__shell">
+      <slot />
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .turma-page {
+    min-height: 60vh;
+  }
+
+  .turma-page__shell {
+    width: var(--content-width-desktop);
+    margin: 0 auto;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .turma-page__shell {
+      width: var(--content-width-tablet);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .turma-page__shell {
+      width: var(--content-width-mobile);
+    }
+  }
+</style>

@@ -1,0 +1,53 @@
+﻿:root {
+  /* Paleta oficial — Linha 2 */
+  --color-primary: #0320A6;
+  --color-primary-bright: #3557F2;
+
+  --color-accent: #F2C335;
+  --color-accent-light: #FFD452;
+  --color-accent-dark: #A68114;
+
+  /* Neutros da referência visual aprovada */
+  --color-page-background: #EFEFEF;
+  --color-surface: #FFFFFF;
+
+  --color-text: #333333;
+  --color-heading: #16233C;
+  --color-text-secondary: #4B5362;
+  --color-text-muted: #6B7483;
+
+  --color-border-neutral: #E5E8EC;
+
+  /* Larguras de referência dos mockups aprovados */
+  --reference-width-desktop: 1440px;
+  --reference-width-tablet: 834px;
+  --reference-width-mobile: 390px;
+
+  /* Larguras úteis de conteúdo */
+  --content-width-desktop: 1240px;
+  --content-width-tablet: 750px;
+  --content-width-mobile: 354px;
+
+  /* Menu principal — desktop */
+  --global-menu-width-desktop: 1340px;
+
+  /* Espaçamento principal */
+  --section-gap-desktop: 24px;
+  --section-gap-tablet: 20px;
+  --section-gap-mobile: 16px;
+
+  /* Raios recorrentes */
+  --radius-xl: 18px;
+  --radius-lg: 16px;
+  --radius-md: 14px;
+  --radius-card: 13px;
+  --radius-control: 11px;
+  --radius-small: 10px;
+  --radius-thumbnail: 8px;
+  --radius-pill: 999px;
+
+  /* Sombras discretas */
+  --shadow-surface: 0 8px 24px rgba(30, 45, 70, 0.06);
+  --shadow-surface-light: 0 7px 20px rgba(30, 45, 70, 0.055);
+  --shadow-action: 0 7px 16px rgba(3, 32, 166, 0.14);
+}

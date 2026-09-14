@@ -1,0 +1,82 @@
+# Registro de Decisões do Projeto
+
+Versão: 1.4  
+Status: APROVADO — ROTAS CANÔNICAS DA TURMA  
+Última atualização: 23/08/2026
+
+- DEC-001 — Site independente do ChatGPT.
+- DEC-002 — Hospedagem gratuita.
+- DEC-003 — Arquivos pedagógicos no Google Drive.
+- DEC-004 — Sem cadastro de alunos.
+- DEC-005 — Organização por Segmento → Ano/Série → Turma.
+- DEC-006 — Suporte a anos letivos e arquivamento.
+- DEC-007 — Filtros obrigatórios conforme a área e o volume de conteúdo.
+- DEC-008 — Biblioteca de vídeos reutilizável.
+- DEC-009 — Vídeos com miniatura e player em modal.
+- DEC-010 — Comunicação privada, sem comentários públicos.
+- DEC-011 — E-mail obrigatório no formulário.
+- DEC-012 — Turma automática no formulário.
+- DEC-013 — Conteúdo global não deve ser duplicado por turma.
+- DEC-014 — Usar “Personalidades”.
+- DEC-015 — Área própria de Provas e Resoluções.
+- DEC-016 — Novidades: Novo, Atenção e Destaque.
+- DEC-017 — Prazos automáticos.
+- DEC-018 — Novidades com painel lateral no desktop e layouts adaptados nos demais dispositivos.
+- DEC-019 — Cabeçalho grande com identidade e foto do professor.
+- DEC-020 — Menu abaixo do cabeçalho.
+- DEC-021 — Fundo cinza e boxes diferenciados.
+- DEC-022 — Acesso rápido uniforme.
+- DEC-023 — Segmentos com distinção cromática.
+- DEC-024 — Três linhas de paletas oficiais respeitadas separadamente.
+- DEC-025 — Sistema único de ícones profissionais.
+- DEC-026 — Somente imagens com direito de reprodução compatível.
+- DEC-027 — Astro + GitHub + GitHub Pages + Pages CMS + Drive + Forms.
+- DEC-028 — Mockup aprovado da home é a referência visual oficial.
+- DEC-029 — Página de turma terá navegação própria, mantendo o contexto Segmento → Ano/Série → Turma.
+- DEC-030 — Navegação interna da turma: Início da turma | Cronogramas | Atividades e listas | Para estudar | Trabalhos | Materiais | Vídeos | Links.
+- DEC-031 — Menu principal e menu interno da turma permanecerão acessíveis durante a rolagem; cabeçalho institucional grande não precisa ficar fixo.
+- DEC-032 — Não exibir “ativa/inativa” para turmas; turmas arquivadas usarão mensagem humana de ano letivo encerrado.
+- DEC-033 — Cronogramas será a área de distribuição de pontos da turma.
+- DEC-034 — Cronogramas suportará regimes bimestral, trimestral e semestral, com 4, 3 ou 2 períodos respectivamente.
+- DEC-035 — Todos os períodos letivos serão apresentados na mesma área de Cronogramas e o período corrente será calculado por data.
+- DEC-036 — Tabela de Cronogramas usará Data/Prazo | Tipo | Descrição/Conteúdo | Valor.
+- DEC-037 — Cronogramas não armazenará notas individuais nem campos de pontos previstos/distribuídos.
+- DEC-038 — Itens do Cronograma serão tratados automaticamente como cumpridos/inativos a partir do dia seguinte ao prazo, sem campo manual de situação.
+- DEC-039 — O CMS exibirá aviso administrativo quando a soma dos itens do Cronograma ultrapassar o valor total da etapa.
+- DEC-040 — Atividades e listas terão listagem única, ordenada da publicação mais recente para a mais antiga.
+- DEC-041 — Filtros de Atividades e listas não serão necessários para exibir a lista completa; filtros apenas refinam os resultados.
+- DEC-042 — Atividades e listas poderão conter múltiplos recursos.
+- DEC-043 — Gabarito/resolução de Atividade ou Lista é opcional e pode ter liberação programada; ausência não gera campo vazio.
+- DEC-044 — Para estudar será sempre orientado a um objetivo concreto, como prova, recuperação, concurso, vestibular, ENEM, olimpíada ou equivalente.
+- DEC-045 — Para estudar poderá conter múltiplos recursos, vídeos e leituras.
+- DEC-046 — Para estudar não terá prazo manual; após a data do objetivo, permanecerá acessível com apresentação atenuada.
+- DEC-047 — Trabalhos terão documento próprio contendo todas as orientações.
+- DEC-048 — Trabalhos não terão campos separados de forma de realização, forma de entrega ou etapas.
+- DEC-049 — Trabalhos poderão conter múltiplos recursos adicionais e não terão upload por alunos ou visitantes.
+- DEC-050 — Trabalhos não terão pontuação armazenada em sua área e não exigirão relações com outras áreas.
+- DEC-051 — Novas inserções relevantes das áreas da turma alimentarão automaticamente Novidades sem duplicar o registro original.
+- DEC-052 — Materiais serão organizados por Área → Subárea → Conteúdo.
+- DEC-053 — Cada Material corresponde a um único registro e a um único arquivo/link.
+- DEC-054 — Um Material poderá possuir múltiplas classificações, inclusive em áreas ou subáreas diferentes, sem duplicação do registro.
+- DEC-055 — Materiais não terão prazo.
+- DEC-056 — Filtros de Materiais atenderão aos três níveis Área, Subárea e Conteúdo.
+- DEC-057 — Vídeos usarão classificação Área → Subárea → Conteúdo e poderão possuir múltiplas classificações.
+- DEC-058 — Vídeos manterão prioridades Essencial, Recomendado e Complementar.
+- DEC-059 — Vídeos não usarão campo ativo/inativo e não terão prazo.
+- DEC-060 — Links serão destinados a sites e recursos externos, separados de Materiais e Vídeos.
+- DEC-061 — Links poderão usar finalidade e classificação matemática opcional Área → Subárea → Conteúdo e não terão prazo ou ativo/inativo.
+- DEC-062 — Início da turma funcionará como painel-resumo, com identificação, avisos, próximos compromissos e resumos das demais áreas.
+- DEC-063 — No desktop, a página de turma usará composição inicial aproximada 2/3 + 1/3 e resumos em duas colunas quando houver espaço.
+- DEC-064 — Tablet e celular reorganizarão os componentes; no celular, tabelas deverão ser convertidas para estruturas adequadas à tela.
+- DEC-065 — O mockup desktop da página de turma foi aprovado como referência visual específica da área de turma.
+- DEC-066 — O tablet terá como referência aprovada o mockup de 834 px, com menu principal 3 × 2, menu interno 4 × 2, identificação e avisos empilhados, compromissos verticais e resumos em uma coluna.
+- DEC-067 — No desktop, no tablet e no mobile, a frase institucional será apresentada sempre em três linhas explícitas e controladas: “Matemática:” / “Mais do que uma disciplina,” / “uma ferramenta para a vida!”.
+- DEC-068 — Na faixa “Falar com o Professor” do tablet, o botão ficará à direita e poderá ter quebra controlada de linha.
+- DEC-069 — O mobile terá como referência aprovada o mockup de 390 px, com menu principal compacto, menu interno compacto, conteúdos em uma coluna e compromissos adaptados a cards/blocos verticais.
+- DEC-070 — No celular, o menu interno deve aparecer como controle funcional e identificável, exibindo “Menu da turma” e o item atual; não haverá box branco vazio no lugar da navegação.
+- DEC-071 — No celular, ações textuais longas, como “Ver cronograma completo”, poderão usar quebra controlada em duas linhas para respeitar a largura.
+- DEC-072 — A chamada final “Falar com o Professor” não exibirá a frase “Turma identificada automaticamente: 1º ano — Turma A”; a identificação automática da turma permanece regra do formulário.
+- DEC-073 — Os mockups aprovados de desktop, tablet e celular deverão ser consultados junto à documentação antes da implementação e durante o aceite visual.
+- DEC-074 — Após aprovação da documentação v1.2, dos mockups responsivos e da ETAPA 23, a implementação local da página de turma está formalmente liberada; o checklist integral permanece obrigatório antes de commit/publicação final.
+- DEC-075 — Nas páginas de turma, a navegação persistente formará uma região superior visualmente contínua e opaca: o cabeçalho institucional permanecerá no fluxo normal; o menu principal ficará sticky ao alcançar o topo; o menu interno ficará sticky imediatamente abaixo dele ao alcançá-lo; e o conteúdo continuará rolando por baixo dessa região sem ficar visível através dela, acima dela ou em suas bordas. A solução não poderá criar transparência, vazamentos laterais, espaços estranhos, sobreposição entre os menus, saltos de layout ou rolagem horizontal e preservará as composições responsivas já aprovadas para desktop, tablet e celular.
+- DEC-076 — A rota canônica de uma turma será `/turmas/{segmento-slug}/{ano-serie-slug}/{turma-slug}/`. O campo `slug` de Turma será o identificador URL estável e único da instância, escrito em minúsculas, sem acentos e em kebab-case, com informação suficiente para evitar colisões entre anos letivos, sem alterar o nome visível da turma; por exemplo, `turma-a-2026`. `segmento-slug` e `ano-serie-slug` serão normalizados de forma centralizada e determinística a partir da classificação, como `Ensino Médio` → `ensino-medio` e `1º ano` → `1o-ano`. A rota-base representará “Início da turma” e somente as extensões `cronogramas/`, `atividades-e-listas/`, `para-estudar/`, `trabalhos/`, `materiais/`, `videos/` e `links/` serão válidas como visões internas, sempre preservando o contexto da mesma turma. Breadcrumb e menu interno usarão essas rotas. A implementação distinguirá o caminho canônico da aplicação da geração técnica de links e respeitará o `base` configurado no Astro por helpers centralizados, sem concatenação indiscriminada de caminhos absolutos iniciados por `/`. A estrutura prevista será `src/utils/turmaRoutes.ts`, `src/pages/turmas/[segmento]/[anoSerie]/[turma]/index.astro` e `src/pages/turmas/[segmento]/[anoSerie]/[turma]/[visao].astro`; `[visao]` aceitará somente as sete extensões aprovadas. `validacao-turma.astro` permanecerá temporariamente como página de referência e validação.

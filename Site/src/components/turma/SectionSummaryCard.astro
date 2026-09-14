@@ -1,0 +1,241 @@
+﻿---
+type SummaryVariant =
+  | 'activities'
+  | 'study'
+  | 'works'
+  | 'materials'
+  | 'videos'
+  | 'links';
+
+interface Props {
+  title: string;
+  variant: SummaryVariant;
+}
+
+const {
+  title,
+  variant,
+} = Astro.props;
+---
+
+<article
+  class:list={[
+    'section-summary-card',
+    `section-summary-card--${variant}`,
+  ]}
+>
+  <div class="section-summary-card__header">
+    <h2>{title}</h2>
+
+    <span
+      class="section-summary-card__marker"
+      aria-hidden="true"
+    ></span>
+  </div>
+
+  <slot />
+</article>
+
+<style>
+  .section-summary-card {
+    position: relative;
+    height: 250px;
+    padding: 24px 26px;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 7px 20px rgba(30, 45, 70, 0.045);
+    text-align: left;
+  }
+
+  .section-summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 5px;
+  }
+
+  .section-summary-card__header {
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-summary-card__header h2 {
+    margin: 0;
+    color: #253047;
+    font-size: 19px;
+    line-height: 1.2;
+  }
+
+  .section-summary-card__marker {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+
+  .section-summary-card--activities {
+    padding-bottom: 28px;
+    border: 1.5px solid rgba(53, 87, 242, 0.30);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(53, 87, 242, 0.105),
+        rgba(255, 255, 255, 0.96)
+      );
+  }
+
+  .section-summary-card--activities::before {
+    background: var(--color-primary-bright);
+  }
+
+  .section-summary-card--activities .section-summary-card__header {
+    border-bottom: 1px solid rgba(53, 87, 242, 0.20);
+  }
+
+  .section-summary-card--activities .section-summary-card__marker {
+    border: 1.5px solid rgba(53, 87, 242, 0.34);
+    background: rgba(53, 87, 242, 0.14);
+  }
+
+  .section-summary-card--study {
+    padding-bottom: 28px;
+    border: 1.5px solid rgba(242, 195, 53, 0.42);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 212, 82, 0.18),
+        rgba(255, 255, 255, 0.96)
+      );
+  }
+
+  .section-summary-card--study::before {
+    background: var(--color-accent);
+  }
+
+  .section-summary-card--study .section-summary-card__header {
+    border-bottom: 1px solid rgba(166, 129, 20, 0.20);
+  }
+
+  .section-summary-card--study .section-summary-card__marker {
+    border: 1.5px solid rgba(166, 129, 20, 0.34);
+    background: rgba(255, 212, 82, 0.22);
+  }
+
+  .section-summary-card--works {
+    padding-bottom: 28px;
+    border: 1.5px solid rgba(3, 32, 166, 0.27);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(3, 32, 166, 0.085),
+        rgba(255, 255, 255, 0.96)
+      );
+  }
+
+  .section-summary-card--works::before {
+    background: var(--color-primary);
+  }
+
+  .section-summary-card--works .section-summary-card__header {
+    border-bottom: 1px solid rgba(3, 32, 166, 0.17);
+  }
+
+  .section-summary-card--works .section-summary-card__marker {
+    border: 1.5px solid rgba(3, 32, 166, 0.28);
+    background: rgba(3, 32, 166, 0.11);
+  }
+
+  .section-summary-card--materials {
+    padding-bottom: 28px;
+    border: 1.5px solid rgba(166, 129, 20, 0.31);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(242, 195, 53, 0.115),
+        rgba(255, 255, 255, 0.97)
+      );
+  }
+
+  .section-summary-card--materials::before {
+    background: var(--color-accent-dark);
+  }
+
+  .section-summary-card--materials .section-summary-card__header {
+    border-bottom: 1px solid rgba(166, 129, 20, 0.18);
+  }
+
+  .section-summary-card--materials .section-summary-card__marker {
+    border: 1.5px solid rgba(166, 129, 20, 0.30);
+    background: rgba(242, 195, 53, 0.16);
+  }
+
+  .section-summary-card--videos {
+    padding-bottom: 28px;
+    border: 1.5px solid rgba(53, 87, 242, 0.24);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(53, 87, 242, 0.075),
+        rgba(255, 212, 82, 0.075),
+        rgba(255, 255, 255, 0.97)
+      );
+  }
+
+  .section-summary-card--videos::before {
+    background: var(--color-primary-bright);
+  }
+
+  .section-summary-card--videos .section-summary-card__header {
+    border-bottom: 1px solid rgba(53, 87, 242, 0.15);
+  }
+
+  .section-summary-card--videos .section-summary-card__marker {
+    border: 1.5px solid rgba(53, 87, 242, 0.27);
+    background: rgba(53, 87, 242, 0.11);
+  }
+
+  .section-summary-card--links {
+    padding-bottom: 28px;
+    border: 1.5px solid rgba(166, 129, 20, 0.27);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 212, 82, 0.105),
+        rgba(53, 87, 242, 0.045),
+        rgba(255, 255, 255, 0.97)
+      );
+  }
+
+  .section-summary-card--links::before {
+    background: var(--color-accent);
+  }
+
+  .section-summary-card--links .section-summary-card__header {
+    border-bottom: 1px solid rgba(166, 129, 20, 0.16);
+  }
+
+  .section-summary-card--links .section-summary-card__marker {
+    border: 1.5px solid rgba(166, 129, 20, 0.27);
+    background: rgba(255, 212, 82, 0.16);
+  }
+
+  @media (max-width: 767px) {
+    .section-summary-card {
+      min-height: 250px;
+      height: auto;
+      padding: 20px 20px 24px;
+      border-radius: var(--radius-lg);
+    }
+
+    .section-summary-card__header {
+      padding-bottom: 10px;
+    }
+
+    .section-summary-card__header h2 {
+      font-size: 18px;
+    }
+  }
+</style>

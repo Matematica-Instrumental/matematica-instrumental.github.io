@@ -1,0 +1,329 @@
+---
+export interface LinksViewClassification {
+  area: string;
+  subarea: string;
+  conteudo: string;
+}
+
+export interface LinksViewItem {
+  id: string;
+  titulo: string;
+  descricao: string;
+  url: string;
+  finalidade: string;
+  tipo: string;
+  acesso?: 'Gratuito' | 'Pago';
+  classificacoes?: LinksViewClassification[];
+  publicacao: string;
+  segmento: 'Ensino Fundamental — Anos Finais' | 'Ensino Médio';
+  anoSerie?: string;
+  turmas?: string[];
+  observacaoProfessor?: string;
+  tags?: string[];
+}
+
+export interface LinksViewGroup {
+  finalidade: string;
+  itens: LinksViewItem[];
+}
+
+interface Props {
+  grupos: LinksViewGroup[];
+}
+
+const { grupos } = Astro.props;
+---
+
+<section class="links-view" aria-labelledby="links-view-title">
+  <header class="links-view__header">
+    <h2 id="links-view-title">Links</h2>
+  </header>
+
+  <div class="links-view__groups">
+    {
+      grupos.map((grupo, indice) => (
+        <section
+          class="links-view__group"
+          aria-labelledby={`links-group-${indice}`}
+        >
+          <header class="links-view__group-header">
+            <span>Finalidade</span>
+            <h3 id={`links-group-${indice}`}>{grupo.finalidade}</h3>
+          </header>
+
+          <div class="links-view__items">
+            {grupo.itens.map((link) => {
+              const recursoExterno = /^https?:\/\//i.test(link.url);
+
+              return (
+                <article class="links-view__item" id={link.id}>
+                  <div class="links-view__main">
+                    <div class="links-view__meta">
+                      <div class="links-view__meta-item">
+                        <span>Tipo</span>
+                        <strong>{link.tipo}</strong>
+                      </div>
+                    </div>
+
+                    <h4>{link.titulo}</h4>
+
+                    <p class="links-view__description">
+                      {link.descricao}
+                    </p>
+                  </div>
+
+                  <a
+                    class="links-view__action"
+                    href={link.url}
+                    target={recursoExterno ? '_blank' : undefined}
+                    rel={recursoExterno ? 'noopener noreferrer' : undefined}
+                    aria-label={`Acessar recurso externo: ${link.titulo}`}
+                  >
+                    Acessar
+
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7" />
+                      <path d="M10 14 21 3" />
+                      <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
+                    </svg>
+                  </a>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .links-view {
+    margin: 24px 0 48px;
+    text-align: left;
+  }
+
+  .links-view__header {
+    margin-bottom: 18px;
+  }
+
+  .links-view__header h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 30px;
+    line-height: 1.15;
+    font-weight: 850;
+  }
+
+  .links-view__groups {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
+  }
+
+  .links-view__group {
+    min-width: 0;
+    overflow: hidden;
+    border: 1.5px solid rgba(53, 87, 242, 0.24);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .links-view__group-header {
+    position: relative;
+    padding: 20px 23px 18px;
+    border-bottom: 1px solid rgba(53, 87, 242, 0.13);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 212, 82, 0.22),
+        rgba(255, 255, 255, 0.96) 62%
+      );
+  }
+
+  .links-view__group-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 5px;
+    background: var(--color-accent);
+  }
+
+  .links-view__group-header > span,
+  .links-view__meta-item > span {
+    color: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+  }
+
+  .links-view__group-header h3 {
+    margin: 7px 0 0;
+    color: var(--color-heading);
+    font-size: 21px;
+    line-height: 1.3;
+    font-weight: 850;
+  }
+
+  .links-view__items {
+    min-width: 0;
+  }
+
+  .links-view__item {
+    min-width: 0;
+    padding: 23px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 22px;
+    align-items: center;
+  }
+
+  .links-view__item + .links-view__item {
+    border-top: 1px solid rgba(53, 87, 242, 0.12);
+  }
+
+  .links-view__main {
+    min-width: 0;
+  }
+
+  .links-view__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .links-view__meta-item {
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+  }
+
+  .links-view__meta-item strong {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 800;
+  }
+
+  .links-view__item h4 {
+    margin: 12px 0 0;
+    color: var(--color-heading);
+    font-size: 20px;
+    line-height: 1.32;
+    font-weight: 850;
+  }
+
+  .links-view__description {
+    margin: 12px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.58;
+    font-weight: 500;
+  }
+
+  .links-view__action {
+    min-height: 44px;
+    padding: 10px 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: var(--radius-control);
+    color: var(--color-primary);
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 850;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+  }
+
+  .links-view__action svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .links-view__action:hover {
+    background: rgba(53, 87, 242, 0.055);
+  }
+
+  .links-view__action:focus-visible {
+    outline: 2px solid var(--color-primary-bright);
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .links-view__groups {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .links-view__item {
+      padding: 22px 24px;
+      gap: 26px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .links-view {
+      margin-top: 20px;
+    }
+
+    .links-view__header h2 {
+      font-size: 27px;
+    }
+
+    .links-view__groups {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .links-view__group {
+      border-radius: var(--radius-lg);
+    }
+
+    .links-view__group-header {
+      padding: 18px 20px 16px;
+    }
+
+    .links-view__group-header h3 {
+      font-size: 19px;
+    }
+
+    .links-view__item {
+      padding: 20px 19px;
+      display: block;
+    }
+
+    .links-view__meta {
+      gap: 10px 14px;
+    }
+
+    .links-view__meta-item {
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .links-view__item h4 {
+      font-size: 18px;
+    }
+
+    .links-view__action {
+      width: 100%;
+      margin-top: 18px;
+    }
+  }
+</style>

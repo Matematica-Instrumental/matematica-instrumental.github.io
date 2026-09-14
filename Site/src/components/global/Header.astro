@@ -1,0 +1,300 @@
+﻿---
+import symbol from '../../assets/brand/simbolo-oficial-colorido.png';
+import signature from '../../assets/brand/assinatura-colorida.png';
+import professorPhoto from '../../assets/brand/foto-perfil.jpg';
+---
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__symbol">
+      <img
+        src={symbol.src}
+        alt=""
+        width={symbol.width}
+        height={symbol.height}
+      />
+    </div>
+
+    <div class="site-header__brand">
+      <img
+        src={signature.src}
+        alt="Matemática Instrumental"
+        width={signature.width}
+        height={signature.height}
+      />
+    </div>
+
+    <div class="site-header__professor">
+      <div class="site-header__professor-copy">
+        <p class="site-header__phrase">
+          <span class="site-header__phrase-line">Matemática:</span>
+          <span class="site-header__phrase-line">Mais do que uma disciplina,</span>
+          <span class="site-header__phrase-line">uma ferramenta para a vida!</span>
+        </p>
+      </div>
+
+      <div class="site-header__photo-block">
+        <img
+          src={professorPhoto.src}
+          alt="Professor Adriano Lima Teixeira"
+          width={professorPhoto.width}
+          height={professorPhoto.height}
+        />
+        <p class="site-header__professor-name">
+          Professor Adriano Lima Teixeira
+        </p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    height: 180px;
+    background: var(--color-surface);
+    border-bottom: 2px solid #b8b8b8;
+  }
+
+  .site-header__inner {
+    width: var(--content-width-desktop);
+    height: 180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 260px 1fr 470px;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .site-header__symbol {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+  }
+
+  .site-header__symbol img {
+    width: 145px;
+    height: auto;
+  }
+
+  .site-header__brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .site-header__brand img {
+    width: 405px;
+    height: auto;
+  }
+
+  .site-header__professor {
+    display: grid;
+    grid-template-columns: 1fr 126px;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .site-header__professor-copy {
+    color: var(--color-heading);
+    line-height: 1.32;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .site-header__phrase {
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid rgba(166, 129, 20, 0.35);
+    border-radius: var(--radius-md);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(242, 195, 53, 0.18),
+        rgba(255, 212, 82, 0.08)
+      );
+    font-size: 17px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .site-header__phrase > .site-header__phrase-line {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .site-header__photo-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .site-header__photo-block img {
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .site-header__professor-name {
+    margin: 0;
+    color: #245eaa;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .site-header {
+      height: 226px;
+    }
+
+    .site-header__inner {
+      width: var(--content-width-tablet);
+      height: 226px;
+      grid-template-columns: 120px 1fr 122px;
+      grid-template-rows: 145px 61px;
+      gap: 8px 18px;
+    }
+
+    .site-header__symbol {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .site-header__symbol img {
+      width: 96px;
+    }
+
+    .site-header__brand {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .site-header__brand img {
+      width: 315px;
+    }
+
+    .site-header__professor {
+      display: contents;
+    }
+
+    .site-header__professor-copy {
+      width: 100%;
+      min-width: 0;
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+
+    .site-header__phrase {
+      width: 100%;
+      max-width: 690px;
+      margin: 0 auto;
+      padding: 8px 18px;
+      font-size: 13px;
+      line-height: 1.28;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .site-header__phrase > .site-header__phrase-line {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .site-header__photo-block {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .site-header__photo-block img {
+      width: 88px;
+      height: 88px;
+    }
+
+    .site-header__professor-name {
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .site-header {
+      height: 238px;
+    }
+
+    .site-header__inner {
+      width: var(--content-width-mobile);
+      height: 238px;
+      grid-template-columns: 72px 1fr 72px;
+      grid-template-rows: 136px 86px;
+      gap: 8px 10px;
+    }
+
+    .site-header__symbol {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .site-header__symbol img {
+      width: 62px;
+      height: auto;
+    }
+
+    .site-header__brand {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .site-header__brand img {
+      width: 182px;
+      height: auto;
+    }
+
+    .site-header__professor {
+      display: contents;
+    }
+
+    .site-header__professor-copy {
+      width: 100%;
+      min-width: 0;
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+
+    .site-header__phrase {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.27;
+    }
+
+    .site-header__phrase > .site-header__phrase-line {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .site-header__photo-block {
+      grid-column: 3;
+      grid-row: 1;
+      gap: 5px;
+    }
+
+    .site-header__photo-block img {
+      width: 62px;
+      height: 62px;
+    }
+
+    .site-header__professor-name {
+      font-size: 9px;
+      line-height: 1.15;
+    }
+  }
+</style>

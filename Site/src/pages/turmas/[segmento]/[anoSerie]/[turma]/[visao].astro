@@ -1,0 +1,251 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import TurmaLayout from '../../../../../layouts/TurmaLayout.astro';
+import ActivitiesListsView from '../../../../../components/turma/ActivitiesListsView.astro';
+import Breadcrumb from '../../../../../components/turma/Breadcrumb.astro';
+import CronogramasView from '../../../../../components/turma/CronogramasView.astro';
+import LinksView from '../../../../../components/turma/LinksView.astro';
+import MaterialsView from '../../../../../components/turma/MaterialsView.astro';
+import StudyView from '../../../../../components/turma/StudyView.astro';
+import TurmaIdentity from '../../../../../components/turma/TurmaIdentity.astro';
+import TurmaNavigation from '../../../../../components/turma/TurmaNavigation.astro';
+import VideosView from '../../../../../components/turma/VideosView.astro';
+import WorksView from '../../../../../components/turma/WorksView.astro';
+import type { ActivitiesListsViewItem } from '../../../../../components/turma/ActivitiesListsView.astro';
+import type { LinksViewGroup } from '../../../../../components/turma/LinksView.astro';
+import type { StudyViewItem } from '../../../../../components/turma/StudyView.astro';
+import type { VideosViewItem } from '../../../../../components/turma/VideosView.astro';
+import type { WorksViewItem } from '../../../../../components/turma/WorksView.astro';
+import {
+  formatarDataResumo,
+  formatarDuracaoVideo,
+  formatarReferenciaPublicacao,
+  getAtividadesListasDaTurma,
+  getCronogramasDaTurma,
+  getItensParaEstudarDaTurma,
+  getLinksDaTurma,
+  getMateriaisDaTurma,
+  getTrabalhosDaTurma,
+  getVideosDaTurma,
+} from '../../../../../utils/turmaContent';
+import { getPortalToday } from '../../../../../utils/portalDate';
+import {
+  getTurmaRouteParams,
+  TURMA_INTERNAL_VIEWS,
+  type TurmaViewId,
+} from '../../../../../utils/turmaRoutes';
+
+interface Props {
+  turma: CollectionEntry<'turmas'>['data'];
+  activeView: TurmaViewId;
+}
+
+export async function getStaticPaths() {
+  const turmas = await getCollection('turmas');
+
+  return turmas.flatMap((entry) => {
+    const turmaParams = getTurmaRouteParams(entry.data);
+
+    return TURMA_INTERNAL_VIEWS.map((view) => ({
+      params: {
+        ...turmaParams,
+        visao: view.slug,
+      },
+      props: {
+        turma: entry.data,
+        activeView: view.id,
+      },
+    }));
+  });
+}
+
+const {
+  turma,
+  activeView,
+} = Astro.props;
+const cronogramas = activeView === 'cronogramas'
+  ? await getCronogramasDaTurma(turma)
+  : null;
+const hojeAtividades = getPortalToday();
+const registrosAtividades = activeView === 'atividades'
+  ? await getAtividadesListasDaTurma(turma.slug, {
+      hoje: hojeAtividades,
+    })
+  : [];
+const atividades = registrosAtividades.map((atividade) => ({
+  tipo: atividade.tipo,
+  publicacao: formatarReferenciaPublicacao(
+    atividade.publicacao,
+    hojeAtividades,
+  ),
+  titulo: atividade.titulo,
+  assunto: atividade.assunto,
+  prazo: atividade.prazo
+    ? formatarDataResumo(atividade.prazo)
+    : undefined,
+  descricao: atividade.descricao,
+  recursos: atividade.recursos,
+  gabaritoResolucao: atividade.gabaritoResolucao?.recursos,
+  gabaritoDisponivelEm: atividade.gabaritoResolucao?.disponivelEm
+    ? formatarDataResumo(atividade.gabaritoResolucao.disponivelEm)
+    : undefined,
+})) satisfies ActivitiesListsViewItem[];
+const assuntosAtividades = [
+  ...new Set(registrosAtividades.map(({ assunto }) => assunto)),
+];
+const registrosParaEstudar = activeView === 'paraEstudar'
+  ? await getItensParaEstudarDaTurma(turma.slug, {
+      hoje: hojeAtividades,
+    })
+  : [];
+const itensParaEstudar = registrosParaEstudar.map((item) => ({
+  titulo: item.titulo,
+  objetivo: item.objetivo,
+  assunto: item.assunto,
+  publicacao: formatarReferenciaPublicacao(
+    item.publicacao,
+    hojeAtividades,
+  ),
+  dataObjetivo: item.dataObjetivo
+    ? formatarDataResumo(item.dataObjetivo)
+    : undefined,
+  resumoOrientacao: item.resumoOrientacao,
+  recursos: item.recursos,
+  leiturasRelacionadas: item.leiturasRelacionadas,
+  atenuado: item.atenuado,
+})) satisfies StudyViewItem[];
+const assuntosParaEstudar = [
+  ...new Set(registrosParaEstudar.map(({ assunto }) => assunto)),
+];
+const registrosTrabalhos = activeView === 'trabalhos'
+  ? await getTrabalhosDaTurma(turma.slug, {
+      hoje: hojeAtividades,
+    })
+  : [];
+const itensTrabalhos = registrosTrabalhos.map((trabalho) => ({
+  titulo: trabalho.titulo,
+  assunto: trabalho.assunto,
+  publicacao: formatarReferenciaPublicacao(
+    trabalho.publicacao,
+    hojeAtividades,
+  ),
+  entregaData: formatarDataResumo(trabalho.marco.data),
+  descricao: trabalho.descricao,
+  documentoTrabalho: trabalho.documentoTrabalho,
+  recursosAdicionais: trabalho.recursosAdicionais,
+  atenuado: trabalho.atenuado,
+})) satisfies WorksViewItem[];
+const assuntosTrabalhos = [
+  ...new Set(registrosTrabalhos.map(({ assunto }) => assunto)),
+];
+const itensMateriais = activeView === 'materiais'
+  ? await getMateriaisDaTurma(turma.slug)
+  : [];
+const registrosVideos = activeView === 'videos'
+  ? await getVideosDaTurma(turma)
+  : [];
+const itensVideos = registrosVideos.map((video) => ({
+  id: video.id,
+  titulo: video.titulo,
+  descricao: video.descricao,
+  url: video.url,
+  miniaturaUrl: video.miniaturaUrl,
+  duracao: formatarDuracaoVideo(video.duracaoSegundos),
+  prioridade: video.prioridade,
+  classificacoes: video.classificacoes,
+  provedor: video.provedor,
+  tags: video.tags,
+})) satisfies VideosViewItem[];
+const gruposLinks = activeView === 'links'
+  ? await getLinksDaTurma(turma)
+  : [] satisfies LinksViewGroup[];
+---
+
+<TurmaLayout
+  title={`${turma.anoSerie} — ${turma.nome} | Matemática Instrumental`}
+  description={turma.descricao}
+>
+  <Breadcrumb
+    segmento={turma.segmento}
+    anoSerie={turma.anoSerie}
+    turma={turma.nome}
+  />
+
+  <TurmaIdentity
+    segmento={turma.segmento}
+    anoSerie={turma.anoSerie}
+    turma={turma.nome}
+    anoLetivo={turma.anoLetivo}
+    descricao={turma.descricao}
+    arquivada={turma.arquivada}
+  />
+
+  <TurmaNavigation
+    turma={turma}
+    activeView={activeView}
+  />
+
+  {
+    activeView === 'cronogramas'
+      && cronogramas
+      && cronogramas.periodoSelecionado.itensCronograma.length > 0
+      && (
+      <CronogramasView
+        periodos={cronogramas.periodos}
+        itensCronograma={cronogramas.periodoSelecionado.itensCronograma}
+        totalEtapa={cronogramas.periodoSelecionado.totalEtapa}
+      />
+    )
+  }
+
+  {
+    activeView === 'atividades'
+      && atividades.length > 0
+      && (
+      <ActivitiesListsView
+        itens={atividades}
+        assuntos={assuntosAtividades}
+      />
+    )
+  }
+
+  {
+    activeView === 'paraEstudar'
+      && itensParaEstudar.length > 0
+      && (
+      <StudyView
+        itens={itensParaEstudar}
+        assuntos={assuntosParaEstudar}
+      />
+    )
+  }
+
+  {
+    activeView === 'trabalhos'
+      && itensTrabalhos.length > 0
+      && (
+      <WorksView
+        itens={itensTrabalhos}
+        assuntos={assuntosTrabalhos}
+      />
+    )
+  }
+
+  {
+    activeView === 'materiais'
+      && itensMateriais.length > 0
+      && <MaterialsView itens={itensMateriais} />
+  }
+
+  {
+    activeView === 'videos'
+      && itensVideos.length > 0
+      && <VideosView itens={itensVideos} />
+  }
+
+  {
+    activeView === 'links'
+      && gruposLinks.length > 0
+      && <LinksView grupos={gruposLinks} />
+  }
+</TurmaLayout>

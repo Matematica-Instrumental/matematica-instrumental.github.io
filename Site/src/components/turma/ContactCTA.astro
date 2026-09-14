@@ -1,0 +1,230 @@
+﻿---
+interface Props {
+  href?: string;
+}
+
+const {
+  href,
+} = Astro.props;
+---
+
+<section
+  class="contact-cta"
+  aria-label="Falar com o Professor"
+>
+  <div class="contact-cta__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+      <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+      <path d="M8 10h8" />
+      <path d="M8 14h5" />
+    </svg>
+  </div>
+
+  <div class="contact-cta__copy">
+    <p class="contact-cta__kicker">
+      Comunicação privada
+    </p>
+
+    <h2 class="contact-cta__title">
+      Falar com o Professor
+    </h2>
+
+    <p class="contact-cta__text">
+      Envie uma dúvida, solicitação ou mensagem diretamente ao professor.
+    </p>
+  </div>
+
+  {
+    href ? (
+      <a
+        class="contact-cta__action"
+        href={href}
+      >
+        <span>Falar com o Professor</span>
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h14" />
+          <path d="m13 6 6 6-6 6" />
+        </svg>
+      </a>
+    ) : (
+      <span class="contact-cta__action">
+        <span>Falar com o Professor</span>
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h14" />
+          <path d="m13 6 6 6-6 6" />
+        </svg>
+      </span>
+    )
+  }
+</section>
+
+<style>
+  .contact-cta {
+    min-height: 150px;
+    margin-top: 24px;
+    padding: 24px 30px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 22px;
+    border: 1.5px solid rgba(53, 87, 242, 0.30);
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(53, 87, 242, 0.11),
+        rgba(255, 212, 82, 0.11),
+        rgba(255, 255, 255, 0.97)
+      );
+    box-shadow: 0 8px 24px rgba(30, 45, 70, 0.055);
+    text-align: left;
+  }
+
+  .contact-cta__icon {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    background: var(--color-primary);
+    color: var(--color-accent-light);
+    box-shadow: 0 6px 14px rgba(3, 32, 166, 0.13);
+  }
+
+  .contact-cta__icon svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .contact-cta__copy {
+    min-width: 0;
+  }
+
+  .contact-cta__kicker {
+    margin: 0 0 5px;
+    color: var(--color-primary-bright);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .contact-cta__title {
+    margin: 0 0 5px;
+    color: var(--color-heading);
+    font-size: 22px;
+    line-height: 1.15;
+    font-weight: 850;
+  }
+
+  .contact-cta__text {
+    margin: 0;
+    color: #586172;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 550;
+  }
+
+  .contact-cta__action {
+    min-width: 205px;
+    height: 46px;
+    padding: 0 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border-radius: var(--radius-control);
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 850;
+    text-decoration: none;
+    box-shadow: var(--shadow-action);
+  }
+
+  .contact-cta__action svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: var(--color-accent-light);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .contact-cta {
+      min-height: 150px;
+      margin-top: 20px;
+      padding: 22px 24px;
+      grid-template-columns: auto 1fr auto;
+      gap: 16px;
+    }
+
+    .contact-cta__action {
+      width: 146px;
+      min-width: 146px;
+      min-height: 52px;
+      height: auto;
+      padding: 9px 12px;
+      grid-column: 3;
+      align-self: center;
+      justify-self: end;
+      line-height: 1.15;
+      text-align: center;
+      white-space: normal;
+    }
+
+    .contact-cta__action span {
+      display: block;
+      white-space: normal;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .contact-cta {
+      min-height: 0;
+      margin-top: 16px;
+      padding: 20px;
+      grid-template-columns: 48px 1fr;
+      grid-template-rows: auto auto;
+      gap: 12px;
+      border-radius: var(--radius-lg);
+    }
+
+    .contact-cta__icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-card);
+    }
+
+    .contact-cta__title {
+      font-size: 20px;
+    }
+
+    .contact-cta__text {
+      font-size: 13px;
+    }
+
+    .contact-cta__action {
+      width: 100%;
+      min-width: 0;
+      min-height: 46px;
+      height: 46px;
+      padding: 0 14px;
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-self: stretch;
+      line-height: 1;
+      white-space: nowrap;
+    }
+  }
+</style>

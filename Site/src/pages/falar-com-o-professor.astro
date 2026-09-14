@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Falar com o Professor | Matemática Instrumental">
+  <main class="contact-page">
+    <h1>Falar com o Professor</h1>
+
+    <p>Comunicação privada.</p>
+
+    <form class="contact-form" data-contact-form>
+      <input type="hidden" name="turma" data-contact-turma />
+
+      <label>
+        <span>Nome</span>
+        <input type="text" name="nome" autocomplete="name" required />
+      </label>
+
+      <label>
+        <span>E-mail</span>
+        <input type="email" name="email" autocomplete="email" required />
+      </label>
+
+      <label>
+        <span>Motivo</span>
+        <input type="text" name="motivo" required />
+      </label>
+
+      <label>
+        <span>Mensagem</span>
+        <textarea name="mensagem" rows="8" required></textarea>
+      </label>
+    </form>
+  </main>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const turma = form?.querySelector<HTMLInputElement>('[data-contact-turma]');
+  const turmaSlug = new URLSearchParams(window.location.search).get('turma');
+
+  if (turma && turmaSlug) {
+    turma.value = turmaSlug;
+  }
+</script>
+
+<style>
+  .contact-page {
+    width: min(100% - 40px, 760px);
+    margin: 0 auto;
+    padding: 48px 0 64px;
+  }
+
+  .contact-page h1 {
+    margin: 0;
+    color: var(--color-heading);
+  }
+
+  .contact-page > p {
+    margin: 10px 0 28px;
+    color: var(--color-text-secondary);
+  }
+
+  .contact-form {
+    display: grid;
+    gap: 18px;
+  }
+
+  .contact-form label {
+    display: grid;
+    gap: 7px;
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border-neutral);
+    border-radius: var(--radius-control);
+    background: #fff;
+    color: var(--color-text);
+    font: inherit;
+  }
+
+  .contact-form textarea {
+    resize: vertical;
+  }
+</style>

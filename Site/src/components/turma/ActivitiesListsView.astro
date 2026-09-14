@@ -1,0 +1,542 @@
+---
+export interface ActivitiesListsViewResource {
+  nome: string;
+  url: string;
+}
+
+export interface ActivitiesListsViewItem {
+  tipo: 'Atividade' | 'Lista de exercícios';
+  publicacao: string;
+  titulo: string;
+  assunto: string;
+  prazo?: string;
+  descricao?: string;
+  recursos?: ActivitiesListsViewResource[];
+  gabaritoResolucao?: ActivitiesListsViewResource[];
+  gabaritoDisponivelEm?: string;
+}
+
+interface Props {
+  itens: ActivitiesListsViewItem[];
+  assuntos: string[];
+}
+
+const {
+  itens,
+  assuntos,
+} = Astro.props;
+---
+
+<section
+  class="activities-validation"
+  aria-labelledby="activities-validation-title"
+>
+    <header class="activities-validation__header">
+      <h2 id="activities-validation-title">Atividades e listas</h2>
+    </header>
+
+    <div
+      class="activities-validation__filters"
+      aria-label="Filtros de atividades e listas"
+    >
+      <label class="activities-validation__filter">
+        <span>Busca</span>
+        <input
+          type="search"
+          name="busca"
+          autocomplete="off"
+        />
+      </label>
+
+      <label class="activities-validation__filter">
+        <span>Assunto</span>
+        <select name="assunto">
+          <option value="">Todos os assuntos</option>
+          {
+            assuntos.map((assunto) => (
+              <option value={assunto}>{assunto}</option>
+            ))
+          }
+        </select>
+      </label>
+
+      <label class="activities-validation__filter">
+        <span>Tipo</span>
+        <select name="tipo">
+          <option value="">Todos os tipos</option>
+          <option value="atividade">Atividade</option>
+          <option value="lista-de-exercicios">
+            Lista de exercícios
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <div
+      class="activities-validation__list"
+      aria-label="Atividades e listas publicadas"
+    >
+      {
+        itens.map((item) => (
+          <article class="activities-validation__item">
+            <span
+              class:list={[
+                'activities-validation__type',
+                {
+                  'activities-validation__type--list':
+                    item.tipo === 'Lista de exercícios',
+                },
+              ]}
+            >
+              {item.tipo}
+            </span>
+
+            <div class="activities-validation__item-line">
+              <h3>{item.titulo}</h3>
+
+              <div class="activities-validation__metadata">
+                <div class="activities-validation__metadata-item">
+                  <span>Assunto</span>
+                  <strong>{item.assunto}</strong>
+                </div>
+
+                <div class="activities-validation__metadata-item">
+                  <span>Publicação</span>
+                  <strong>{item.publicacao}</strong>
+                </div>
+
+                <div
+                  class:list={[
+                    'activities-validation__metadata-item',
+                    'activities-validation__metadata-item--deadline',
+                  ]}
+                >
+                  <span>Prazo</span>
+                  <strong>{item.prazo ?? '-'}</strong>
+                </div>
+              </div>
+            </div>
+
+            {
+              (item.descricao ||
+                item.recursos?.length ||
+                item.gabaritoResolucao?.length ||
+                item.gabaritoDisponivelEm) && (
+                <div class="activities-validation__item-body">
+                  {item.descricao && (
+                    <p class="activities-validation__description">
+                      {item.descricao}
+                    </p>
+                  )}
+
+                  {item.recursos && item.recursos.length > 0 && (
+                    <section class="activities-validation__resource-section">
+                      <h4 class="activities-validation__resource-title">
+                        Recursos
+                      </h4>
+
+                      <div class="activities-validation__resource-links">
+                        {item.recursos.map((recurso) => (
+                          <a
+                            class="activities-validation__resource-link"
+                            href={recurso.url}
+                          >
+                            {recurso.nome}
+                          </a>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+
+                  {item.gabaritoResolucao &&
+                    item.gabaritoResolucao.length > 0 && (
+                      <section
+                        class:list={[
+                          'activities-validation__resource-section',
+                          'activities-validation__resource-section--solution',
+                        ]}
+                      >
+                        <h4 class="activities-validation__resource-title">
+                          Gabarito / Resolução
+                        </h4>
+
+                        <div class="activities-validation__resource-links">
+                          {item.gabaritoResolucao.map((recurso) => (
+                            <a
+                              class="activities-validation__resource-link"
+                              href={recurso.url}
+                            >
+                              {recurso.nome}
+                            </a>
+                          ))}
+                        </div>
+                      </section>
+                    )}
+
+                  {item.gabaritoDisponivelEm && (
+                    <section
+                      class:list={[
+                        'activities-validation__resource-section',
+                        'activities-validation__resource-section--solution',
+                      ]}
+                    >
+                      <h4 class="activities-validation__resource-title">
+                        Gabarito / Resolução
+                      </h4>
+
+                      <p class="activities-validation__solution-availability">
+                        Disponível em {item.gabaritoDisponivelEm}
+                      </p>
+                    </section>
+                  )}
+                </div>
+              )
+            }
+          </article>
+        ))
+      }
+    </div>
+</section>
+
+<style>
+  .activities-validation {
+    margin: 24px 0 48px;
+    text-align: left;
+  }
+
+  .activities-validation__header {
+    margin-bottom: 18px;
+  }
+
+  .activities-validation__header h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 30px;
+    line-height: 1.15;
+    font-weight: 850;
+  }
+
+  .activities-validation__filters {
+    margin: 0 0 18px;
+    padding: 18px 20px 20px;
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1.8fr)
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+    gap: 16px;
+    border: 1.5px solid rgba(53, 87, 242, 0.20);
+    border-radius: var(--radius-md);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(53, 87, 242, 0.045),
+        rgba(255, 255, 255, 0.98) 52%
+      );
+    box-shadow: var(--shadow-surface-light);
+  }
+
+  .activities-validation__filter {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .activities-validation__filter > span {
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 850;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+
+  .activities-validation__filter input,
+  .activities-validation__filter select {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 13px;
+    border: 1px solid rgba(53, 87, 242, 0.22);
+    border-radius: var(--radius-control);
+    outline: 0;
+    background: var(--color-surface);
+    color: #354052;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 650;
+  }
+
+  .activities-validation__filter input:focus-visible,
+  .activities-validation__filter select:focus-visible {
+    border-color: var(--color-primary-bright);
+    box-shadow: 0 0 0 3px rgba(53, 87, 242, 0.13);
+  }
+
+  .activities-validation__list {
+    overflow: hidden;
+    border: 1.5px solid rgba(53, 87, 242, 0.24);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .activities-validation__item {
+    position: relative;
+    padding: 24px 26px 25px;
+    border-bottom: 1px solid rgba(53, 87, 242, 0.12);
+  }
+
+  .activities-validation__item:last-child {
+    border-bottom: 0;
+  }
+
+  .activities-validation__item::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    bottom: 25px;
+    left: 0;
+    width: 4px;
+    border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+    background: var(--color-accent);
+  }
+
+  .activities-validation__type {
+    padding: 5px 9px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    background: rgba(53, 87, 242, 0.10);
+    color: var(--color-primary);
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .activities-validation__type--list {
+    background: rgba(3, 32, 166, 0.11);
+  }
+
+  .activities-validation__item-line {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .activities-validation__item h3 {
+    min-width: 0;
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 19px;
+    line-height: 1.3;
+    font-weight: 850;
+  }
+
+  .activities-validation__metadata {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 12px;
+  }
+
+  .activities-validation__metadata-item {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .activities-validation__metadata-item span {
+    color: var(--color-text-muted);
+    font-size: 9px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+  }
+
+  .activities-validation__metadata-item strong {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.25;
+    font-weight: 800;
+  }
+
+  .activities-validation__metadata-item--deadline strong {
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 767px) {
+    .activities-validation__metadata {
+      justify-items: stretch;
+    }
+
+    .activities-validation__metadata-item {
+      width: 100%;
+      justify-self: stretch;
+      align-items: stretch;
+      text-align: center;
+    }
+
+    .activities-validation__metadata-item span,
+    .activities-validation__metadata-item strong {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .activities-validation__item-line {
+      grid-template-columns:
+        minmax(0, 1fr)
+        clamp(250px, 32vw, 300px);
+      align-items: center;
+      column-gap: 24px;
+    }
+
+    .activities-validation__metadata {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+      justify-items: stretch;
+      gap: 16px;
+      white-space: nowrap;
+    }
+
+    .activities-validation__metadata-item {
+      width: 100%;
+      justify-self: stretch;
+      align-items: center;
+      text-align: center;
+    }
+
+    .activities-validation__metadata-item span,
+    .activities-validation__metadata-item strong {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .activities-validation__item-line {
+      column-gap: 42px;
+    }
+
+    .activities-validation__metadata {
+      gap: 30px;
+    }
+  }
+
+  .activities-validation__item-body {
+    margin-top: 20px;
+    display: grid;
+    gap: 18px;
+  }
+
+  .activities-validation__description {
+    max-width: 72ch;
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  .activities-validation__resource-section {
+    min-width: 0;
+    display: grid;
+    gap: 8px;
+  }
+
+  .activities-validation__resource-section--solution {
+    padding-top: 2px;
+  }
+
+  .activities-validation__resource-title {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-family: inherit;
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: default;
+  }
+
+  .activities-validation__resource-links {
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 24px;
+  }
+
+  .activities-validation__resource-link {
+    max-width: 100%;
+    min-height: 42px;
+    padding: 9px 8px;
+    display: inline-flex;
+    flex: 0 1 auto;
+    align-items: center;
+    border-radius: var(--radius-control);
+    color: var(--color-primary);
+    font-size: 14px;
+    line-height: 1.25;
+    font-weight: 800;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+
+  .activities-validation__resource-link:hover {
+    background: rgba(53, 87, 242, 0.055);
+  }
+
+  .activities-validation__resource-link:focus-visible {
+    outline: 2px solid var(--color-primary-bright);
+    outline-offset: 2px;
+  }
+
+  .activities-validation__solution-availability {
+    max-width: 100%;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    cursor: default;
+  }
+
+  @media (max-width: 767px) {
+    .activities-validation__item-body {
+      margin-top: 18px;
+      gap: 16px;
+    }
+
+    .activities-validation__description {
+      max-width: none;
+    }
+
+    .activities-validation__resource-links {
+      gap: 8px 16px;
+    }
+
+    .activities-validation__resource-link {
+      min-height: 44px;
+    }
+  }
+</style>

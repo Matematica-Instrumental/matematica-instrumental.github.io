@@ -1,0 +1,396 @@
+---
+import type { SegmentoTurmasViewData } from '../../utils/turmaContent';
+
+interface Props {
+  segmentos: readonly SegmentoTurmasViewData[];
+}
+
+const { segmentos } = Astro.props;
+---
+
+<main class="turmas-page">
+  <div class="turmas-page__inner">
+    <header class="turmas-page__heading">
+      <h1>Turmas</h1>
+    </header>
+
+    {
+      segmentos.length === 0 ? (
+        <p class="empty-state">Nenhuma turma disponível no momento.</p>
+      ) : (
+        <div class="segment-list">
+          {segmentos.map((segmento, segmentoIndex) => (
+            <section
+              class:list={[
+                'segment-group',
+                {
+                  'segment-group--fundamental':
+                    segmento.nome === 'Ensino Fundamental — Anos Finais',
+                  'segment-group--medio': segmento.nome === 'Ensino Médio',
+                },
+              ]}
+              aria-labelledby={`segmento-${segmentoIndex}`}
+            >
+              <header class="segment-group__heading">
+                <span class="hierarchy-label">Segmento</span>
+                <h2 id={`segmento-${segmentoIndex}`}>{segmento.nome}</h2>
+              </header>
+
+              <div class="year-list">
+                {segmento.anosSeries.map((anoSerie, anoSerieIndex) => (
+                  <section
+                    class="year-group"
+                    aria-labelledby={
+                      `segmento-${segmentoIndex}-ano-${anoSerieIndex}`
+                    }
+                  >
+                    <header class="year-group__heading">
+                      <span class="hierarchy-label">Ano / série</span>
+                      <h3
+                        id={`segmento-${segmentoIndex}-ano-${anoSerieIndex}`}
+                      >
+                        {anoSerie.nome}
+                      </h3>
+                    </header>
+
+                    <div class="class-list">
+                      {anoSerie.turmas.map((turma) => (
+                        <a
+                          class:list={[
+                            'class-card',
+                            { 'class-card--archived': turma.arquivada },
+                          ]}
+                          href={turma.href}
+                        >
+                          <div class="class-card__header">
+                            <div>
+                              <span class="hierarchy-label">Turma</span>
+                              <h4>{turma.nome}</h4>
+                            </div>
+
+                            <svg
+                              class="class-card__arrow"
+                              viewBox="0 0 24 24"
+                              aria-hidden="true"
+                            >
+                              <path d="m9 6 6 6-6 6" />
+                            </svg>
+                          </div>
+
+                          <p class="class-card__school-year">
+                            Ano letivo {turma.anoLetivo}
+                          </p>
+
+                          {turma.arquivada && (
+                            <p class="class-card__archived-message">
+                              Turma arquivada — ano letivo encerrado
+                            </p>
+                          )}
+
+                          {turma.descricao && (
+                            <p class="class-card__description">
+                              {turma.descricao}
+                            </p>
+                          )}
+                        </a>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</main>
+
+<style>
+  .turmas-page {
+    padding: 46px 0 58px;
+  }
+
+  .turmas-page__inner {
+    width: var(--content-width-desktop);
+    margin: 0 auto;
+  }
+
+  .turmas-page__heading {
+    padding-bottom: 22px;
+    border-bottom: 1px solid #d7dce3;
+  }
+
+  .turmas-page__heading h1 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 40px;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .segment-list {
+    margin-top: 30px;
+    display: grid;
+    gap: 28px;
+  }
+
+  .empty-state {
+    margin: 30px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .segment-group {
+    --segment-color: var(--color-primary-bright);
+    --segment-soft: rgba(53, 87, 242, 0.08);
+    overflow: hidden;
+    border: 1px solid #d9dee6;
+    border-top: 5px solid var(--segment-color);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface-light);
+  }
+
+  .segment-group--medio {
+    --segment-color: var(--color-accent-dark);
+    --segment-soft: rgba(242, 195, 53, 0.12);
+  }
+
+  .segment-group__heading {
+    padding: 24px 28px 22px;
+    background:
+      linear-gradient(90deg, var(--segment-soft), rgba(255, 255, 255, 0));
+  }
+
+  .hierarchy-label {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 850;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .segment-group__heading h2 {
+    margin: 7px 0 0;
+    color: var(--color-heading);
+    font-size: 25px;
+    line-height: 1.2;
+  }
+
+  .year-list {
+    padding: 4px 28px 28px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .year-group {
+    min-width: 0;
+    padding-top: 20px;
+    border-top: 1px solid #dfe3e9;
+  }
+
+  .year-group__heading {
+    margin-bottom: 14px;
+  }
+
+  .year-group__heading h3 {
+    margin: 5px 0 0;
+    color: var(--segment-color);
+    font-size: 21px;
+    line-height: 1.2;
+  }
+
+  .class-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .class-card {
+    min-height: 124px;
+    padding: 18px;
+    display: block;
+    border: 1px solid #dfe4eb;
+    border-radius: var(--radius-card);
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+    box-shadow: 0 3px 12px rgba(30, 45, 70, 0.04);
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+  }
+
+  .class-card:hover {
+    border-color: var(--segment-color);
+    box-shadow: 0 8px 20px rgba(30, 45, 70, 0.10);
+    transform: translateY(-2px);
+  }
+
+  .class-card:focus-visible {
+    outline: 3px solid var(--color-accent-light);
+    outline-offset: 3px;
+  }
+
+  .class-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .class-card h4 {
+    margin: 5px 0 0;
+    color: var(--color-heading);
+    font-size: 18px;
+    line-height: 1.25;
+  }
+
+  .class-card__arrow {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    margin-top: 4px;
+    fill: none;
+    stroke: var(--segment-color);
+    stroke-width: 2.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .class-card__school-year {
+    margin: 10px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 700;
+  }
+
+  .class-card__description {
+    margin: 11px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .class-card--archived {
+    border-color: #cfd4dc;
+    background: #f6f7f8;
+    box-shadow: none;
+  }
+
+  .class-card--archived .class-card__arrow {
+    color: var(--color-text-muted);
+    stroke: currentColor;
+  }
+
+  .class-card__archived-message {
+    margin: 10px 0 0;
+    color: #596273;
+    font-size: 12px;
+    line-height: 1.35;
+    font-weight: 800;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .turmas-page {
+      padding: 38px 0 48px;
+    }
+
+    .turmas-page__inner {
+      width: var(--content-width-tablet);
+    }
+
+    .turmas-page__heading h1 {
+      font-size: 36px;
+    }
+
+    .segment-list {
+      margin-top: 26px;
+      gap: 24px;
+    }
+
+    .segment-group__heading {
+      padding: 22px 24px 20px;
+    }
+
+    .year-list {
+      padding: 4px 24px 24px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .turmas-page {
+      padding: 30px 0 38px;
+    }
+
+    .turmas-page__inner {
+      width: var(--content-width-mobile);
+    }
+
+    .turmas-page__heading {
+      padding-bottom: 17px;
+    }
+
+    .turmas-page__heading h1 {
+      font-size: 31px;
+    }
+
+    .segment-list {
+      margin-top: 22px;
+      gap: 20px;
+    }
+
+    .segment-group {
+      border-radius: var(--radius-lg);
+    }
+
+    .segment-group__heading {
+      padding: 20px 18px 18px;
+    }
+
+    .segment-group__heading h2 {
+      font-size: 21px;
+    }
+
+    .year-list {
+      padding: 2px 18px 20px;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .year-group {
+      padding-top: 17px;
+    }
+
+    .year-group__heading h3 {
+      font-size: 19px;
+    }
+
+    .class-card {
+      min-height: 112px;
+      padding: 17px;
+    }
+
+    .class-card h4 {
+      font-size: 17px;
+    }
+
+    .class-card__description {
+      font-size: 13px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .class-card {
+      transition: none;
+    }
+  }
+</style>

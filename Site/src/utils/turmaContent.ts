@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { getTurmaHref } from './turmaRoutes';
 import {
   avisoEstaDentroDaValidade,
   comparePortalDates,
@@ -151,6 +152,37 @@ export type TurmaContentContext = Pick<
   'id' | 'slug' | 'segmento' | 'anoSerie' | 'anoLetivo'
 >;
 
+export type TurmaGlobalSource = Pick<
+  CollectionEntry<'turmas'>['data'],
+  | 'id'
+  | 'nome'
+  | 'slug'
+  | 'segmento'
+  | 'anoSerie'
+  | 'anoLetivo'
+  | 'descricao'
+  | 'arquivada'
+  | 'ordem'
+>;
+
+export interface TurmaGlobalViewData {
+  nome: string;
+  anoLetivo: number;
+  descricao?: string;
+  arquivada: boolean;
+  href: string;
+}
+
+export interface AnoSerieTurmasViewData {
+  nome: string;
+  turmas: TurmaGlobalViewData[];
+}
+
+export interface SegmentoTurmasViewData {
+  nome: string;
+  anosSeries: AnoSerieTurmasViewData[];
+}
+
 interface LeituraComHojeOptions {
   hoje?: PortalDate;
 }
@@ -180,6 +212,80 @@ const meses = [
 const ordenacaoPtBr = new Intl.Collator('pt-BR', {
   usage: 'sort',
 });
+
+const ordenacaoNaturalPtBr = new Intl.Collator('pt-BR', {
+  usage: 'sort',
+  numeric: true,
+});
+
+export const ORDEM_INSTITUCIONAL_SEGMENTOS = [
+  'Ensino Fundamental — Anos Finais',
+  'Ensino Médio',
+] as const;
+
+function compararTurmasGlobais(
+  turmaA: TurmaGlobalSource,
+  turmaB: TurmaGlobalSource,
+): number {
+  return Number(Boolean(turmaA.arquivada))
+    - Number(Boolean(turmaB.arquivada))
+    || turmaA.ordem - turmaB.ordem
+    || ordenacaoPtBr.compare(turmaA.nome, turmaB.nome);
+}
+
+export function prepararSegmentosTurmas(
+  turmas: readonly TurmaGlobalSource[],
+): SegmentoTurmasViewData[] {
+  const turmasPorId = new Map<string, TurmaGlobalSource>();
+
+  for (const turma of turmas) {
+    if (turmasPorId.has(turma.id)) {
+      throw new Error(`Turma duplicada na listagem global: "${turma.id}".`);
+    }
+
+    turmasPorId.set(turma.id, turma);
+  }
+
+  return ORDEM_INSTITUCIONAL_SEGMENTOS.flatMap((segmento) => {
+    const turmasDoSegmento = [...turmasPorId.values()].filter(
+      (turma) => turma.segmento === segmento,
+    );
+
+    if (turmasDoSegmento.length === 0) {
+      return [];
+    }
+
+    const anosSeries = [...new Set(
+      turmasDoSegmento.map((turma) => turma.anoSerie),
+    )]
+      .sort((anoSerieA, anoSerieB) =>
+        ordenacaoNaturalPtBr.compare(anoSerieA, anoSerieB),
+      )
+      .map((anoSerie) => ({
+        nome: anoSerie,
+        turmas: turmasDoSegmento
+          .filter((turma) => turma.anoSerie === anoSerie)
+          .sort(compararTurmasGlobais)
+          .map((turma) => ({
+            nome: turma.nome,
+            anoLetivo: turma.anoLetivo,
+            descricao: turma.descricao || undefined,
+            arquivada: Boolean(turma.arquivada),
+            href: getTurmaHref(turma),
+          })),
+      }));
+
+    return [{ nome: segmento, anosSeries }];
+  });
+}
+
+export async function getSegmentosTurmasGlobais(): Promise<
+  SegmentoTurmasViewData[]
+> {
+  const turmas = await getCollection('turmas');
+
+  return prepararSegmentosTurmas(turmas.map(({ data }) => data));
+}
 
 export function formatarDataResumo(data: PortalDate): string {
   const [, mes, dia] = data.split('-');

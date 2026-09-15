@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TurmasView from '../../components/turmas/TurmasView.astro';
+import { getSegmentosTurmasGlobais } from '../../utils/turmaContent';
+
+const segmentos = await getSegmentosTurmasGlobais();
 ---
 
 <BaseLayout title="Turmas | Matemática Instrumental">
-  <main>
-    <h1>Turmas</h1>
-  </main>
+  <TurmasView segmentos={segmentos} />
 </BaseLayout>

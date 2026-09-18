@@ -1,0 +1,333 @@
+---
+import type { NovidadeVisual } from '../../utils/novidades';
+
+interface Props {
+  item: NovidadeVisual;
+  variant: 'compact' | 'full';
+}
+
+const { item, variant } = Astro.props;
+const stateSlug = item.estado
+  .toLocaleLowerCase('pt-BR')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '');
+---
+
+{
+  variant === 'compact' ? (
+    <a
+      class:list={['news-item', `news-item--${stateSlug}`]}
+      href={item.hrefDetalhe}
+    >
+      <div class="news-item__topline">
+        <span class="news-item__state">{item.estado}</span>
+        <span class="news-item__time">{item.temporalidade}</span>
+      </div>
+
+      <h3>{item.titulo}</h3>
+
+      <p class="news-item__context">
+        <span>{item.fonte}</span>
+        <span aria-hidden="true">•</span>
+        <span>{item.audiencia}</span>
+      </p>
+    </a>
+  ) : (
+    <article
+      class:list={['news-card', `news-card--${stateSlug}`]}
+      id={item.chave}
+    >
+      <div class="news-card__state-column">
+        <span class="news-card__state">{item.estado}</span>
+        <span class="news-card__source">{item.fonte}</span>
+      </div>
+
+      <div class="news-card__content">
+        <h2>{item.titulo}</h2>
+        <dl class="news-card__metadata">
+          <div>
+            <dt>Temporalidade</dt>
+            <dd>{item.temporalidade}</dd>
+          </div>
+          <div>
+            <dt>Audiência</dt>
+            <dd>{item.audiencia}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="news-card__actions" aria-label={`Ações de ${item.titulo}`}>
+        {
+          item.acoes.map((acao) => (
+            <a
+              href={acao.href}
+              target={acao.externa ? '_blank' : undefined}
+              rel={acao.externa ? 'noopener noreferrer' : undefined}
+            >
+              {acao.label} <span aria-hidden="true">→</span>
+            </a>
+          ))
+        }
+      </div>
+    </article>
+  )
+}
+
+<style>
+  .news-item,
+  .news-card {
+    --state-color: var(--color-primary-bright);
+    --state-background: rgba(53, 87, 242, 0.11);
+  }
+
+  .news-item--destaque,
+  .news-card--destaque {
+    --state-color: var(--color-primary);
+    --state-background: rgba(3, 32, 166, 0.12);
+  }
+
+  .news-item--atencao,
+  .news-card--atencao {
+    --state-color: var(--accent-attention, #a68114);
+    --state-background: rgba(242, 195, 53, 0.24);
+  }
+
+  .news-item {
+    padding: 12px 13px 11px;
+    display: block;
+    border: 1px solid rgba(3, 32, 166, 0.11);
+    border-left: 4px solid var(--state-color);
+    border-radius: var(--radius-control);
+    background: rgba(255, 255, 255, 0.88);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 160ms ease, transform 160ms ease;
+  }
+
+  .news-item:hover,
+  .news-item:focus-visible {
+    border-color: var(--state-color);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .news-item__topline {
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .news-item__state,
+  .news-card__state {
+    border-radius: var(--radius-pill);
+    background: var(--state-background);
+    color: var(--state-color);
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .news-item__state {
+    padding: 4px 8px;
+    font-size: 9px;
+  }
+
+  .news-item__time {
+    color: var(--color-text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .news-item h3 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 13px;
+    line-height: 1.28;
+    overflow-wrap: break-word;
+  }
+
+  .news-item__context {
+    margin: 5px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1.3;
+    overflow-wrap: break-word;
+  }
+
+  .news-card {
+    min-height: 134px;
+    padding: 22px 24px;
+    display: grid;
+    grid-template-columns: 124px minmax(0, 1fr) minmax(160px, 230px);
+    gap: 24px;
+    align-items: center;
+    border: 1px solid var(--color-border-neutral);
+    border-left: 5px solid var(--state-color);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface-light);
+    scroll-margin-top: 18px;
+  }
+
+  .news-card:target {
+    border-color: var(--state-color);
+    box-shadow: 0 0 0 3px var(--state-background), var(--shadow-surface);
+  }
+
+  .news-card__state-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+  }
+
+  .news-card__state {
+    min-width: 78px;
+    padding: 6px 10px;
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .news-card__source {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .news-card__content h2 {
+    margin: 0 0 15px;
+    color: var(--color-heading);
+    font-size: 19px;
+    line-height: 1.25;
+    overflow-wrap: break-word;
+  }
+
+  .news-card__metadata {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .news-card__metadata div,
+  .news-card__actions {
+    min-width: 0;
+  }
+
+  .news-card__metadata dt {
+    margin-bottom: 4px;
+    color: var(--color-text-muted);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .news-card__metadata dd {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.35;
+    font-weight: 700;
+  }
+
+  .news-card__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .news-card__actions a {
+    min-height: 42px;
+    padding: 9px 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border: 1px solid rgba(3, 32, 166, 0.18);
+    border-radius: var(--radius-control);
+    background: rgba(53, 87, 242, 0.07);
+    color: var(--color-primary);
+    font-size: 11px;
+    line-height: 1.25;
+    font-weight: 850;
+    text-decoration: none;
+    overflow-wrap: break-word;
+  }
+
+  .news-card__actions a:hover,
+  .news-card__actions a:focus-visible {
+    border-color: var(--color-primary-bright);
+    background: rgba(53, 87, 242, 0.12);
+    outline: none;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .news-card {
+      grid-template-columns: 110px minmax(0, 1fr) 190px;
+      gap: 18px;
+      padding: 20px;
+    }
+
+    .news-card__metadata {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .news-item {
+      padding: 11px 11px 10px;
+    }
+
+    .news-item__topline {
+      align-items: flex-start;
+    }
+
+    .news-item__time {
+      max-width: 145px;
+    }
+
+    .news-card {
+      min-height: 0;
+      padding: 18px;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      border-radius: var(--radius-card);
+    }
+
+    .news-card__state-column {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .news-card__content h2 {
+      margin-bottom: 13px;
+      font-size: 17px;
+    }
+
+    .news-card__metadata {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .news-card__actions {
+      width: 100%;
+    }
+
+    .news-card__actions a {
+      min-height: 46px;
+      font-size: 12px;
+    }
+  }
+</style>

@@ -1,0 +1,146 @@
+---
+import NewsItem from './NewsItem.astro';
+import type { NovidadeVisual } from '../../utils/novidades';
+
+interface Props {
+  items: NovidadeVisual[];
+}
+
+const { items } = Astro.props;
+const hasItems = items.length > 0;
+---
+
+<main class="news-page">
+  <header class="news-page__header">
+    <p class="news-page__eyebrow">Atualizações do portal</p>
+    <h1>Novidades</h1>
+    <p>
+      Publicações recentes, prazos próximos e conteúdos em destaque reunidos
+      em uma única visão.
+    </p>
+  </header>
+
+  {
+    hasItems && (
+      <section class="news-list" aria-label="Novidades ativas">
+        {items.map((item) => <NewsItem item={item} variant="full" />)}
+      </section>
+    )
+  }
+
+  {
+    !hasItems && (
+      <section
+        class="news-empty"
+        aria-label="Estado vazio de Novidades"
+      >
+        <p>Nenhuma novidade no momento.</p>
+      </section>
+    )
+  }
+</main>
+
+<style>
+  .news-page {
+    width: var(--content-width-desktop);
+    margin: 0 auto;
+    padding: 40px 0 8px;
+  }
+
+  .news-page__header {
+    margin-bottom: 24px;
+    padding: 34px 38px;
+    border: 1px solid rgba(3, 32, 166, 0.13);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(circle at 92% 18%, rgba(255, 212, 82, 0.23), transparent 24%),
+      linear-gradient(135deg, #ffffff 0%, #f4f7ff 100%);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .news-page__eyebrow {
+    margin: 0;
+    color: var(--color-primary-bright);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .news-page__header h1 {
+    margin: 7px 0 9px;
+    color: var(--color-heading);
+    font-size: 42px;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+
+  .news-page__header > p:last-child {
+    max-width: 680px;
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .news-empty {
+    padding: 28px 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-border-neutral);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface-light);
+  }
+
+  .news-empty p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .news-page {
+      width: var(--content-width-tablet);
+      padding-top: 30px;
+    }
+
+    .news-page__header {
+      padding: 30px 32px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .news-page {
+      width: var(--content-width-mobile);
+      padding-top: 18px;
+    }
+
+    .news-page__header {
+      margin-bottom: 16px;
+      padding: 26px 22px;
+      border-radius: var(--radius-lg);
+    }
+
+    .news-page__header h1 {
+      font-size: 34px;
+    }
+
+    .news-page__header > p:last-child {
+      font-size: 14px;
+    }
+
+    .news-empty {
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+  }
+</style>

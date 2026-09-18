@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NewsList from '../../components/novidades/NewsList.astro';
+import { getNovidadesAtivas } from '../../utils/novidades';
+
+const novidades = await getNovidadesAtivas();
+---
+
+<BaseLayout
+  title="Novidades — Matemática Instrumental"
+  description="Publicações recentes, prazos próximos e conteúdos em destaque do portal Matemática Instrumental"
+>
+  <NewsList items={novidades} />
+</BaseLayout>

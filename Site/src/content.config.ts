@@ -2,6 +2,7 @@ import { defineCollection, reference } from 'astro:content';
 import { glob, type Loader, type LoaderContext } from 'astro/loaders';
 import { z } from 'astro/zod';
 import {
+  comparePortalDates,
   normalizePortalDate,
   tryNormalizePortalDate,
 } from './utils/portalDate';
@@ -33,6 +34,21 @@ const marcoTrabalhoSchema = z.strictObject({
   tipo: z.enum(['Entrega', 'Apresentação']),
   data: portalDateSchema,
 });
+
+const destaqueNovidadesSchema = z
+  .strictObject({
+    inicio: portalDateSchema,
+    fim: portalDateSchema,
+  })
+  .superRefine(({ inicio, fim }, context) => {
+    if (comparePortalDates(fim, inicio) < 0) {
+      context.addIssue({
+        code: 'custom',
+        path: ['fim'],
+        message: 'O fim de destaqueNovidades deve ser igual ou posterior ao início.',
+      });
+    }
+  });
 
 function optionalYamlGlob(base: string): Loader {
   const loader = glob({
@@ -115,6 +131,7 @@ const videos = defineCollection({
     turmas: z.array(reference('turmas')).min(1).optional(),
     tags: z.array(z.string()),
     publicacao: portalDateSchema,
+    destaqueNovidades: destaqueNovidadesSchema.optional(),
   }),
 });
 
@@ -169,6 +186,7 @@ const itensCronograma = defineCollection({
     valorIndividual: z.number().nonnegative().optional(),
     publicacao: portalDateSchema.optional(),
     ordem: z.number().int().optional(),
+    destaqueNovidades: destaqueNovidadesSchema.optional(),
   }),
 });
 
@@ -190,6 +208,7 @@ const atividadesListas = defineCollection({
     tags: z.array(z.string()),
     gabaritoResolucao: z.array(recursoVinculadoSchema).min(1).optional(),
     dataLiberacaoGabarito: portalDateSchema.optional(),
+    destaqueNovidades: destaqueNovidadesSchema.optional(),
   }),
 });
 
@@ -211,6 +230,7 @@ const paraEstudar = defineCollection({
     leiturasRelacionadas: z.array(recursoVinculadoSchema).min(1).optional(),
     tags: z.array(z.string()),
     publicacao: portalDateSchema,
+    destaqueNovidades: destaqueNovidadesSchema.optional(),
   }),
 });
 
@@ -229,6 +249,7 @@ const trabalhos = defineCollection({
     documentoTrabalho: recursoVinculadoSchema,
     recursosAdicionais: z.array(recursoVinculadoSchema).min(1).optional(),
     tags: z.array(z.string()),
+    destaqueNovidades: destaqueNovidadesSchema.optional(),
   }),
 });
 
@@ -246,6 +267,7 @@ const materiais = defineCollection({
     turmas: z.array(reference('turmas')).min(1),
     arquivoLink: recursoVinculadoSchema,
     tags: z.array(z.string()).optional(),
+    destaqueNovidades: destaqueNovidadesSchema.optional(),
   }),
 });
 
@@ -269,6 +291,7 @@ const links = defineCollection({
     turmas: z.array(reference('turmas')).min(1).optional(),
     observacaoProfessor: z.string().optional(),
     tags: z.array(z.string()).optional(),
+    destaqueNovidades: destaqueNovidadesSchema.optional(),
   }),
 });
 

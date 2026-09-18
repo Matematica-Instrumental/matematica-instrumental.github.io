@@ -118,6 +118,22 @@ export function comparePortalDates(
   return left < right ? -1 : 1;
 }
 
+export function addPortalDays(
+  date: PortalDate,
+  days: number,
+): PortalDate {
+  if (!Number.isInteger(days)) {
+    throw new RangeError('A quantidade de dias deve ser um número inteiro.');
+  }
+
+  const [year, month, day] = date.split('-').map(Number);
+  const instant = new Date(Date.UTC(year, month - 1, day));
+
+  instant.setUTCDate(instant.getUTCDate() + days);
+
+  return normalizePortalDate(instant);
+}
+
 export function avisoEstaDentroDaValidade(
   validade: PortalDate,
   hoje: PortalDate,

@@ -1,9 +1,207 @@
-﻿---
+---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import NewsPanel from '../components/novidades/NewsPanel.astro';
+import { getNovidadesDaHome } from '../utils/novidades';
+
+const novidades = await getNovidadesDaHome();
 ---
 
 <BaseLayout title="Matemática Instrumental">
-  <main>
-    <h1>Matemática Instrumental</h1>
+  <main class="home-page">
+    <section class="home-opening" aria-labelledby="home-title">
+      <div class="home-opening__copy">
+        <p class="home-opening__eyebrow">Portal educacional</p>
+        <h1 id="home-title">Matemática Instrumental</h1>
+        <p class="home-opening__lead">
+          Conteúdos, orientações e datas importantes organizados para acompanhar
+          cada etapa dos estudos.
+        </p>
+
+        <div class="home-opening__audiences" aria-label="Públicos do portal">
+          <span>Ensino Fundamental — Anos Finais</span>
+          <span>Ensino Médio</span>
+        </div>
+      </div>
+
+      <NewsPanel items={novidades} />
+    </section>
+
+    <section class="home-support" aria-label="Contexto da página inicial">
+      <div>
+        <p class="home-support__label">Acesso rápido</p>
+        <p>Encontre sua turma e consulte os conteúdos organizados por área.</p>
+      </div>
+      <span aria-hidden="true">Segmento → Ano/Série → Turma</span>
+    </section>
   </main>
 </BaseLayout>
+
+<style>
+  .home-page {
+    width: var(--content-width-desktop);
+    margin: 0 auto;
+    padding: 34px 0 0;
+  }
+
+  .home-opening {
+    display: grid;
+    grid-template-columns: minmax(0, 1.58fr) minmax(380px, 0.92fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .home-opening__copy,
+  .home-support {
+    border: 1px solid var(--color-border-neutral);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .home-opening__copy {
+    min-height: 430px;
+    padding: 60px 58px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background:
+      radial-gradient(circle at 88% 18%, rgba(255, 212, 82, 0.26), transparent 27%),
+      linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%);
+  }
+
+  .home-opening__eyebrow,
+  .home-support__label {
+    margin: 0;
+    color: var(--color-primary-bright);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .home-opening h1 {
+    max-width: 640px;
+    margin: 11px 0 18px;
+    color: var(--color-heading);
+    font-size: clamp(40px, 4vw, 62px);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+
+  .home-opening__lead {
+    max-width: 610px;
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 18px;
+    line-height: 1.55;
+  }
+
+  .home-opening__audiences {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+
+  .home-opening__audiences span {
+    padding: 9px 13px;
+    border: 1px solid rgba(3, 32, 166, 0.14);
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 750;
+  }
+
+  .home-support {
+    min-height: 98px;
+    margin-top: 24px;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background: var(--color-surface);
+  }
+
+  .home-support p {
+    margin: 5px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+  }
+
+  .home-support > span {
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .home-page {
+      width: var(--content-width-tablet);
+      padding-top: 26px;
+    }
+
+    .home-opening {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .home-opening__copy {
+      min-height: 278px;
+      padding: 40px 46px;
+    }
+
+    .home-opening h1 {
+      font-size: 48px;
+    }
+
+    .home-support {
+      margin-top: 20px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .home-page {
+      width: var(--content-width-mobile);
+      padding-top: 18px;
+    }
+
+    .home-opening {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .home-opening__copy {
+      min-height: 292px;
+      padding: 34px 24px;
+      border-radius: var(--radius-lg);
+    }
+
+    .home-opening h1 {
+      margin-top: 9px;
+      font-size: 38px;
+      overflow-wrap: anywhere;
+    }
+
+    .home-opening__lead {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .home-opening__audiences {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .home-support {
+      min-height: 0;
+      margin-top: 16px;
+      padding: 20px;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 14px;
+      border-radius: var(--radius-lg);
+    }
+  }
+</style>

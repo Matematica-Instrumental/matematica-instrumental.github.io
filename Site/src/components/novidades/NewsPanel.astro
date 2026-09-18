@@ -1,0 +1,176 @@
+---
+import NewsItem from './NewsItem.astro';
+import { applyAstroBaseUrl } from '../../utils/turmaRoutes';
+import type { NovidadeVisual } from '../../utils/novidades';
+
+interface Props {
+  items: NovidadeVisual[];
+  allHref?: string;
+}
+
+const {
+  items,
+  allHref = applyAstroBaseUrl('/novidades/'),
+} = Astro.props;
+const hasItems = items.length > 0;
+const isEmpty = !hasItems;
+---
+
+<section
+  class:list={['news-panel', { 'news-panel--empty': isEmpty }]}
+  aria-labelledby="news-panel-title"
+>
+  <header class="news-panel__header">
+    <div>
+      <p class="news-panel__eyebrow">Acompanhe o portal</p>
+      <h2 id="news-panel-title">Novidades</h2>
+    </div>
+
+    {
+      hasItems && (
+        <a class="news-panel__all" href={allHref}>
+          Ver todas <span aria-hidden="true">→</span>
+        </a>
+      )
+    }
+  </header>
+
+  {
+    hasItems && (
+      <div class="news-panel__list">
+        {items.map((item) => <NewsItem item={item} variant="compact" />)}
+      </div>
+    )
+  }
+
+  {
+    !hasItems && (
+      <p class="news-panel__empty">
+        Nenhuma novidade no momento.
+      </p>
+    )
+  }
+</section>
+
+<style>
+  .news-panel {
+    height: 430px;
+    padding: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(53, 87, 242, 0.28);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(145deg, #eef2ff 0%, #ffffff 72%);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .news-panel__header {
+    min-height: 48px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .news-panel__eyebrow {
+    margin: 0;
+    color: var(--color-primary-bright);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .news-panel__header h2 {
+    margin: 4px 0 0;
+    color: var(--color-heading);
+    font-size: 25px;
+    line-height: 1;
+  }
+
+  .news-panel__all {
+    min-height: 40px;
+    padding: 8px 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-primary-bright);
+    font-size: 12px;
+    font-weight: 850;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .news-panel__list {
+    height: 319px;
+    padding-right: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: rgba(53, 87, 242, 0.4) transparent;
+    scrollbar-width: thin;
+  }
+
+  .news-panel__empty {
+    min-height: 290px;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    color: var(--color-text-secondary);
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .news-panel.news-panel--empty {
+    height: auto;
+    align-self: start;
+  }
+
+  .news-panel--empty .news-panel__header {
+    margin-bottom: 0;
+  }
+
+  .news-panel--empty .news-panel__empty {
+    min-height: 0;
+    padding: 18px 0 4px;
+    display: block;
+    text-align: left;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .news-panel {
+      height: 405px;
+    }
+
+    .news-panel__list {
+      height: 294px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-content: start;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .news-panel {
+      height: 440px;
+      padding: 20px;
+      border-radius: var(--radius-lg);
+    }
+
+    .news-panel__header {
+      align-items: center;
+    }
+
+    .news-panel__header h2 {
+      font-size: 22px;
+    }
+
+    .news-panel__list {
+      height: 333px;
+      padding-right: 5px;
+    }
+  }
+</style>

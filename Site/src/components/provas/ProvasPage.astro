@@ -1,0 +1,311 @@
+---
+import ProvaCard from './ProvaCard.astro';
+import ProvasEmptyState from './ProvasEmptyState.astro';
+import ProvasFilters from './ProvasFilters.astro';
+import type { ProvasViewModel } from '../../utils/provas';
+
+interface Props {
+  modelo: ProvasViewModel;
+}
+
+const { modelo } = Astro.props;
+const possuiConteudo = modelo.itens.length > 0;
+const rotuloContagem = `${modelo.itens.length} ${modelo.itens.length === 1
+  ? 'prova'
+  : 'provas'}`;
+---
+
+<main class="proofs-page" data-provas-page>
+  <div class="proofs-page__inner">
+    <header class="proofs-page__heading">
+      <p class="proofs-page__eyebrow">
+        Acervo de Matemática
+      </p>
+      <h1>Provas e Resoluções</h1>
+      <p>
+        Consulte provas de Matemática de diferentes instituições e acesse
+        as resoluções quando estiverem disponíveis.
+      </p>
+    </header>
+
+    {
+      possuiConteudo ? (
+        <>
+          <ProvasFilters opcoes={modelo.opcoes} />
+
+          <div class="proofs-results-heading" data-results-heading>
+            <p
+              data-results-count
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {rotuloContagem}
+            </p>
+            <span>Ordenação: edições mais recentes primeiro</span>
+          </div>
+
+          <section
+            class="proofs-list"
+            aria-label="Provas e resoluções"
+            data-proofs-list
+          >
+            {modelo.itens.map((prova) => <ProvaCard prova={prova} />)}
+          </section>
+
+          <ProvasEmptyState tipo="sem-resultados" hidden />
+        </>
+      ) : (
+        <ProvasEmptyState tipo="vazio" />
+      )
+    }
+  </div>
+</main>
+
+<script>
+  import {
+    anoSerieDisponivelParaSegmento,
+    possuiFiltroProvaAtivo,
+    provaCorrespondeAosFiltros,
+    PROVA_FILTER_NAMES,
+    type ProvaFilterName,
+    type ProvaFilterValues,
+  } from '../../utils/provasFilter';
+
+  type FilterControl = HTMLInputElement | HTMLSelectElement;
+
+  document.querySelectorAll<HTMLElement>('[data-provas-page]').forEach((root) => {
+    const controls = [...root.querySelectorAll<FilterControl>('[data-filter-control]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-proof-card]')];
+
+    if (controls.length === 0 || cards.length === 0) {
+      return;
+    }
+
+    const list = root.querySelector<HTMLElement>('[data-proofs-list]');
+    const resultsHeading = root.querySelector<HTMLElement>('[data-results-heading]');
+    const resultsCount = root.querySelector<HTMLElement>('[data-results-count]');
+    const noResults = root.querySelector<HTMLElement>('[data-no-results-state]');
+    const clearButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-clear-filters]')];
+
+    const getControl = (name: ProvaFilterName) => controls.find(
+      (control) => control.name === name,
+    );
+
+    const updateYearSeriesOptions = () => {
+      const segmentControl = getControl('segmento') as HTMLSelectElement | undefined;
+      const yearSeriesControl = getControl('anoSerie') as HTMLSelectElement | undefined;
+
+      if (!segmentControl || !yearSeriesControl) {
+        return;
+      }
+
+      const selectedSegment = segmentControl.value;
+
+      [...yearSeriesControl.options].forEach((option) => {
+        if (!option.value) {
+          return;
+        }
+
+        const unavailable = !anoSerieDisponivelParaSegmento(
+          selectedSegment,
+          option.dataset.segmento ?? '',
+        );
+
+        option.hidden = unavailable;
+        option.disabled = unavailable;
+      });
+
+      const selectedOption = yearSeriesControl.selectedOptions[0];
+
+      if (selectedOption?.disabled) {
+        yearSeriesControl.value = '';
+      }
+    };
+
+    const getFilters = () => Object.fromEntries(
+      PROVA_FILTER_NAMES.map((name) => [name, getControl(name)?.value ?? '']),
+    ) as ProvaFilterValues;
+
+    const cardMatches = (
+      card: HTMLElement,
+      filters: ProvaFilterValues,
+    ) => {
+      const assuntos = JSON.parse(card.dataset.assuntos ?? '[]') as string[];
+
+      return provaCorrespondeAosFiltros({
+        buscaNormalizada: card.dataset.busca ?? '',
+        segmento: card.dataset.segmento ?? '',
+        anoSerie: card.dataset.anoSerie ?? '',
+        instituicao: card.dataset.instituicao ?? '',
+        ano: card.dataset.ano ?? '',
+        tipo: card.dataset.tipo ?? '',
+        fase: card.dataset.fase ?? '',
+        assuntosNormalizados: assuntos,
+        dificuldade: card.dataset.dificuldade ?? '',
+      }, filters);
+    };
+
+    const updateResults = () => {
+      updateYearSeriesOptions();
+
+      const filters = getFilters();
+      const active = possuiFiltroProvaAtivo(filters);
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const visible = cardMatches(card, filters);
+        card.hidden = !visible;
+
+        if (visible) {
+          visibleCount += 1;
+        }
+      });
+
+      clearButtons.forEach((button) => {
+        button.hidden = !active;
+      });
+
+      if (list) list.hidden = visibleCount === 0;
+      if (resultsHeading) resultsHeading.hidden = visibleCount === 0;
+      if (noResults) noResults.hidden = visibleCount > 0;
+
+      if (resultsCount) {
+        resultsCount.textContent = `${visibleCount} ${visibleCount === 1
+          ? 'prova'
+          : 'provas'}`;
+      }
+    };
+
+    controls.forEach((control) => {
+      control.addEventListener(
+        control instanceof HTMLInputElement ? 'input' : 'change',
+        updateResults,
+      );
+    });
+
+    clearButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        controls.forEach((control) => {
+          control.value = '';
+        });
+        updateResults();
+        getControl('busca')?.focus();
+      });
+    });
+
+    updateResults();
+  });
+</script>
+
+<style>
+  .proofs-page {
+    min-height: 62vh;
+    padding: 42px 0 72px;
+  }
+
+  .proofs-page__inner {
+    width: var(--content-width-desktop);
+    margin: 0 auto;
+  }
+
+  .proofs-page__heading {
+    max-width: 850px;
+  }
+
+  .proofs-page__eyebrow {
+    margin: 0 0 8px;
+    color: var(--color-primary-bright);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .proofs-page__heading h1 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 38px;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .proofs-page__heading > p:last-child {
+    margin: 13px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .proofs-results-heading {
+    margin: 25px 0 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+
+  .proofs-results-heading p,
+  .proofs-results-heading span {
+    margin: 0;
+  }
+
+  .proofs-results-heading p {
+    color: var(--color-heading);
+    font-weight: 850;
+  }
+
+  .proofs-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  :global([hidden]) {
+    display: none !important;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .proofs-page {
+      padding: 34px 0 60px;
+    }
+
+    .proofs-page__inner {
+      width: var(--content-width-tablet);
+    }
+
+    .proofs-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .proofs-page {
+      padding: 24px 0 48px;
+    }
+
+    .proofs-page__inner {
+      width: var(--content-width-mobile);
+    }
+
+    .proofs-page__heading h1 {
+      font-size: 31px;
+    }
+
+    .proofs-page__heading > p:last-child {
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .proofs-results-heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .proofs-list {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+  }
+</style>

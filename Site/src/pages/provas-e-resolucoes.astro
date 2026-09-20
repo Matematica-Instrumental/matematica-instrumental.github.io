@@ -1,9 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ProvasPage from '../components/provas/ProvasPage.astro';
+import { getProvasViewModel } from '../utils/provas';
+
+const modelo = await getProvasViewModel();
 ---
 
-<BaseLayout title="Provas e Resoluções | Matemática Instrumental">
-  <main>
-    <h1>Provas e Resoluções</h1>
-  </main>
+<BaseLayout
+  title="Provas e Resoluções | Matemática Instrumental"
+  description="Acervo de provas de Matemática e resoluções disponíveis"
+>
+  <ProvasPage modelo={modelo} />
 </BaseLayout>

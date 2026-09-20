@@ -12,6 +12,54 @@ const segmentoSchema = z.enum([
   'Ensino Médio',
 ]);
 
+const anoSerieProvaSchema = z.enum([
+  '6º ano',
+  '7º ano',
+  '8º ano',
+  '9º ano',
+  '1º ano',
+  '2º ano',
+  '3º ano',
+]);
+
+const tipoProvaSchema = z.enum([
+  'ENEM',
+  'Vestibular',
+  'Concurso',
+  'Processo seriado',
+  'Olimpíada',
+  'Avaliação institucional',
+]);
+
+const dificuldadeProvaSchema = z.enum([
+  'Básica',
+  'Intermediária',
+  'Avançada',
+]);
+
+const textoObrigatorioSchema = z.string().trim().min(1);
+
+const urlRecursoProvaSchema = z.string().trim().refine((value) => {
+  if (/^\/(?!\/)/.test(value)) {
+    return true;
+  }
+
+  try {
+    const url = new URL(value);
+
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}, {
+  message: 'Use uma URL HTTP(S) válida ou um caminho interno iniciado por /.',
+});
+
+const recursoProvaSchema = z.strictObject({
+  nome: textoObrigatorioSchema,
+  url: urlRecursoProvaSchema,
+});
+
 const portalDateSchema = z
   .union([z.string(), z.date()])
   .refine((value) => tryNormalizePortalDate(value) !== null, {
@@ -295,6 +343,39 @@ const links = defineCollection({
   }),
 });
 
+const provas = defineCollection({
+  loader: optionalYamlGlob('./src/content/provas'),
+  schema: z.strictObject({
+    titulo: textoObrigatorioSchema,
+    ano: z.number().int().min(1000).max(9999),
+    segmento: segmentoSchema,
+    anoSerie: anoSerieProvaSchema,
+    tipo: tipoProvaSchema,
+    instituicao: textoObrigatorioSchema,
+    assuntos: z.array(textoObrigatorioSchema).min(1),
+    prova: recursoProvaSchema,
+    fonte: recursoProvaSchema,
+    fase: textoObrigatorioSchema.optional(),
+    dificuldade: dificuldadeProvaSchema.optional(),
+    descricao: textoObrigatorioSchema.optional(),
+    resolucao: recursoProvaSchema.optional(),
+    condicaoUso: textoObrigatorioSchema.optional(),
+    tags: z.array(textoObrigatorioSchema).min(1).optional(),
+  }).superRefine(({ segmento, anoSerie }, context) => {
+    const anosSeriesPermitidos = segmento === 'Ensino Fundamental — Anos Finais'
+      ? ['6º ano', '7º ano', '8º ano', '9º ano']
+      : ['1º ano', '2º ano', '3º ano'];
+
+    if (!anosSeriesPermitidos.includes(anoSerie)) {
+      context.addIssue({
+        code: 'custom',
+        path: ['anoSerie'],
+        message: `O Ano/Série "${anoSerie}" não pertence ao Segmento "${segmento}".`,
+      });
+    }
+  }),
+});
+
 export const collections = {
   turmas,
   videos,
@@ -307,4 +388,5 @@ export const collections = {
   trabalhos,
   materiais,
   links,
+  provas,
 };

@@ -1,0 +1,129 @@
+---
+import { getCollection } from 'astro:content';
+import ContactForm from './ContactForm.astro';
+import ContactIntro from './ContactIntro.astro';
+
+interface Props {
+  validation?: boolean;
+}
+
+const { validation = false } = Astro.props;
+const turmas = await getCollection('turmas');
+const contextosTurma = turmas.map(({ data }) => ({
+  slug: data.slug,
+  nomeExibicao: `${data.anoSerie} — ${data.nome}`,
+}));
+const eyebrow = validation ? 'Referência visual aprovada' : 'Comunicação privada';
+---
+
+<main class="contact-page" data-contact-page>
+  <div class="contact-page__inner">
+    <header class="contact-page__heading">
+      <p class="contact-page__eyebrow">{eyebrow}</p>
+      <h1>Falar com o Professor</h1>
+      <p>
+        Use este canal para enviar uma mensagem privada ao professor.
+        Todos os campos indicados são obrigatórios.
+      </p>
+    </header>
+
+    <div class="contact-page__layout">
+      <ContactIntro validation={validation} />
+      <ContactForm
+        contextosTurma={contextosTurma}
+        validation={validation}
+      />
+    </div>
+  </div>
+</main>
+
+<style>
+  .contact-page {
+    min-height: 62vh;
+    padding: 42px 0 72px;
+  }
+
+  .contact-page__inner {
+    width: var(--content-width-desktop);
+    margin: 0 auto;
+  }
+
+  .contact-page__heading {
+    max-width: 760px;
+    margin-bottom: 26px;
+  }
+
+  .contact-page__eyebrow {
+    margin: 0 0 8px;
+    color: var(--color-primary-bright);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .contact-page__heading h1 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 38px;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .contact-page__heading > p:last-child {
+    margin: 13px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .contact-page__layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.55fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .contact-page {
+      padding: 34px 0 60px;
+    }
+
+    .contact-page__inner {
+      width: var(--content-width-tablet);
+    }
+
+    .contact-page__layout {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .contact-page {
+      padding: 24px 0 48px;
+    }
+
+    .contact-page__inner {
+      width: var(--content-width-mobile);
+    }
+
+    .contact-page__heading {
+      margin-bottom: 18px;
+    }
+
+    .contact-page__heading h1 {
+      font-size: 31px;
+    }
+
+    .contact-page__heading > p:last-child {
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .contact-page__layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+  }
+</style>

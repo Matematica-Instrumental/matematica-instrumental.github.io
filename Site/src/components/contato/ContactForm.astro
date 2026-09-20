@@ -1,0 +1,546 @@
+---
+import {
+  CONTACT_FORM_SUBJECT,
+  FORMSPREE_ENDPOINT,
+} from '../../config/contactForm';
+import type { ContactTurmaOption } from '../../utils/contactContext';
+
+interface Props {
+  contextosTurma: ContactTurmaOption[];
+  validation?: boolean;
+}
+
+const {
+  contextosTurma,
+  validation = false,
+} = Astro.props;
+const contextosTurmaJson = JSON.stringify(contextosTurma).replaceAll('<', '\\u003c');
+const endpoint = validation ? undefined : FORMSPREE_ENDPOINT;
+const privacyNote = validation
+  ? 'Nesta validação, nenhum dado é transmitido ou armazenado.'
+  : 'Nome, e-mail, motivo e mensagem não são colocados na URL nem armazenados pelo site. O Formspree processa e pode armazenar a submissão para realizar o envio.';
+---
+
+<section
+  class="contact-form-panel"
+  aria-labelledby="contact-form-title"
+  data-contact-form-root
+  data-validation-mode={validation ? 'true' : 'false'}
+  data-form-endpoint={endpoint}
+>
+  <div class="contact-form-panel__heading">
+    <h2 id="contact-form-title">Enviar mensagem</h2>
+    <p>Os campos marcados com <span aria-hidden="true">*</span> são obrigatórios.</p>
+  </div>
+
+  <form
+    class="contact-form"
+    data-contact-form
+    aria-describedby="contact-privacy-note contact-form-status"
+    autocomplete="off"
+  >
+    <input
+      type="hidden"
+      name="turma"
+      value="contato-geral"
+      data-contact-turma-value
+    />
+    <input
+      type="hidden"
+      name="subject"
+      value={CONTACT_FORM_SUBJECT}
+    />
+
+    <div class="contact-form__honeypot" aria-hidden="true">
+      <label for="contact-gotcha">Não preencha este campo</label>
+      <input
+        id="contact-gotcha"
+        type="text"
+        name="_gotcha"
+        value=""
+        tabindex="-1"
+        autocomplete="off"
+      />
+    </div>
+
+    <label class="contact-form__field">
+      <span>Turma</span>
+      <input
+        class="contact-form__context"
+        type="text"
+        value="Não se aplica / contato geral"
+        readonly
+        aria-readonly="true"
+        data-contact-turma-display
+      />
+      <small>Preenchida automaticamente quando o contato parte de uma turma.</small>
+    </label>
+
+    <label class="contact-form__field">
+      <span>Nome <b aria-hidden="true">*</b></span>
+      <input type="text" name="name" autocomplete="name" required />
+    </label>
+
+    <label class="contact-form__field">
+      <span>E-mail <b aria-hidden="true">*</b></span>
+      <input type="email" name="email" autocomplete="email" required />
+    </label>
+
+    <label class="contact-form__field">
+      <span>Motivo <b aria-hidden="true">*</b></span>
+      <input type="text" name="motivo" required />
+    </label>
+
+    <label class="contact-form__field">
+      <span>Mensagem <b aria-hidden="true">*</b></span>
+      <textarea name="message" rows="7" required></textarea>
+    </label>
+
+    <p id="contact-privacy-note" class="contact-form__note">
+      {privacyNote}
+    </p>
+
+    <div
+      id="contact-form-status"
+      class="contact-form__status"
+      data-form-status
+      aria-live="polite"
+      tabindex="-1"
+      hidden
+    ></div>
+
+    <button
+      class="contact-form__submit"
+      type="button"
+      data-form-submit
+    >
+      <span>Enviar mensagem</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m22 2-7 20-4-9-9-4Z" />
+        <path d="M22 2 11 13" />
+      </svg>
+    </button>
+  </form>
+
+  <div
+    class="contact-form__success"
+    data-success-panel
+    role="status"
+    aria-live="polite"
+    tabindex="-1"
+    hidden
+  >
+    <span class="contact-form__success-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+    </span>
+    <h3>Mensagem enviada com sucesso.</h3>
+    <p>A confirmação permanece nesta página e os dados enviados não são exibidos novamente.</p>
+  </div>
+
+  <script
+    type="application/json"
+    data-contact-contexts
+    set:html={contextosTurmaJson}
+  ></script>
+</section>
+
+<script>
+  import {
+    resolveContactContext,
+    type ContactTurmaOption,
+  } from '../../utils/contactContext';
+  import { submitContactFormData } from '../../utils/contactSubmission';
+
+  type ContactFormState = 'inicial' | 'enviando' | 'sucesso' | 'erro';
+
+  const roots = document.querySelectorAll<HTMLElement>('[data-contact-form-root]');
+
+  roots.forEach((root) => {
+    if (root.dataset.initialized === 'true') {
+      return;
+    }
+
+    root.dataset.initialized = 'true';
+
+    const form = root.querySelector<HTMLFormElement>('[data-contact-form]');
+    const submit = root.querySelector<HTMLButtonElement>('[data-form-submit]');
+    const status = root.querySelector<HTMLElement>('[data-form-status]');
+    const successPanel = root.querySelector<HTMLElement>('[data-success-panel]');
+    const turmaValue = root.querySelector<HTMLInputElement>('[data-contact-turma-value]');
+    const turmaDisplay = root.querySelector<HTMLInputElement>('[data-contact-turma-display]');
+    const contextsNode = root.querySelector<HTMLScriptElement>('[data-contact-contexts]');
+
+    if (!form || !submit || !status || !successPanel || !turmaValue || !turmaDisplay) {
+      return;
+    }
+
+    const validationMode = root.dataset.validationMode === 'true';
+    const endpoint = root.dataset.formEndpoint;
+    const allowedStates = new Set<ContactFormState>([
+      'inicial',
+      'enviando',
+      'sucesso',
+      'erro',
+    ]);
+    const params = new URLSearchParams(window.location.search);
+    const requestedState = params.get('estado') as ContactFormState | null;
+    const initialState = validationMode && requestedState && allowedStates.has(requestedState)
+      ? requestedState
+      : 'inicial';
+
+    let contexts: ContactTurmaOption[] = [];
+
+    if (contextsNode?.textContent) {
+      try {
+        contexts = JSON.parse(contextsNode.textContent) as ContactTurmaOption[];
+      } catch {
+        contexts = [];
+      }
+    }
+
+    const context = resolveContactContext(contexts, params.get('turma'));
+    turmaValue.value = context.technicalValue;
+    turmaDisplay.value = context.displayValue;
+    let isSubmitting = false;
+
+    const setState = (state: ContactFormState, moveFocus = false) => {
+      root.dataset.state = state;
+      form.hidden = state === 'sucesso';
+      successPanel.hidden = state !== 'sucesso';
+      submit.disabled = state === 'enviando';
+      form.setAttribute('aria-busy', state === 'enviando' ? 'true' : 'false');
+      status.hidden = state === 'inicial' || state === 'sucesso';
+      status.classList.remove(
+        'contact-form__status--sending',
+        'contact-form__status--error',
+      );
+      status.removeAttribute('role');
+
+      if (state === 'enviando') {
+        status.textContent = 'Enviando mensagem…';
+        status.classList.add('contact-form__status--sending');
+        status.setAttribute('role', 'status');
+      }
+
+      if (state === 'erro') {
+        status.textContent = 'Não foi possível enviar a mensagem. Tente novamente.';
+        status.classList.add('contact-form__status--error');
+        status.setAttribute('role', 'alert');
+      }
+
+      if (moveFocus) {
+        if (state === 'sucesso') {
+          successPanel.focus();
+        } else if (state === 'enviando' || state === 'erro') {
+          status.focus();
+        }
+      }
+    };
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      submit.click();
+    });
+
+    submit.addEventListener('click', async () => {
+      if (validationMode) {
+        setState('enviando', true);
+        return;
+      }
+
+      if (isSubmitting) {
+        return;
+      }
+
+      if (!form.reportValidity()) {
+        return;
+      }
+
+      if (!endpoint) {
+        setState('erro', true);
+        return;
+      }
+
+      isSubmitting = true;
+      setState('enviando', true);
+
+      try {
+        const succeeded = await submitContactFormData(
+          endpoint,
+          new FormData(form),
+        );
+
+        if (!succeeded) {
+          setState('erro', true);
+          return;
+        }
+
+        ['name', 'email', 'motivo', 'message'].forEach((fieldName) => {
+          const field = form.elements.namedItem(fieldName);
+
+          if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+            field.value = '';
+          }
+        });
+
+        setState('sucesso', true);
+      } catch {
+        setState('erro', true);
+      } finally {
+        isSubmitting = false;
+      }
+    });
+
+    setState(initialState);
+  });
+</script>
+
+<style>
+  .contact-form-panel {
+    min-width: 0;
+    padding: 32px;
+    border: 1px solid var(--color-border-neutral);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .contact-form-panel__heading {
+    margin-bottom: 24px;
+  }
+
+  .contact-form-panel__heading h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 20px;
+  }
+
+  .contact-form-panel__heading p {
+    margin: 7px 0 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+  }
+
+  .contact-form-panel__heading span,
+  .contact-form__field b {
+    color: #9b2c2c;
+  }
+
+  .contact-form {
+    display: grid;
+    gap: 18px;
+  }
+
+  .contact-form__honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .contact-form__field {
+    min-width: 0;
+    display: grid;
+    gap: 7px;
+    color: var(--color-heading);
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .contact-form__field b {
+    font-weight: 900;
+  }
+
+  .contact-form__field input,
+  .contact-form__field textarea {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid #cfd5df;
+    border-radius: var(--radius-control);
+    background: #fff;
+    color: var(--color-text);
+    font: inherit;
+    font-weight: 400;
+    line-height: 1.45;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .contact-form__field input {
+    min-height: 46px;
+    padding: 11px 13px;
+  }
+
+  .contact-form__field textarea {
+    min-height: 148px;
+    padding: 12px 13px;
+    resize: vertical;
+  }
+
+  .contact-form__field input:focus-visible,
+  .contact-form__field textarea:focus-visible,
+  .contact-form__submit:focus-visible,
+  .contact-form__status:focus-visible,
+  .contact-form__success:focus-visible {
+    outline: 3px solid rgba(53, 87, 242, 0.28);
+    outline-offset: 2px;
+    border-color: var(--color-primary-bright);
+  }
+
+  .contact-form__field .contact-form__context {
+    border-color: rgba(3, 32, 166, 0.2);
+    background: #f4f6ff;
+    color: var(--color-primary);
+    font-weight: 750;
+    cursor: default;
+  }
+
+  .contact-form__field small {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+  }
+
+  .contact-form__note {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .contact-form__status {
+    margin: 0;
+    padding: 13px 15px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.45;
+  }
+
+  .contact-form__status--sending {
+    border-color: rgba(3, 32, 166, 0.14);
+    background: #f2f5ff;
+    color: var(--color-primary);
+  }
+
+  .contact-form__status--error {
+    border-color: #e1b4b4;
+    background: #fff5f5;
+    color: #8a2424;
+  }
+
+  .contact-form__submit {
+    width: fit-content;
+    min-height: 46px;
+    padding: 11px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-control);
+    background: var(--color-primary);
+    box-shadow: var(--shadow-action);
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 850;
+    cursor: pointer;
+    transition: background-color 150ms ease, transform 150ms ease, opacity 150ms ease;
+  }
+
+  .contact-form__submit:hover:not(:disabled) {
+    background: var(--color-primary-bright);
+    transform: translateY(-1px);
+  }
+
+  .contact-form__submit:disabled {
+    opacity: 0.58;
+    cursor: wait;
+    transform: none;
+  }
+
+  .contact-form__submit svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .contact-form__success {
+    min-height: 390px;
+    padding: 52px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .contact-form__success[hidden] {
+    display: none;
+  }
+
+  .contact-form__success-icon {
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #eaf7ef;
+    color: #247646;
+  }
+
+  .contact-form__success-icon svg {
+    width: 27px;
+    height: 27px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .contact-form__success h3 {
+    margin: 20px 0 0;
+    color: var(--color-heading);
+    font-size: 23px;
+  }
+
+  .contact-form__success p {
+    max-width: 470px;
+    margin: 10px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 767px) {
+    .contact-form-panel {
+      padding: 24px 20px;
+      border-radius: var(--radius-lg);
+    }
+
+    .contact-form {
+      gap: 16px;
+    }
+
+    .contact-form__submit {
+      width: 100%;
+      min-height: 48px;
+    }
+
+    .contact-form__success {
+      min-height: 320px;
+      padding: 38px 10px;
+    }
+  }
+</style>

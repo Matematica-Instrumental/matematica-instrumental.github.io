@@ -1,0 +1,107 @@
+---
+interface Props {
+  validation?: boolean;
+}
+
+const { validation = false } = Astro.props;
+const privacyText = validation
+  ? 'Comunicação privada. Nesta validação, nenhum dado é enviado ou armazenado.'
+  : 'Comunicação privada. Os dados deste formulário são enviados pelo Formspree para encaminhamento da mensagem ao professor.';
+---
+
+<aside class="contact-intro" aria-labelledby="contact-guidance-title">
+  <h2 id="contact-guidance-title">Antes de enviar</h2>
+  <p>
+    Confira seu e-mail e descreva o motivo da mensagem com clareza.
+  </p>
+  <p>
+    Não é possível anexar arquivos por este formulário.
+  </p>
+  <div class="contact-intro__privacy">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+    <p>{privacyText}</p>
+  </div>
+</aside>
+
+<style>
+  .contact-intro {
+    padding: 28px;
+    border: 1px solid var(--color-border-neutral);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(circle at 92% 8%, rgba(255, 212, 82, 0.22), transparent 28%),
+      linear-gradient(145deg, #ffffff 0%, #f7f8ff 100%);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .contact-intro h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 20px;
+  }
+
+  .contact-intro > p {
+    margin: 14px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .contact-intro__privacy {
+    margin-top: 24px;
+    padding-top: 20px;
+    display: flex;
+    gap: 11px;
+    border-top: 1px solid var(--color-border-neutral);
+  }
+
+  .contact-intro__privacy svg {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .contact-intro__privacy p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .contact-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 28px;
+      align-items: start;
+    }
+
+    .contact-intro h2,
+    .contact-intro__privacy {
+      grid-column: 1 / -1;
+    }
+
+    .contact-intro > p {
+      margin-top: 12px;
+    }
+
+    .contact-intro__privacy {
+      margin-top: 18px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .contact-intro {
+      padding: 22px 20px;
+      border-radius: var(--radius-lg);
+    }
+  }
+</style>

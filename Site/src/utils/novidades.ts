@@ -14,6 +14,12 @@ import {
   type TurmaViewId,
 } from './turmaRoutes';
 import { ORDEM_INSTITUCIONAL_SEGMENTOS } from './turmaContent';
+import {
+  getOportunidadeHref,
+  obterDataCriticaAtencaoOportunidade,
+  oportunidadeEstaNaRetencao,
+  prepararOportunidade,
+} from './oportunidades';
 
 const avisoSources = import.meta.glob(
   '../content/avisos/**/*.{yml,yaml}',
@@ -45,6 +51,10 @@ const videoSources = import.meta.glob(
 );
 const linkSources = import.meta.glob(
   '../content/links/**/*.{yml,yaml}',
+  { query: '?raw', import: 'default' },
+);
+const oportunidadeSources = import.meta.glob(
+  '../content/oportunidades/**/*.{yml,yaml}',
   { query: '?raw', import: 'default' },
 );
 
@@ -94,6 +104,7 @@ type TrabalhoEntry = Pick<CollectionEntry<'trabalhos'>, 'id' | 'data'>;
 type MaterialEntry = Pick<CollectionEntry<'materiais'>, 'id' | 'data'>;
 type VideoEntry = Pick<CollectionEntry<'videos'>, 'id' | 'data'>;
 type LinkEntry = Pick<CollectionEntry<'links'>, 'id' | 'data'>;
+type OportunidadeEntry = Pick<CollectionEntry<'oportunidades'>, 'id' | 'data'>;
 
 export interface FontesNovidades {
   turmas: TurmaEntry[];
@@ -105,6 +116,7 @@ export interface FontesNovidades {
   materiais: MaterialEntry[];
   videos: VideoEntry[];
   links: LinkEntry[];
+  oportunidades: OportunidadeEntry[];
 }
 
 export interface ProjetarNovidadesOptions {
@@ -629,6 +641,59 @@ export function projetarNovidades(
     }));
   }
 
+  for (const registro of fontes.oportunidades) {
+    const oportunidade = prepararOportunidade({
+      id: registro.id,
+      ...registro.data,
+    }, hoje);
+    const marcoCritico = obterDataCriticaAtencaoOportunidade(
+      oportunidade.marcos,
+      hoje,
+    );
+
+    if (!oportunidadeEstaNaRetencao(
+      oportunidade.marcos,
+      oportunidade.situacao,
+      hoje,
+    )) {
+      continue;
+    }
+
+    const estado = calcularEstado({
+      destaqueNovidades: oportunidade.destaqueNovidades,
+      publicacao: oportunidade.publicacao,
+      diasNovo: 7,
+      dataCritica: marcoCritico?.data,
+      diasDepoisDataCritica: 1,
+    }, hoje);
+
+    if (!estado) {
+      continue;
+    }
+
+    adicionar(criarNovidade({
+      idOrigem: oportunidade.id,
+      fonteChave: 'oportunidade',
+      fonte: 'Oportunidade',
+      titulo: oportunidade.titulo,
+      audiencia: {
+        turmas: [],
+        descricao: oportunidade.direcionamentoTexto,
+      },
+      acoes: [{
+        label: 'Ver oportunidade',
+        href: getOportunidadeHref(oportunidade.id),
+      }],
+      estado,
+      hoje,
+      publicacao: oportunidade.publicacao,
+      dataCritica: marcoCritico?.data,
+      rotuloAtencao: marcoCritico?.tipo === 'Encerramento de inscrições'
+        ? 'Inscrições até'
+        : 'Realização',
+    }));
+  }
+
   for (const registro of fontes.materiais) {
     const { data } = registro;
     const audiencia = resolverAudiencia(
@@ -733,6 +798,7 @@ export async function carregarFontesNovidades(): Promise<FontesNovidades> {
     materiais,
     videos,
     links,
+    oportunidades,
   ] = await Promise.all([
     getCollection('turmas'),
     Object.keys(avisoSources).length > 0
@@ -759,6 +825,9 @@ export async function carregarFontesNovidades(): Promise<FontesNovidades> {
     Object.keys(linkSources).length > 0
       ? getCollection('links')
       : Promise.resolve([] as LinkEntry[]),
+    Object.keys(oportunidadeSources).length > 0
+      ? getCollection('oportunidades')
+      : Promise.resolve([] as OportunidadeEntry[]),
   ]);
 
   return {
@@ -771,6 +840,7 @@ export async function carregarFontesNovidades(): Promise<FontesNovidades> {
     materiais,
     videos,
     links,
+    oportunidades,
   };
 }
 

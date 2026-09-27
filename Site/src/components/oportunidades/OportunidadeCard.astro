@@ -1,0 +1,338 @@
+---
+import type { OportunidadeViewItem } from '../../utils/oportunidades';
+import OportunidadeMarco from './OportunidadeMarco.astro';
+
+interface Props {
+  oportunidade: OportunidadeViewItem;
+}
+
+const { oportunidade } = Astro.props;
+---
+
+<article
+  class:list={[
+    'opportunity-card',
+    { 'opportunity-card--closed': oportunidade.encerrado },
+  ]}
+  id={oportunidade.anchorId}
+  data-opportunity-card
+  data-busca={oportunidade.buscaNormalizada}
+  data-categoria={oportunidade.categoria}
+  data-situacao={oportunidade.situacao}
+  data-anos={JSON.stringify(oportunidade.anos)}
+  data-global={String(oportunidade.global)}
+  data-direcionamentos={JSON.stringify(oportunidade.direcionamentos)}
+  data-instituicao={oportunidade.instituicao}
+>
+  <div class="opportunity-card__labels">
+    <span class="opportunity-card__category">{oportunidade.categoria}</span>
+    <span
+      class:list={[
+        'opportunity-card__status',
+        { 'opportunity-card__status--closed': oportunidade.encerrado },
+      ]}
+    >
+      {oportunidade.situacao}
+    </span>
+  </div>
+
+  <div class="opportunity-card__heading">
+    <h2>{oportunidade.titulo}</h2>
+    <p>{oportunidade.instituicao}</p>
+  </div>
+
+  <p class="opportunity-card__description">{oportunidade.descricao}</p>
+
+  <dl class="opportunity-card__metadata">
+    <div>
+      <dt>Público-alvo</dt>
+      <dd>{oportunidade.publicoAlvo}</dd>
+    </div>
+    <div>
+      <dt>Direcionamento</dt>
+      <dd>{oportunidade.direcionamentoTexto}</dd>
+    </div>
+    {
+      oportunidade.local && (
+        <div>
+          <dt>Local</dt>
+          <dd>{oportunidade.local}</dd>
+        </div>
+      )
+    }
+  </dl>
+
+  <section class="timeline" aria-labelledby={`${oportunidade.anchorId}-timeline-title`}>
+    <h3 id={`${oportunidade.anchorId}-timeline-title`}>Datas importantes</h3>
+    <ol>
+      {oportunidade.marcos.map((marco) => <OportunidadeMarco marco={marco} />)}
+    </ol>
+  </section>
+
+  <div class="opportunity-card__source">
+    <strong>Fonte oficial</strong>
+    <a
+      href={oportunidade.fonte.href}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {oportunidade.fonte.nome}
+    </a>
+  </div>
+
+  {
+    oportunidade.condicaoUso && (
+      <p class="opportunity-card__condition">{oportunidade.condicaoUso}</p>
+    )
+  }
+
+  <div class="opportunity-card__actions">
+    {
+      oportunidade.acoes.map((acao) => (
+        <a
+          class:list={[
+            'opportunity-card__action',
+            { 'opportunity-card__action--primary': acao.primaria },
+          ]}
+          href={acao.href}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {acao.rotulo}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 17 17 7"></path>
+            <path d="M7 7h10v10"></path>
+          </svg>
+        </a>
+      ))
+    }
+  </div>
+</article>
+
+<style>
+  .opportunity-card {
+    min-width: 0;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border-neutral);
+    border-top: 4px solid var(--color-primary-bright);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface-light);
+  }
+
+  .opportunity-card--closed {
+    border-top-color: #9aa2ae;
+    background: #fbfbfc;
+  }
+
+  .opportunity-card__labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .opportunity-card__category,
+  .opportunity-card__status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 27px;
+    padding: 5px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+
+  .opportunity-card__category {
+    background: #edf1ff;
+    color: var(--color-primary);
+  }
+
+  .opportunity-card__status {
+    background: #fff7dc;
+    color: #725b14;
+  }
+
+  .opportunity-card__status--closed {
+    background: #eef0f3;
+    color: #59616d;
+  }
+
+  .opportunity-card__heading {
+    margin-top: 17px;
+  }
+
+  .opportunity-card__heading h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 21px;
+    line-height: 1.25;
+    letter-spacing: -0.012em;
+  }
+
+  .opportunity-card__heading p {
+    margin: 7px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .opportunity-card__description {
+    margin: 15px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .opportunity-card__metadata {
+    margin: 18px 0 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-block: 1px solid var(--color-border-neutral);
+  }
+
+  .opportunity-card__metadata div {
+    min-width: 0;
+    padding: 13px 14px 13px 0;
+  }
+
+  .opportunity-card__metadata dt,
+  .timeline h3,
+  .opportunity-card__source strong {
+    color: var(--color-text-muted);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.065em;
+    text-transform: uppercase;
+  }
+
+  .opportunity-card__metadata dd {
+    margin: 5px 0 0;
+    color: var(--color-heading);
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.4;
+    overflow-wrap: break-word;
+  }
+
+  .timeline {
+    margin-top: 18px;
+  }
+
+  .timeline h3 {
+    margin: 0 0 10px;
+  }
+
+  .timeline ol {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+    list-style: none;
+  }
+
+  .opportunity-card__source {
+    margin-top: 18px;
+    padding-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 8px;
+    border-top: 1px solid var(--color-border-neutral);
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .opportunity-card__source a {
+    color: var(--color-primary);
+    font-weight: 750;
+    text-underline-offset: 3px;
+  }
+
+  .opportunity-card__condition {
+    margin: 12px 0 0;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .opportunity-card__actions {
+    margin-top: auto;
+    padding-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .opportunity-card__action {
+    min-height: 42px;
+    padding: 9px 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-control);
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 850;
+    text-decoration: none;
+  }
+
+  .opportunity-card__action--primary {
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: var(--shadow-action);
+  }
+
+  .opportunity-card__action:hover {
+    background: #f2f5ff;
+  }
+
+  .opportunity-card__action--primary:hover {
+    background: var(--color-primary-bright);
+  }
+
+  .opportunity-card__action:focus-visible,
+  .opportunity-card__source a:focus-visible {
+    outline: 3px solid rgba(53, 87, 242, 0.28);
+    outline-offset: 2px;
+  }
+
+  .opportunity-card__action svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (max-width: 767px) {
+    .opportunity-card {
+      padding: 21px 18px;
+    }
+
+    .opportunity-card__heading h2 {
+      font-size: 19px;
+    }
+
+    .opportunity-card__metadata {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .opportunity-card__actions {
+      flex-direction: column;
+    }
+
+    .opportunity-card__action {
+      width: 100%;
+      min-height: 46px;
+    }
+  }
+</style>

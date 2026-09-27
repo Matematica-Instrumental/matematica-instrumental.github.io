@@ -1,0 +1,303 @@
+---
+import type {
+  OportunidadesViewModel,
+} from '../../utils/oportunidades';
+import OportunidadeCard from './OportunidadeCard.astro';
+import OportunidadesEmptyState from './OportunidadesEmptyState.astro';
+import OportunidadesFilters from './OportunidadesFilters.astro';
+
+interface Props {
+  modelo: OportunidadesViewModel;
+}
+
+const { modelo } = Astro.props;
+const possuiConteudo = modelo.itens.length > 0;
+const rotuloContagem = `${modelo.itens.length} ${modelo.itens.length === 1
+  ? 'oportunidade'
+  : 'oportunidades'}`;
+---
+
+<main class="opportunities-page" data-opportunities-page>
+  <div class="opportunities-page__inner">
+    <header class="opportunities-page__heading">
+      <p class="opportunities-page__eyebrow">Agenda acadêmica</p>
+      <h1>Oportunidades e Datas</h1>
+      <p>
+        Acompanhe inscrições, provas, eventos e resultados relevantes para
+        sua trajetória acadêmica.
+      </p>
+    </header>
+
+    {
+      possuiConteudo ? (
+        <>
+          <OportunidadesFilters opcoes={modelo.opcoes} />
+
+          <div class="results-heading" data-results-heading>
+            <p data-results-count aria-live="polite" aria-atomic="true">
+              {rotuloContagem}
+            </p>
+            <span>Ordenação: próximo marco mais útil primeiro</span>
+          </div>
+
+          <section
+            class="opportunities-list"
+            aria-label="Oportunidades e datas"
+            data-opportunities-list
+          >
+            {
+              modelo.itens.map((oportunidade) => (
+                <OportunidadeCard oportunidade={oportunidade} />
+              ))
+            }
+          </section>
+
+          <OportunidadesEmptyState tipo="sem-resultados" hidden />
+        </>
+      ) : (
+        <OportunidadesEmptyState tipo="vazio" />
+      )
+    }
+  </div>
+</main>
+
+<script>
+  import {
+    anoSerieOportunidadeDisponivelParaSegmento,
+    oportunidadeCorrespondeAosFiltros,
+    OPORTUNIDADE_FILTER_NAMES,
+    possuiFiltroOportunidadeAtivo,
+    type OportunidadeFilterName,
+    type OportunidadeFilterValues,
+  } from '../../utils/oportunidadesFilter';
+  import type { OportunidadeDirecionamentoView } from '../../utils/oportunidades';
+
+  type FilterControl = HTMLInputElement | HTMLSelectElement;
+
+  document.querySelectorAll<HTMLElement>('[data-opportunities-page]').forEach((root) => {
+    const controls = [...root.querySelectorAll<FilterControl>('[data-filter-control]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-opportunity-card]')];
+
+    if (controls.length === 0 || cards.length === 0) {
+      return;
+    }
+
+    const list = root.querySelector<HTMLElement>('[data-opportunities-list]');
+    const resultsHeading = root.querySelector<HTMLElement>('[data-results-heading]');
+    const resultsCount = root.querySelector<HTMLElement>('[data-results-count]');
+    const noResults = root.querySelector<HTMLElement>('[data-no-results-state]');
+    const clearButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-clear-filters]')];
+
+    const getControl = (name: OportunidadeFilterName) => controls.find(
+      (control) => control.name === name,
+    );
+
+    const getFilters = () => Object.fromEntries(
+      OPORTUNIDADE_FILTER_NAMES.map((name) => [name, getControl(name)?.value ?? '']),
+    ) as OportunidadeFilterValues;
+
+    const updateYearSeriesOptions = () => {
+      const segmentControl = getControl('segmento') as HTMLSelectElement | undefined;
+      const yearSeriesControl = getControl('anoSerie') as HTMLSelectElement | undefined;
+
+      if (!segmentControl || !yearSeriesControl) {
+        return;
+      }
+
+      [...yearSeriesControl.options].forEach((option) => {
+        if (!option.value) {
+          return;
+        }
+
+        const unavailable = !anoSerieOportunidadeDisponivelParaSegmento(
+          segmentControl.value,
+          option.dataset.segmento ?? '',
+        );
+
+        option.hidden = unavailable;
+        option.disabled = unavailable;
+      });
+
+      if (yearSeriesControl.selectedOptions[0]?.disabled) {
+        yearSeriesControl.value = '';
+      }
+    };
+
+    const cardMatches = (
+      card: HTMLElement,
+      filters: OportunidadeFilterValues,
+    ) => oportunidadeCorrespondeAosFiltros({
+      buscaNormalizada: card.dataset.busca ?? '',
+      categoria: card.dataset.categoria ?? '',
+      situacao: card.dataset.situacao ?? '',
+      anos: JSON.parse(card.dataset.anos ?? '[]') as string[],
+      global: card.dataset.global === 'true',
+      direcionamentos: JSON.parse(
+        card.dataset.direcionamentos ?? '[]',
+      ) as OportunidadeDirecionamentoView[],
+      instituicao: card.dataset.instituicao ?? '',
+    }, filters);
+
+    const updateResults = () => {
+      updateYearSeriesOptions();
+
+      const filters = getFilters();
+      const active = possuiFiltroOportunidadeAtivo(filters);
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const visible = cardMatches(card, filters);
+
+        card.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+
+      clearButtons.forEach((button) => {
+        button.hidden = !active;
+      });
+
+      if (list) list.hidden = visibleCount === 0;
+      if (resultsHeading) resultsHeading.hidden = visibleCount === 0;
+      if (noResults) noResults.hidden = visibleCount > 0;
+
+      if (resultsCount) {
+        resultsCount.textContent = `${visibleCount} ${visibleCount === 1
+          ? 'oportunidade'
+          : 'oportunidades'}`;
+      }
+    };
+
+    controls.forEach((control) => {
+      control.addEventListener(
+        control instanceof HTMLInputElement ? 'input' : 'change',
+        updateResults,
+      );
+    });
+
+    clearButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        controls.forEach((control) => {
+          control.value = '';
+        });
+        updateResults();
+        getControl('busca')?.focus();
+      });
+    });
+
+    updateResults();
+  });
+</script>
+
+<style>
+  .opportunities-page {
+    min-height: 62vh;
+    padding: 42px 0 72px;
+  }
+
+  .opportunities-page__inner {
+    width: var(--content-width-desktop);
+    margin: 0 auto;
+  }
+
+  .opportunities-page__heading {
+    max-width: 850px;
+  }
+
+  .opportunities-page__eyebrow {
+    margin: 0 0 8px;
+    color: var(--color-primary-bright);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .opportunities-page__heading h1 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 38px;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .opportunities-page__heading > p:last-child {
+    margin: 13px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .results-heading {
+    margin: 25px 0 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+
+  .results-heading p,
+  .results-heading span {
+    margin: 0;
+  }
+
+  .results-heading p {
+    color: var(--color-heading);
+    font-weight: 850;
+  }
+
+  .opportunities-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  :global([hidden]) {
+    display: none !important;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .opportunities-page {
+      padding: 34px 0 60px;
+    }
+
+    .opportunities-page__inner {
+      width: var(--content-width-tablet);
+    }
+
+    .opportunities-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .opportunities-page {
+      padding: 24px 0 48px;
+    }
+
+    .opportunities-page__inner {
+      width: var(--content-width-mobile);
+      max-width: calc(100% - 36px);
+    }
+
+    .opportunities-page__heading h1 {
+      font-size: 31px;
+    }
+
+    .opportunities-page__heading > p:last-child {
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .results-heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .opportunities-list {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+  }
+</style>

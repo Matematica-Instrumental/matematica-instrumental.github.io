@@ -1,0 +1,208 @@
+---
+import type { OportunidadesFilterOptions } from '../../utils/oportunidades';
+
+interface Props {
+  opcoes: OportunidadesFilterOptions;
+}
+
+const { opcoes } = Astro.props;
+---
+
+<section class="filters" aria-labelledby="filters-title" data-opportunities-filters>
+  <div class="filters__heading">
+    <div>
+      <p>Agenda acadêmica</p>
+      <h2 id="filters-title">Filtrar oportunidades</h2>
+    </div>
+    <button type="button" data-clear-filters hidden>Limpar filtros</button>
+  </div>
+
+  <div class="filters__grid" role="search">
+    <label class="filter filter--search">
+      <span>Busca</span>
+      <input
+        type="search"
+        name="busca"
+        autocomplete="off"
+        placeholder="Título, instituição, descrição ou categoria"
+        data-filter-control
+      />
+    </label>
+
+    <label class="filter">
+      <span>Categoria</span>
+      <select name="categoria" data-filter-control>
+        <option value="">Todas as categorias</option>
+        {opcoes.categorias.map((categoria) => <option value={categoria}>{categoria}</option>)}
+      </select>
+    </label>
+
+    <label class="filter">
+      <span>Situação</span>
+      <select name="situacao" data-filter-control>
+        <option value="">Todas as situações</option>
+        {opcoes.situacoes.map((situacao) => <option value={situacao}>{situacao}</option>)}
+      </select>
+    </label>
+
+    <label class="filter">
+      <span>Ano</span>
+      <select name="ano" data-filter-control>
+        <option value="">Todos os anos</option>
+        {opcoes.anos.map((ano) => <option value={ano}>{ano}</option>)}
+      </select>
+    </label>
+
+    <label class="filter">
+      <span>Segmento</span>
+      <select name="segmento" data-filter-control>
+        <option value="">Todos os segmentos</option>
+        {opcoes.segmentos.map((segmento) => <option value={segmento}>{segmento}</option>)}
+      </select>
+    </label>
+
+    <label class="filter">
+      <span>Ano/Série</span>
+      <select name="anoSerie" data-filter-control>
+        <option value="">Todas as séries</option>
+        {
+          opcoes.anosSeries.map(({ valor, segmento }) => (
+            <option value={valor} data-segmento={segmento}>{valor}</option>
+          ))
+        }
+      </select>
+    </label>
+
+    <label class="filter filter--institution">
+      <span>Instituição</span>
+      <select name="instituicao" data-filter-control>
+        <option value="">Todas as instituições</option>
+        {
+          opcoes.instituicoes.map((instituicao) => (
+            <option value={instituicao}>{instituicao}</option>
+          ))
+        }
+      </select>
+    </label>
+  </div>
+</section>
+
+<style>
+  .filters {
+    margin-top: 24px;
+    padding: 26px;
+    border: 1px solid var(--color-border-neutral);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .filters__heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .filters__heading p {
+    margin: 0 0 8px;
+    color: var(--color-primary-bright);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .filters__heading h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 21px;
+  }
+
+  .filters__heading button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-primary);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .filters__grid {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .filter {
+    min-width: 0;
+    display: grid;
+    gap: 7px;
+    color: var(--color-heading);
+    font-size: 12px;
+    font-weight: 850;
+  }
+
+  .filter--search,
+  .filter--institution {
+    grid-column: span 2;
+  }
+
+  .filter input,
+  .filter select {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #cfd5df;
+    border-radius: var(--radius-control);
+    background: #fff;
+    color: var(--color-text);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 450;
+  }
+
+  .filter input:focus-visible,
+  .filter select:focus-visible,
+  .filters__heading button:focus-visible {
+    outline: 3px solid rgba(53, 87, 242, 0.28);
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .filters__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 767px) {
+    .filters {
+      margin-top: 18px;
+      padding: 22px 18px;
+      border-radius: var(--radius-lg);
+    }
+
+    .filters__heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .filters__grid {
+      margin-top: 17px;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 13px;
+    }
+
+    .filter--search,
+    .filter--institution {
+      grid-column: auto;
+    }
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+import type { OportunidadeMarcoView } from '../../utils/oportunidades';
+
+interface Props {
+  marco: OportunidadeMarcoView;
+}
+
+const { marco } = Astro.props;
+---
+
+<li class:list={{ 'timeline__item--critical': marco.critico }}>
+  <time datetime={marco.data}>{marco.dataFormatada}</time>
+  <div>
+    <span>{marco.tipo}</span>
+    <p>{marco.rotulo}</p>
+    {marco.critico && <small>Data crítica para Atenção</small>}
+  </div>
+</li>
+
+<style>
+  li {
+    min-width: 0;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: 86px minmax(0, 1fr);
+    gap: 12px;
+    border-left: 3px solid #dce2ec;
+    border-radius: 0 var(--radius-small) var(--radius-small) 0;
+    background: #f7f8fa;
+  }
+
+  .timeline__item--critical {
+    border-left-color: var(--color-accent-dark);
+    background: #fffaf0;
+  }
+
+  time {
+    color: var(--color-heading);
+    font-size: 11px;
+    font-weight: 850;
+    line-height: 1.4;
+  }
+
+  span {
+    color: var(--color-text-muted);
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: var(--color-heading);
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.4;
+  }
+
+  small {
+    display: block;
+    margin-top: 4px;
+    color: #725b14;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  @media (max-width: 767px) {
+    li {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 5px;
+    }
+  }
+</style>

@@ -1,9 +1,11 @@
 ---
+import OportunidadesPage from '../components/oportunidades/OportunidadesPage.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getOportunidadesViewModel } from '../utils/oportunidades';
+
+const modelo = await getOportunidadesViewModel();
 ---
 
 <BaseLayout title="Oportunidades e Datas | Matemática Instrumental">
-  <main>
-    <h1>Oportunidades e Datas</h1>
-  </main>
+  <OportunidadesPage modelo={modelo} />
 </BaseLayout>

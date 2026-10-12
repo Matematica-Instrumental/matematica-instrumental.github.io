@@ -1,0 +1,183 @@
+---
+import MatematicaAlemCard from './MatematicaAlemCard.astro';
+import MatematicaAlemEmptyState from './MatematicaAlemEmptyState.astro';
+import MatematicaAlemFilters from './MatematicaAlemFilters.astro';
+import {
+  conteudoMatematicaAlemCorrespondeAosFiltros,
+  type FiltrosMatematicaAlem,
+  type MatematicaAlemViewModel,
+} from '../../utils/matematicaAlem';
+
+interface Props {
+  modelo: MatematicaAlemViewModel;
+  filtrosIniciais?: Partial<FiltrosMatematicaAlem>;
+}
+
+const {
+  modelo,
+  filtrosIniciais = {},
+} = Astro.props;
+const filtros: FiltrosMatematicaAlem = {
+  busca: filtrosIniciais.busca ?? '',
+  categoria: filtrosIniciais.categoria ?? '',
+};
+const possuiConteudo = modelo.itens.length > 0;
+const correspondencias = modelo.itens.filter((item) => (
+  conteudoMatematicaAlemCorrespondeAosFiltros(item, filtros)
+));
+const idsVisiveis = new Set(correspondencias.map(({ id }) => id));
+const rotuloContagem = `${correspondencias.length} ${correspondencias.length === 1 ? 'conteúdo' : 'conteúdos'}`;
+---
+
+<main class="alem" data-alem-page>
+  <section class="alem__intro" aria-labelledby="alem-title">
+    <p class="alem__eyebrow">Explorar · descobrir · conectar</p>
+    <h1 id="alem-title">Matemática além da sala</h1>
+    <p class="alem__lead">
+      Histórias, ideias, pessoas e aplicações para perceber a matemática em outros contextos.
+    </p>
+  </section>
+
+  {possuiConteudo ? (
+    <section class="alem__catalog" aria-labelledby="catalog-title" data-catalog>
+      <div class="alem__section-heading">
+        <div>
+          <p class="alem__kicker">Conteúdos editoriais</p>
+          <h2 id="catalog-title">Para olhar a matemática por outros ângulos</h2>
+        </div>
+        <p class="alem__count" data-count aria-live="polite" aria-atomic="true">
+          {rotuloContagem}
+        </p>
+      </div>
+
+      <MatematicaAlemFilters
+        categorias={modelo.categorias}
+        buscaInicial={filtros.busca}
+        categoriaInicial={filtros.categoria}
+      />
+
+      <div class="alem__grid" data-grid hidden={correspondencias.length === 0}>
+        {modelo.itens.map((item) => (
+          <MatematicaAlemCard item={item} hidden={!idsVisiveis.has(item.id)} />
+        ))}
+      </div>
+
+      <MatematicaAlemEmptyState
+        tipo="sem-resultados"
+        hidden={correspondencias.length > 0}
+      />
+    </section>
+  ) : (
+    <MatematicaAlemEmptyState tipo="vazio" />
+  )}
+</main>
+
+<script>
+  const normalizar = (value: string) => value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('pt-BR')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  document.querySelectorAll<HTMLElement>('[data-alem-page]').forEach((root) => {
+    const form = root.querySelector<HTMLFormElement>('[data-filters]');
+
+    if (!form) return;
+
+    const search = form.querySelector<HTMLInputElement>('[data-search]');
+    const category = form.querySelector<HTMLSelectElement>('[data-category]');
+    const clear = form.querySelector<HTMLButtonElement>('[data-clear]');
+    const count = root.querySelector<HTMLElement>('[data-count]');
+    const grid = root.querySelector<HTMLElement>('[data-grid]');
+    const noResults = root.querySelector<HTMLElement>('[data-no-results]');
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
+
+    if (!search || !category || !clear || !count || !grid || !noResults) return;
+
+    const atualizar = () => {
+      const busca = normalizar(search.value);
+      const categoria = category.value;
+      let visiveis = 0;
+
+      cards.forEach((card) => {
+        const corresponde = (!busca || (card.dataset.searchIndex ?? '').includes(busca))
+          && (!categoria || card.dataset.category === categoria);
+        card.hidden = !corresponde;
+        if (corresponde) visiveis += 1;
+      });
+
+      count.textContent = `${visiveis} ${visiveis === 1 ? 'conteúdo' : 'conteúdos'}`;
+      clear.hidden = !(search.value.trim() || categoria);
+      grid.hidden = visiveis === 0;
+      noResults.hidden = visiveis > 0;
+    };
+
+    form.addEventListener('submit', (event) => event.preventDefault());
+    search.addEventListener('input', atualizar);
+    category.addEventListener('change', atualizar);
+    clear.addEventListener('click', () => {
+      form.reset();
+      search.value = '';
+      category.value = '';
+      atualizar();
+      search.focus();
+    });
+
+  });
+</script>
+
+<style>
+  .alem {
+    width: min(var(--content-width-desktop), calc(100% - 48px));
+    margin: 0 auto;
+    padding: 46px 0 24px;
+  }
+
+  .alem__intro {
+    position: relative;
+    overflow: hidden;
+    padding: 38px 42px 40px;
+    border: 1px solid #d9dfe8;
+    border-radius: var(--radius-xl);
+    background: radial-gradient(circle at 92% 5%, rgba(242,195,53,.38) 0 8%, transparent 8.2%), radial-gradient(circle at 86% 31%, rgba(53,87,242,.13) 0 12%, transparent 12.2%), linear-gradient(125deg, #fff 0%, #f7f9ff 64%, #fff8df 100%);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .alem__intro::after {
+    content: '';
+    position: absolute;
+    right: 5%;
+    bottom: -66px;
+    width: 210px;
+    height: 150px;
+    border: 16px solid rgba(3,32,166,.07);
+    border-radius: 50%;
+    transform: rotate(-12deg);
+    pointer-events: none;
+  }
+
+  .alem__eyebrow,
+  .alem__kicker { margin: 0 0 9px; color: var(--color-primary); font-size: .76rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .alem__intro h1 { max-width: 780px; margin: 0; color: var(--color-heading); font-size: clamp(2.15rem,5vw,3.7rem); line-height: 1.03; letter-spacing: -.045em; }
+  .alem__lead { max-width: 720px; margin: 18px 0 0; color: var(--color-text-secondary); font-size: clamp(1rem,1.7vw,1.18rem); line-height: 1.65; }
+  .alem__catalog { padding: 42px 0 30px; }
+  .alem__section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
+  .alem__section-heading h2 { max-width: 720px; margin: 0; color: var(--color-heading); font-size: clamp(1.45rem,2.5vw,2.1rem); line-height: 1.18; letter-spacing: -.025em; }
+  .alem__count { flex: 0 0 auto; margin: 0; color: var(--color-text-muted); font-size: .8rem; font-weight: 750; }
+  .alem__grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+  .alem__grid[hidden] { display: none; }
+
+  @media (max-width: 900px) {
+    .alem { width: min(var(--content-width-tablet), calc(100% - 40px)); padding-top: 34px; }
+    .alem__intro { padding: 32px; }
+    .alem__grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 620px) {
+    .alem { width: min(var(--content-width-mobile), calc(100% - 32px)); padding-top: 24px; }
+    .alem__intro { padding: 27px 22px 29px; }
+    .alem__intro::after { opacity: .55; }
+    .alem__section-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
+  }
+</style>

@@ -1,0 +1,158 @@
+---
+import type { CategoriaMatematicaAlem } from '../../utils/matematicaAlem';
+
+interface Props {
+  categorias: readonly CategoriaMatematicaAlem[];
+  buscaInicial?: string;
+  categoriaInicial?: string;
+}
+
+const {
+  categorias,
+  buscaInicial = '',
+  categoriaInicial = '',
+} = Astro.props;
+const filtroAtivo = Boolean(buscaInicial || categoriaInicial);
+---
+
+<form class="alem-filters" aria-label="Filtros de Matemática além da sala" data-filters>
+  <label class="alem-field alem-field--search">
+    <span>Busca</span>
+    <span class="alem-field__control">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="6.5"></circle>
+        <path d="m16 16 4 4"></path>
+      </svg>
+      <input
+        type="search"
+        name="busca"
+        value={buscaInicial}
+        placeholder="Título, assunto, autoria..."
+        autocomplete="off"
+        data-search
+      />
+    </span>
+  </label>
+
+  <label class="alem-field">
+    <span>Categoria</span>
+    <select name="categoria" data-category>
+      <option value="">Todas as categorias</option>
+      {categorias.map((categoria) => (
+        <option value={categoria} selected={categoria === categoriaInicial}>{categoria}</option>
+      ))}
+    </select>
+  </label>
+
+  <button class="alem-clear" type="button" data-clear hidden={!filtroAtivo}>
+    Limpar filtros
+  </button>
+</form>
+
+<style>
+  .alem-filters {
+    display: grid;
+    grid-template-columns: minmax(240px, 1.2fr) minmax(210px, 0.8fr) auto;
+    gap: 15px;
+    align-items: end;
+    margin-bottom: 24px;
+    padding: 18px;
+    border: 1px solid #dce1e9;
+    border-radius: var(--radius-lg);
+    background: #fff;
+    box-shadow: var(--shadow-surface-light);
+  }
+
+  .alem-field {
+    display: grid;
+    gap: 7px;
+    color: var(--color-heading);
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+
+  .alem-field__control {
+    position: relative;
+  }
+
+  .alem-field__control svg {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: var(--color-text-muted);
+    stroke-width: 2;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  input,
+  select {
+    width: 100%;
+    min-height: 46px;
+    border: 1px solid #bec8d8;
+    border-radius: var(--radius-control);
+    background: #fff;
+    color: var(--color-heading);
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+
+  input {
+    padding: 0 14px 0 43px;
+  }
+
+  select {
+    padding: 0 38px 0 13px;
+  }
+
+  input:focus-visible,
+  select:focus-visible,
+  .alem-clear:focus-visible {
+    outline: 3px solid rgba(53, 87, 242, 0.35);
+    outline-offset: 2px;
+  }
+
+  .alem-clear {
+    min-height: 46px;
+    padding: 0 17px;
+    border: 1px solid #bec8d8;
+    border-radius: var(--radius-control);
+    background: #f5f7fb;
+    color: var(--color-primary);
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .alem-clear[hidden] {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .alem-filters {
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 0.7fr);
+    }
+
+    .alem-clear {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .alem-filters {
+      grid-template-columns: 1fr;
+      gap: 13px;
+      padding: 15px;
+    }
+
+    .alem-clear {
+      width: 100%;
+    }
+  }
+</style>

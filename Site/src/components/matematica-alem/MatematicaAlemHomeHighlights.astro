@@ -1,0 +1,42 @@
+---
+import MatematicaAlemCard from './MatematicaAlemCard.astro';
+import type { MatematicaAlemItem } from '../../utils/matematicaAlem';
+import { applyAstroBaseUrl } from '../../utils/turmaRoutes';
+
+interface Props {
+  itens: MatematicaAlemItem[];
+}
+
+const { itens } = Astro.props;
+const hrefArea = applyAstroBaseUrl('/matematica-alem-da-sala/');
+---
+
+{itens.length > 0 && (
+  <section class="alem-home" aria-labelledby="alem-home-title">
+    <div class="alem-home__heading">
+      <div>
+        <p>Explorar · descobrir · conectar</p>
+        <h2 id="alem-home-title">Matemática além da sala</h2>
+      </div>
+      <a href={hrefArea}>Ver todos os conteúdos</a>
+    </div>
+    <div class="alem-home__grid">
+      {itens.map((item) => <MatematicaAlemCard item={item} compact />)}
+    </div>
+  </section>
+)}
+
+<style>
+  .alem-home { margin-top: 24px; padding: 28px; border: 1px solid var(--color-border-neutral); border-radius: var(--radius-xl); background: #f7f9ff; box-shadow: var(--shadow-surface); }
+  .alem-home__heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 20px; }
+  .alem-home__heading p { margin: 0 0 6px; color: var(--color-primary-bright); font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+  .alem-home__heading h2 { margin: 0; color: var(--color-heading); font-size: clamp(1.45rem,2.5vw,2rem); }
+  .alem-home__heading > a { color: var(--color-primary); font-size: 13px; font-weight: 800; }
+  .alem-home__grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; }
+
+  @media (max-width: 1050px) { .alem-home__grid { grid-template-columns: 1fr; } }
+  @media (max-width: 620px) {
+    .alem-home { margin-top: 16px; padding: 20px; border-radius: var(--radius-lg); }
+    .alem-home__heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+  }
+</style>

@@ -1,9 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import MatematicaAlemPage from '../components/matematica-alem/MatematicaAlemPage.astro';
+import { prepararMatematicaAlem } from '../utils/matematicaAlem';
+import { resolverImagemMatematicaAlem } from '../utils/matematicaAlemAssets';
+import { carregarMatematicaAlem } from '../utils/matematicaAlemLoader';
+
+const modelo = prepararMatematicaAlem(
+  await carregarMatematicaAlem(),
+  resolverImagemMatematicaAlem,
+);
 ---
 
-<BaseLayout title="Matemática além da sala | Matemática Instrumental">
-  <main>
-    <h1>Matemática além da sala</h1>
-  </main>
+<BaseLayout
+  title="Matemática além da sala | Matemática Instrumental"
+  description="Histórias, ideias, pessoas e aplicações para perceber a matemática em outros contextos."
+>
+  <MatematicaAlemPage modelo={modelo} />
 </BaseLayout>

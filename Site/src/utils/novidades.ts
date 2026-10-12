@@ -20,6 +20,7 @@ import {
   oportunidadeEstaNaRetencao,
   prepararOportunidade,
 } from './oportunidades';
+import { getMatematicaAlemCanonicalPath } from './matematicaAlem';
 
 const avisoSources = import.meta.glob(
   '../content/avisos/**/*.{yml,yaml}',
@@ -55,6 +56,10 @@ const linkSources = import.meta.glob(
 );
 const oportunidadeSources = import.meta.glob(
   '../content/oportunidades/**/*.{yml,yaml}',
+  { query: '?raw', import: 'default' },
+);
+const matematicaAlemSources = import.meta.glob(
+  '../content/matematica-alem/**/*.{yml,yaml}',
   { query: '?raw', import: 'default' },
 );
 
@@ -105,6 +110,7 @@ type MaterialEntry = Pick<CollectionEntry<'materiais'>, 'id' | 'data'>;
 type VideoEntry = Pick<CollectionEntry<'videos'>, 'id' | 'data'>;
 type LinkEntry = Pick<CollectionEntry<'links'>, 'id' | 'data'>;
 type OportunidadeEntry = Pick<CollectionEntry<'oportunidades'>, 'id' | 'data'>;
+type MatematicaAlemEntry = Pick<CollectionEntry<'matematicaAlem'>, 'id' | 'data'>;
 
 export interface FontesNovidades {
   turmas: TurmaEntry[];
@@ -117,6 +123,7 @@ export interface FontesNovidades {
   videos: VideoEntry[];
   links: LinkEntry[];
   oportunidades: OportunidadeEntry[];
+  matematicaAlem: MatematicaAlemEntry[];
 }
 
 export interface ProjetarNovidadesOptions {
@@ -694,6 +701,42 @@ export function projetarNovidades(
     }));
   }
 
+  for (const registro of fontes.matematicaAlem) {
+    const { data } = registro;
+
+    if (data.arquivado === true) {
+      continue;
+    }
+
+    const estado = calcularEstado({
+      destaqueNovidades: data.destaqueNovidades,
+      publicacao: data.publicacao,
+      diasNovo: 10,
+    }, hoje);
+
+    if (!estado) {
+      continue;
+    }
+
+    adicionar(criarNovidade({
+      idOrigem: registro.id,
+      fonteChave: 'matematica-alem',
+      fonte: 'Matemática além da sala',
+      titulo: data.titulo,
+      audiencia: {
+        turmas: [],
+        descricao: 'Todos os públicos',
+      },
+      acoes: [{
+        label: 'Ver conteúdo',
+        href: applyAstroBaseUrl(getMatematicaAlemCanonicalPath(registro.id)),
+      }],
+      estado,
+      hoje,
+      publicacao: data.publicacao,
+    }));
+  }
+
   for (const registro of fontes.materiais) {
     const { data } = registro;
     const audiencia = resolverAudiencia(
@@ -799,6 +842,7 @@ export async function carregarFontesNovidades(): Promise<FontesNovidades> {
     videos,
     links,
     oportunidades,
+    matematicaAlem,
   ] = await Promise.all([
     getCollection('turmas'),
     Object.keys(avisoSources).length > 0
@@ -828,6 +872,9 @@ export async function carregarFontesNovidades(): Promise<FontesNovidades> {
     Object.keys(oportunidadeSources).length > 0
       ? getCollection('oportunidades')
       : Promise.resolve([] as OportunidadeEntry[]),
+    Object.keys(matematicaAlemSources).length > 0
+      ? getCollection('matematicaAlem')
+      : Promise.resolve([] as MatematicaAlemEntry[]),
   ]);
 
   return {
@@ -841,6 +888,7 @@ export async function carregarFontesNovidades(): Promise<FontesNovidades> {
     videos,
     links,
     oportunidades,
+    matematicaAlem,
   };
 }
 

@@ -1,0 +1,206 @@
+---
+import type { MatematicaAlemItem } from '../../utils/matematicaAlem';
+
+interface Props {
+  item: MatematicaAlemItem;
+  hidden?: boolean;
+  compact?: boolean;
+}
+
+const { item, hidden = false, compact = false } = Astro.props;
+---
+
+<article
+  id={item.anchorId}
+  class:list={['content-card', { 'content-card--compact': compact }]}
+  data-card
+  data-search-index={item.buscaNormalizada}
+  data-category={item.categoria}
+  hidden={hidden}
+>
+  {item.imagemResolvida && (
+    <figure class="content-card__visual">
+      <img src={item.imagemResolvida.src} alt={item.imagemResolvida.alt} loading="lazy" />
+      <figcaption class="content-card__credit">
+        <span>{item.imagemResolvida.credito} · {item.imagemResolvida.licenca}</span>
+        {item.imagemResolvida.fonteUrl && (
+          <a href={item.imagemResolvida.fonteUrl} target="_blank" rel="noopener noreferrer">Fonte</a>
+        )}
+        {item.imagemResolvida.licencaUrl && (
+          <a href={item.imagemResolvida.licencaUrl} target="_blank" rel="noopener noreferrer">Licença</a>
+        )}
+      </figcaption>
+    </figure>
+  )}
+
+  <div class="content-card__body">
+    <div class="content-card__meta">
+      <span class="content-card__category">{item.categoria}</span>
+      <time datetime={item.publicacao}>{item.publicacaoFormatada}</time>
+    </div>
+
+    <h3>{item.titulo}</h3>
+    <p class="content-card__summary">{item.resumo}</p>
+    {!compact && <p class="content-card__text">{item.texto}</p>}
+
+    {!compact && (
+      <dl class="content-card__details">
+        <div>
+          <dt>Autoria</dt>
+          <dd>{item.autoria}</dd>
+        </div>
+        <div>
+          <dt>Origem</dt>
+          <dd>{item.origem}</dd>
+        </div>
+        {item.fontes?.length && (
+          <div>
+            <dt>Fontes</dt>
+            <dd>
+              {item.fontes.map((fonte, index) => (
+                <>
+                  {index > 0 && ' · '}
+                  <a href={fonte.url} target="_blank" rel="noopener noreferrer">{fonte.nome}</a>
+                </>
+              ))}
+            </dd>
+          </div>
+        )}
+        {item.linksRelacionados?.length && (
+          <div>
+            <dt>Links</dt>
+            <dd>
+              {item.linksRelacionados.map((link, index) => (
+                <>
+                  {index > 0 && ' · '}
+                  <a href={link.url} target="_blank" rel="noopener noreferrer">{link.titulo}</a>
+                </>
+              ))}
+            </dd>
+          </div>
+        )}
+      </dl>
+    )}
+
+    <div class="content-card__footer">
+      {!compact && item.tags?.length ? (
+        <ul class="content-card__tags" aria-label="Assuntos">
+          {item.tags.map((tag) => <li>{tag}</li>)}
+        </ul>
+      ) : <span></span>}
+
+      {item.acao && (
+        <a
+          class="content-card__action"
+          href={item.acao.url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {item.acao.rotulo}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 17 17 7"></path>
+            <path d="M8 7h9v9"></path>
+          </svg>
+        </a>
+      )}
+    </div>
+  </div>
+</article>
+
+<style>
+  .content-card {
+    display: flex;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #dce1e9;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface-light);
+  }
+
+  .content-card[hidden] { display: none; }
+
+  .content-card__visual {
+    position: relative;
+    flex: 0 0 31%;
+    min-width: 148px;
+    margin: 0;
+    overflow: hidden;
+    background: #edf1ff;
+  }
+
+  .content-card__visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .content-card__credit {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 8px;
+    padding: 5px 7px;
+    border-radius: 6px;
+    background: rgba(10, 20, 40, 0.78);
+    color: #fff;
+    font-size: 0.61rem;
+    line-height: 1.3;
+  }
+
+  .content-card__credit a { color: #fff; }
+
+  .content-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    padding: 20px;
+  }
+
+  .content-card__meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .content-card__category { display: inline-flex; min-width: 0; padding: 5px 9px; border-radius: var(--radius-pill); background: #eaf0ff; color: var(--color-primary); font-size: .7rem; font-weight: 800; line-height: 1.2; }
+  .content-card__meta time { flex: 0 0 auto; color: var(--color-text-muted); font-size: .72rem; font-weight: 700; }
+  h3 { margin: 0; color: var(--color-heading); font-size: 1.22rem; line-height: 1.24; letter-spacing: -.018em; }
+  .content-card__summary { margin: 9px 0 0; color: #3f4b5e; font-size: .93rem; font-weight: 700; line-height: 1.52; }
+  .content-card__text { margin: 8px 0 0; color: var(--color-text-secondary); font-size: .84rem; line-height: 1.56; }
+  .content-card__details { display: grid; gap: 7px; margin: 16px 0 0; padding-top: 13px; border-top: 1px solid #e8ebf0; }
+  .content-card__details div { display: grid; grid-template-columns: 57px minmax(0,1fr); gap: 8px; }
+  .content-card__details dt,
+  .content-card__details dd { margin: 0; font-size: .72rem; line-height: 1.4; }
+  .content-card__details dt { color: var(--color-text-muted); font-weight: 800; text-transform: uppercase; }
+  .content-card__details dd { min-width: 0; color: var(--color-text-secondary); }
+  .content-card__details a { color: var(--color-primary); }
+  .content-card__footer { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-top: auto; padding-top: 17px; }
+  .content-card__tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; list-style: none; }
+  .content-card__tags li { padding: 4px 7px; border: 1px solid #e0e4ea; border-radius: var(--radius-pill); color: var(--color-text-muted); font-size: .66rem; font-weight: 700; }
+  .content-card__action { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 7px; min-height: 39px; padding: 0 12px; border-radius: 9px; background: var(--color-primary); box-shadow: var(--shadow-action); color: #fff; font-size: .76rem; font-weight: 800; text-decoration: none; }
+  .content-card__action:hover { background: #021b8b; }
+  .content-card__action:focus-visible { outline: 3px solid rgba(53,87,242,.35); outline-offset: 2px; }
+  .content-card__action svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
+
+  .content-card--compact { flex-direction: column; height: 100%; }
+  .content-card--compact .content-card__visual { flex: none; width: 100%; min-height: 150px; }
+
+  @media (max-width: 1090px) {
+    .content-card { flex-direction: column; }
+    .content-card__visual { flex: none; width: 100%; min-height: 180px; }
+  }
+
+  @media (min-width: 621px) and (max-width: 900px) {
+    .content-card { flex-direction: row; }
+    .content-card__visual { flex: 0 0 31%; width: auto; min-height: 0; }
+  }
+
+  @media (max-width: 620px) {
+    .content-card__visual { min-height: 164px; }
+    .content-card__body { padding: 17px; }
+    .content-card__meta { align-items: flex-start; }
+    .content-card__category { white-space: normal; }
+    .content-card__footer { align-items: stretch; flex-direction: column; }
+    .content-card__action { width: 100%; min-height: 44px; }
+  }
+</style>

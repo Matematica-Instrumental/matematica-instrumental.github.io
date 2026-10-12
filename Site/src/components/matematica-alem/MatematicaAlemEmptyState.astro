@@ -1,0 +1,66 @@
+---
+interface Props {
+  tipo: 'vazio' | 'sem-resultados';
+  hidden?: boolean;
+}
+
+const { tipo, hidden = false } = Astro.props;
+const vazio = tipo === 'vazio';
+---
+
+<section
+  class:list={['alem-empty', { 'alem-empty--catalog': vazio }]}
+  data-no-results={!vazio ? '' : undefined}
+  data-empty={vazio ? '' : undefined}
+  role={!vazio ? 'status' : undefined}
+  hidden={hidden}
+>
+  <span class="alem-empty__icon" aria-hidden="true">{vazio ? '◇' : '∅'}</span>
+  {vazio ? (
+    <h2>Nenhum conteúdo disponível no momento.</h2>
+  ) : (
+    <p>Nenhum conteúdo corresponde aos filtros selecionados.</p>
+  )}
+</section>
+
+<style>
+  .alem-empty {
+    display: grid;
+    justify-items: center;
+    gap: 13px;
+    padding: 54px 24px;
+    border: 1px dashed #bdc7d5;
+    border-radius: var(--radius-lg);
+    background: #f8f9fb;
+    color: var(--color-text-secondary);
+    text-align: center;
+  }
+
+  .alem-empty--catalog {
+    margin-top: 28px;
+    padding-block: 72px;
+  }
+
+  .alem-empty__icon {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    border-radius: 50%;
+    background: #e9eefb;
+    color: var(--color-primary);
+    font-size: 1.35rem;
+    font-weight: 800;
+  }
+
+  p,
+  h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: 1.03rem;
+  }
+
+  [hidden] {
+    display: none;
+  }
+</style>

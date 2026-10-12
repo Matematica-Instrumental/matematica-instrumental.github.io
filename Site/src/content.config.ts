@@ -47,6 +47,33 @@ const categoriaOportunidadeSchema = z.enum([
   'Evento',
 ]);
 
+const categoriaMatematicaAlemSchema = z.enum([
+  'Curiosidades',
+  'História da Matemática',
+  'Personalidades',
+  'Matemática no cotidiano',
+  'Aplicações',
+  'Desafios',
+  'Vídeos',
+  'Leituras',
+  'Sites e recursos',
+]);
+
+const origemMatematicaAlemSchema = z.enum(['Autoral', 'Curadoria']);
+
+const rotuloAcaoMatematicaAlemSchema = z.enum([
+  'Saiba mais',
+  'Ver fonte',
+  'Assistir',
+  'Acessar conteúdo',
+]);
+
+const direitoImagemMatematicaAlemSchema = z.enum([
+  'Própria',
+  'Domínio público',
+  'Licenciada',
+]);
+
 const tipoMarcoOportunidadeSchema = z.enum([
   'Abertura de inscrições',
   'Encerramento de inscrições',
@@ -136,6 +163,60 @@ const marcoOportunidadeSchema = z.strictObject({
 const fonteOportunidadeSchema = z.strictObject({
   nome: textoObrigatorioSchema,
   url: httpUrlSchema,
+});
+
+const fonteMatematicaAlemSchema = z.strictObject({
+  nome: textoObrigatorioSchema,
+  url: httpUrlSchema,
+});
+
+const acaoMatematicaAlemSchema = z.strictObject({
+  rotulo: rotuloAcaoMatematicaAlemSchema,
+  url: httpUrlSchema,
+});
+
+const linkRelacionadoMatematicaAlemSchema = z.strictObject({
+  titulo: textoObrigatorioSchema,
+  url: httpUrlSchema,
+});
+
+const arquivoImagemMatematicaAlemSchema = textoObrigatorioSchema.refine(
+  (value) => (
+    !/^https?:\/\//i.test(value)
+    && (
+      /^\/(?!\/)/.test(value)
+      || /^src\/assets\/editorial\//.test(value)
+    )
+  ),
+  {
+    message: 'Use um caminho local iniciado por / ou src/assets/editorial/. Hotlink externo não é permitido.',
+  },
+);
+
+const imagemMatematicaAlemSchema = z.strictObject({
+  arquivo: arquivoImagemMatematicaAlemSchema,
+  alt: textoObrigatorioSchema,
+  credito: textoObrigatorioSchema,
+  direito: direitoImagemMatematicaAlemSchema,
+  licenca: textoObrigatorioSchema,
+  fonteUrl: httpUrlSchema.optional(),
+  licencaUrl: httpUrlSchema.optional(),
+}).superRefine(({ direito, fonteUrl, licencaUrl }, context) => {
+  if (direito !== 'Própria' && !fonteUrl) {
+    context.addIssue({
+      code: 'custom',
+      path: ['fonteUrl'],
+      message: 'Imagem de Domínio público ou Licenciada exige fonteUrl.',
+    });
+  }
+
+  if (direito === 'Licenciada' && !licencaUrl) {
+    context.addIssue({
+      code: 'custom',
+      path: ['licencaUrl'],
+      message: 'Imagem Licenciada exige licencaUrl.',
+    });
+  }
 });
 
 const direcionamentoOportunidadeSchema = z.strictObject({
@@ -555,6 +636,35 @@ const oportunidades = defineCollection({
   }),
 });
 
+const matematicaAlem = defineCollection({
+  loader: optionalYamlGlob('./src/content/matematica-alem'),
+  schema: z.strictObject({
+    titulo: textoObrigatorioSchema,
+    categoria: categoriaMatematicaAlemSchema,
+    resumo: textoObrigatorioSchema,
+    texto: textoObrigatorioSchema,
+    publicacao: portalDateSchema,
+    origem: origemMatematicaAlemSchema,
+    autoria: textoObrigatorioSchema,
+    fontes: z.array(fonteMatematicaAlemSchema).min(1).optional(),
+    imagem: imagemMatematicaAlemSchema.optional(),
+    acao: acaoMatematicaAlemSchema.optional(),
+    linksRelacionados: z.array(linkRelacionadoMatematicaAlemSchema).min(1).optional(),
+    tags: z.array(textoObrigatorioSchema).min(1).optional(),
+    destaqueNovidades: destaqueNovidadesSchema.optional(),
+    destaqueHome: z.boolean().optional(),
+    arquivado: z.boolean().optional(),
+  }).superRefine(({ origem, fontes }, context) => {
+    if (origem === 'Curadoria' && !fontes?.length) {
+      context.addIssue({
+        code: 'custom',
+        path: ['fontes'],
+        message: 'Conteúdo de Curadoria exige ao menos uma fonte.',
+      });
+    }
+  }),
+});
+
 export const collections = {
   turmas,
   videos,
@@ -569,4 +679,5 @@ export const collections = {
   links,
   provas,
   oportunidades,
+  matematicaAlem,
 };

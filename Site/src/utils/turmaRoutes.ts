@@ -53,6 +53,13 @@ export function normalizeTurmaRouteSegment(value: string): string {
   return normalized;
 }
 
+export function getTurmasGrupoAnchor(
+  segmento: string,
+  anoSerie: string,
+): string {
+  return `turmas-${normalizeTurmaRouteSegment(segmento)}-${normalizeTurmaRouteSegment(anoSerie)}`;
+}
+
 function validateTurmaSlug(slug: string): string {
   if (normalizeTurmaRouteSegment(slug) !== slug) {
     throw new Error(

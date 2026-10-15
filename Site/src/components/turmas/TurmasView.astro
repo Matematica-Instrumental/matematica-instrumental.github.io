@@ -1,5 +1,9 @@
 ---
 import type { SegmentoTurmasViewData } from '../../utils/turmaContent';
+import {
+  getTurmasGrupoAnchor,
+  normalizeTurmaRouteSegment,
+} from '../../utils/turmaRoutes';
 
 interface Props {
   segmentos: readonly SegmentoTurmasViewData[];
@@ -19,7 +23,7 @@ const { segmentos } = Astro.props;
         <p class="empty-state">Nenhuma turma disponível no momento.</p>
       ) : (
         <div class="segment-list">
-          {segmentos.map((segmento, segmentoIndex) => (
+          {segmentos.map((segmento) => (
             <section
               class:list={[
                 'segment-group',
@@ -29,25 +33,28 @@ const { segmentos } = Astro.props;
                   'segment-group--medio': segmento.nome === 'Ensino Médio',
                 },
               ]}
-              aria-labelledby={`segmento-${segmentoIndex}`}
+              aria-labelledby={`turmas-${normalizeTurmaRouteSegment(segmento.nome)}-titulo`}
             >
               <header class="segment-group__heading">
                 <span class="hierarchy-label">Segmento</span>
-                <h2 id={`segmento-${segmentoIndex}`}>{segmento.nome}</h2>
+                <h2 id={`turmas-${normalizeTurmaRouteSegment(segmento.nome)}-titulo`}>
+                  {segmento.nome}
+                </h2>
               </header>
 
               <div class="year-list">
-                {segmento.anosSeries.map((anoSerie, anoSerieIndex) => (
+                {segmento.anosSeries.map((anoSerie) => (
                   <section
                     class="year-group"
+                    id={getTurmasGrupoAnchor(segmento.nome, anoSerie.nome)}
                     aria-labelledby={
-                      `segmento-${segmentoIndex}-ano-${anoSerieIndex}`
+                      `${getTurmasGrupoAnchor(segmento.nome, anoSerie.nome)}-titulo`
                     }
                   >
                     <header class="year-group__heading">
                       <span class="hierarchy-label">Ano / série</span>
                       <h3
-                        id={`segmento-${segmentoIndex}-ano-${anoSerieIndex}`}
+                        id={`${getTurmasGrupoAnchor(segmento.nome, anoSerie.nome)}-titulo`}
                       >
                         {anoSerie.nome}
                       </h3>

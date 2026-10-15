@@ -1,5 +1,10 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { getTurmaHref } from './turmaRoutes';
+import {
+  applyAstroBaseUrl,
+  getTurmaHref,
+  getTurmasGrupoAnchor,
+  normalizeTurmaRouteSegment,
+} from './turmaRoutes';
 import {
   avisoEstaDentroDaValidade,
   comparePortalDates,
@@ -183,6 +188,24 @@ export interface SegmentoTurmasViewData {
   anosSeries: AnoSerieTurmasViewData[];
 }
 
+export interface TurmaHomeSource {
+  segmento: string;
+  anoSerie: string;
+  arquivada?: boolean;
+}
+
+export interface AcessoAnoSerieTurmasHome {
+  anoSerie: string;
+  anchorId: string;
+  href: string;
+}
+
+export interface AcessoSegmentoTurmasHome {
+  segmento: string;
+  segmentoSlug: string;
+  anos: AcessoAnoSerieTurmasHome[];
+}
+
 interface LeituraComHojeOptions {
   hoje?: PortalDate;
 }
@@ -233,21 +256,11 @@ function compararTurmasGlobais(
     || ordenacaoPtBr.compare(turmaA.nome, turmaB.nome);
 }
 
-export function prepararSegmentosTurmas(
-  turmas: readonly TurmaGlobalSource[],
-): SegmentoTurmasViewData[] {
-  const turmasPorId = new Map<string, TurmaGlobalSource>();
-
-  for (const turma of turmas) {
-    if (turmasPorId.has(turma.id)) {
-      throw new Error(`Turma duplicada na listagem global: "${turma.id}".`);
-    }
-
-    turmasPorId.set(turma.id, turma);
-  }
-
+function agruparTurmasPorSegmentoEAno<
+  T extends Pick<TurmaHomeSource, 'segmento' | 'anoSerie'>,
+>(turmas: readonly T[]) {
   return ORDEM_INSTITUCIONAL_SEGMENTOS.flatMap((segmento) => {
-    const turmasDoSegmento = [...turmasPorId.values()].filter(
+    const turmasDoSegmento = turmas.filter(
       (turma) => turma.segmento === segmento,
     );
 
@@ -262,9 +275,52 @@ export function prepararSegmentosTurmas(
         ordenacaoNaturalPtBr.compare(anoSerieA, anoSerieB),
       )
       .map((anoSerie) => ({
+        anoSerie,
+        turmas: turmasDoSegmento.filter((turma) => turma.anoSerie === anoSerie),
+      }));
+
+    return [{ segmento, anosSeries }];
+  });
+}
+
+export function getAcessosTurmasHome(
+  turmas: readonly TurmaHomeSource[],
+): AcessoSegmentoTurmasHome[] {
+  const turmasElegiveis = turmas.filter((turma) => turma.arquivada !== true);
+  const turmasHref = applyAstroBaseUrl('/turmas/');
+
+  return agruparTurmasPorSegmentoEAno(turmasElegiveis).map(
+    ({ segmento, anosSeries }) => ({
+      segmento,
+      segmentoSlug: normalizeTurmaRouteSegment(segmento),
+      anos: anosSeries.map(({ anoSerie }) => {
+        const anchorId = getTurmasGrupoAnchor(segmento, anoSerie);
+
+        return { anoSerie, anchorId, href: `${turmasHref}#${anchorId}` };
+      }),
+    }),
+  );
+}
+
+export function prepararSegmentosTurmas(
+  turmas: readonly TurmaGlobalSource[],
+): SegmentoTurmasViewData[] {
+  const turmasPorId = new Map<string, TurmaGlobalSource>();
+
+  for (const turma of turmas) {
+    if (turmasPorId.has(turma.id)) {
+      throw new Error(`Turma duplicada na listagem global: "${turma.id}".`);
+    }
+
+    turmasPorId.set(turma.id, turma);
+  }
+
+  return agruparTurmasPorSegmentoEAno([...turmasPorId.values()]).map(
+    ({ segmento, anosSeries }) => ({
+      nome: segmento,
+      anosSeries: anosSeries.map(({ anoSerie, turmas: turmasDoAno }) => ({
         nome: anoSerie,
-        turmas: turmasDoSegmento
-          .filter((turma) => turma.anoSerie === anoSerie)
+        turmas: turmasDoAno
           .sort(compararTurmasGlobais)
           .map((turma) => ({
             nome: turma.nome,
@@ -273,10 +329,9 @@ export function prepararSegmentosTurmas(
             arquivada: Boolean(turma.arquivada),
             href: getTurmaHref(turma),
           })),
-      }));
-
-    return [{ nome: segmento, anosSeries }];
-  });
+      })),
+    }),
+  );
 }
 
 export async function getSegmentosTurmasGlobais(): Promise<

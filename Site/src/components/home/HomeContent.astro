@@ -1,0 +1,41 @@
+---
+import HomeHero from './HomeHero.astro';
+import HomeQuickAccess from './HomeQuickAccess.astro';
+import HomeTurmasAccess from './HomeTurmasAccess.astro';
+import NewsPanel from '../novidades/NewsPanel.astro';
+import MatematicaAlemHomeHighlights from '../matematica-alem/MatematicaAlemHomeHighlights.astro';
+import type { NovidadeVisual } from '../../utils/novidades';
+import type { MatematicaAlemItem } from '../../utils/matematicaAlem';
+import type { AcessoSegmentoTurmasHome } from '../../utils/turmaContent';
+
+interface Props {
+  novidades: NovidadeVisual[];
+  grupos: AcessoSegmentoTurmasHome[];
+  destaques: MatematicaAlemItem[];
+}
+
+const { novidades, grupos, destaques } = Astro.props;
+---
+
+<div class="home-content">
+  <section class="home-opening" aria-labelledby="home-title">
+    <HomeHero />
+    <NewsPanel items={novidades.slice(0, 6)} />
+  </section>
+  <HomeQuickAccess />
+  <HomeTurmasAccess grupos={grupos} />
+  {destaques.length > 0 && <MatematicaAlemHomeHighlights itens={destaques} />}
+</div>
+
+<style>
+
+  .home-opening { display: grid; grid-template-columns: minmax(0, 2.3fr) minmax(340px, 1fr); align-items: stretch; gap: 24px; }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .home-opening { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  }
+
+  @media (max-width: 767px) {
+    .home-opening { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  }
+</style>

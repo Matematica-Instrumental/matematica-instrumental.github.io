@@ -1,0 +1,50 @@
+---
+import portalSymbol from '../../assets/brand/simbolo-oficial-colorido.png';
+---
+
+<div class="home-hero">
+  <div class="home-hero__copy">
+    <h1 id="home-title">
+      <span>Bem-vindos ao{' '}</span>
+      <span class="home-hero__brand">Matemática Instrumental</span>
+    </h1>
+    <p>Conteúdo organizado, claro e objetivo para você aprender mais e melhor.</p>
+    <a class="home-start" href="#acesso-rapido">
+      Comece por aqui
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+  </div>
+  <div class="home-hero__identity" aria-hidden="true">
+    <img src={portalSymbol.src} width={portalSymbol.width} height={portalSymbol.height} alt="" />
+  </div>
+</div>
+
+<style>
+  .home-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 180px; align-items: center; gap: 20px; min-height: 320px; padding: 36px; overflow: hidden; border: 1px solid var(--color-border-neutral); border-radius: var(--radius-xl); background: radial-gradient(ellipse at 90% 78%, #e4edff 0%, transparent 42%), linear-gradient(135deg, #fff, #f4f6fa); box-shadow: var(--shadow-surface); }
+  .home-hero__copy { position: relative; z-index: 1; min-width: 0; }
+  .home-hero h1 { margin: 0; color: var(--color-heading); font-size: 34px; line-height: 1.16; letter-spacing: -.025em; }
+  .home-hero h1 > span { display: block; }
+  .home-hero h1 > .home-hero__brand { margin-top: 7px; color: var(--color-primary); font-size: 40px; }
+  .home-hero__copy > p { max-width: 500px; margin: 16px 0 22px; color: var(--color-text-secondary); font-size: 17px; line-height: 1.5; }
+  .home-start { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 46px; padding: 12px 17px; border-radius: var(--radius-small); background: var(--color-primary); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; box-shadow: var(--shadow-action); }
+  .home-start svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .home-hero__identity { position: relative; min-width: 0; }
+  .home-hero__identity::after { position: absolute; content: ''; width: 140%; height: 26px; left: -20%; bottom: -14px; border: 2px solid rgba(255, 255, 255, .85); border-radius: 50%; box-shadow: 0 0 0 10px rgba(255, 255, 255, .27), 0 0 0 20px rgba(255, 255, 255, .16); }
+  .home-hero__identity img { position: relative; z-index: 1; width: 100%; height: auto; }
+
+  .home-start:focus-visible { outline: 3px solid var(--color-primary-bright); outline-offset: 3px; }
+
+  @media (min-width: 768px) and (max-width: 1399px) {
+    .home-hero { min-height: 288px; grid-template-columns: minmax(0, 1fr) 140px; padding: 32px; }
+    .home-hero h1 { font-size: 30px; }
+    .home-hero h1 > .home-hero__brand { font-size: 36px; }
+  }
+
+  @media (max-width: 767px) {
+    .home-hero { min-height: 280px; grid-template-columns: minmax(0, 1fr) 74px; gap: 12px; padding: 22px; border-radius: var(--radius-lg); }
+    .home-hero h1 { font-size: 23px; }
+    .home-hero h1 > .home-hero__brand { font-size: 27px; }
+    .home-hero__copy > p { margin: 13px 0 18px; font-size: 14px; }
+    .home-start { min-height: 44px; padding: 11px 12px; gap: 10px; font-size: 13px; }
+  }
+</style>

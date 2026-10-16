@@ -1,3 +1,8 @@
+import {
+  isValidTurmaSlug,
+  normalizeContentRouteSegment,
+} from './contentIntegrity';
+
 export interface TurmaRouteData {
   segmento: string;
   anoSerie: string;
@@ -36,21 +41,7 @@ export interface TurmaRouteParams {
 }
 
 export function normalizeTurmaRouteSegment(value: string): string {
-  const normalized = value
-    .replaceAll('º', 'o')
-    .replaceAll('ª', 'a')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/-{2,}/g, '-')
-    .replace(/^-|-$/g, '');
-
-  if (!normalized) {
-    throw new Error(`Não foi possível gerar um segmento de URL para "${value}".`);
-  }
-
-  return normalized;
+  return normalizeContentRouteSegment(value);
 }
 
 export function getTurmasGrupoAnchor(
@@ -60,8 +51,8 @@ export function getTurmasGrupoAnchor(
   return `turmas-${normalizeTurmaRouteSegment(segmento)}-${normalizeTurmaRouteSegment(anoSerie)}`;
 }
 
-function validateTurmaSlug(slug: string): string {
-  if (normalizeTurmaRouteSegment(slug) !== slug) {
+export function validateTurmaSlug(slug: string): string {
+  if (!isValidTurmaSlug(slug)) {
     throw new Error(
       `O slug de turma "${slug}" deve estar em minúsculas, sem acentos e em kebab-case.`,
     );

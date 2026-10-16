@@ -6,6 +6,14 @@ import {
   normalizePortalDate,
   tryNormalizePortalDate,
 } from './utils/portalDate';
+import {
+  isChronologicalInterval,
+  isHttpUrl,
+  isPublicationCompatibleWithHighlight,
+  isSafeLinkedResourceTarget,
+  isSafeLocalAssetPath,
+  isValidTurmaSlug,
+} from './utils/contentIntegrity';
 
 const segmentoSchema = z.enum([
   'Ensino Fundamental — Anos Finais',
@@ -83,37 +91,20 @@ const tipoMarcoOportunidadeSchema = z.enum([
 
 const textoObrigatorioSchema = z.string().trim().min(1);
 
-const urlRecursoProvaSchema = z.string().trim().refine((value) => {
-  if (/^\/(?!\/)/.test(value)) {
-    return true;
-  }
-
-  try {
-    const url = new URL(value);
-
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}, {
-  message: 'Use uma URL HTTP(S) válida ou um caminho interno iniciado por /.',
-});
+const urlRecursoSchema = textoObrigatorioSchema.refine(
+  isSafeLinkedResourceTarget,
+  {
+    message: 'Use uma URL HTTP(S) válida ou um caminho interno iniciado por /.',
+  },
+);
 
 const recursoProvaSchema = z.strictObject({
   nome: textoObrigatorioSchema,
-  url: urlRecursoProvaSchema,
+  url: urlRecursoSchema,
 });
 
-const httpUrlSchema = z.string().trim().refine((value) => {
-  try {
-    const url = new URL(value);
-
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}, {
-  message: 'Use uma URL HTTP(S) válida.',
+const httpUrlSchema = textoObrigatorioSchema.refine(isHttpUrl, {
+  message: 'Use uma URL HTTP(S) válida; outros protocolos não são permitidos.',
 });
 
 const portalDateSchema = z
@@ -124,8 +115,8 @@ const portalDateSchema = z
   .transform((value) => normalizePortalDate(value));
 
 const recursoVinculadoSchema = z.strictObject({
-  nome: z.string(),
-  url: z.url(),
+  nome: textoObrigatorioSchema,
+  url: urlRecursoSchema,
 });
 
 const classificacaoMatematicaSchema = z.strictObject({
@@ -154,6 +145,27 @@ const destaqueNovidadesSchema = z
     }
   });
 
+function validatePublicationHighlightOrder(
+  publicacao: string | undefined,
+  destaqueNovidades: { inicio: string; fim: string } | undefined,
+  addIssue: (issue: {
+    code: 'custom';
+    path: string[];
+    message: string;
+  }) => void,
+): void {
+  if (
+    publicacao
+    && !isPublicationCompatibleWithHighlight(publicacao, destaqueNovidades)
+  ) {
+    addIssue({
+      code: 'custom',
+      path: ['destaqueNovidades', 'fim'],
+      message: 'O fim de destaqueNovidades deve ser igual ou posterior à publicação.',
+    });
+  }
+}
+
 const marcoOportunidadeSchema = z.strictObject({
   tipo: tipoMarcoOportunidadeSchema,
   rotulo: textoObrigatorioSchema,
@@ -181,13 +193,7 @@ const linkRelacionadoMatematicaAlemSchema = z.strictObject({
 });
 
 const arquivoImagemMatematicaAlemSchema = textoObrigatorioSchema.refine(
-  (value) => (
-    !/^https?:\/\//i.test(value)
-    && (
-      /^\/(?!\/)/.test(value)
-      || /^src\/assets\/editorial\//.test(value)
-    )
-  ),
+  isSafeLocalAssetPath,
   {
     message: 'Use um caminho local iniciado por / ou src/assets/editorial/. Hotlink externo não é permitido.',
   },
@@ -299,14 +305,36 @@ const turmas = defineCollection({
   schema: z.object({
     id: z.string(),
     nome: z.string(),
-    slug: z.string(),
+    slug: textoObrigatorioSchema.refine(isValidTurmaSlug, {
+      message: 'Use somente minúsculas ASCII e kebab-case, sem espaços, acentos ou barras.',
+    }),
     segmento: segmentoSchema,
-    anoSerie: z.string(),
+    anoSerie: anoSerieProvaSchema,
     turma: z.string(),
     anoLetivo: z.number().int(),
     descricao: z.string(),
     arquivada: z.boolean().optional(),
     ordem: z.number().int(),
+  }).superRefine(({ slug, anoLetivo, segmento, anoSerie }, context) => {
+    if (!slug.split('-').includes(String(anoLetivo))) {
+      context.addIssue({
+        code: 'custom',
+        path: ['slug'],
+        message: `O slug deve identificar o ano letivo ${anoLetivo} para evitar colisões.`,
+      });
+    }
+
+    const anosSeriesPermitidos = segmento === 'Ensino Fundamental — Anos Finais'
+      ? ['6º ano', '7º ano', '8º ano', '9º ano']
+      : ['1º ano', '2º ano', '3º ano'];
+
+    if (!anosSeriesPermitidos.includes(anoSerie)) {
+      context.addIssue({
+        code: 'custom',
+        path: ['anoSerie'],
+        message: `O Ano/Série "${anoSerie}" não pertence ao Segmento "${segmento}".`,
+      });
+    }
   }),
 });
 
@@ -316,9 +344,9 @@ const videos = defineCollection({
     id: z.string(),
     titulo: z.string(),
     descricao: z.string(),
-    url: z.url(),
+    url: httpUrlSchema,
     provedor: z.enum(['YouTube', 'Vimeo', 'Outro']),
-    miniaturaUrl: z.url(),
+    miniaturaUrl: httpUrlSchema,
     duracaoSegundos: z.number().int().positive(),
     prioridade: z.enum([
       'Essencial',
@@ -332,6 +360,12 @@ const videos = defineCollection({
     tags: z.array(z.string()),
     publicacao: portalDateSchema,
     destaqueNovidades: destaqueNovidadesSchema.optional(),
+  }).superRefine(({ publicacao, destaqueNovidades }, context) => {
+    validatePublicationHighlightOrder(
+      publicacao,
+      destaqueNovidades,
+      (issue) => context.addIssue(issue),
+    );
   }),
 });
 
@@ -347,6 +381,14 @@ const avisos = defineCollection({
     publicacao: portalDateSchema,
     validade: portalDateSchema,
     prioridade: z.enum(['Novo', 'Atenção', 'Destaque']),
+  }).superRefine(({ publicacao, validade }, context) => {
+    if (!isChronologicalInterval(publicacao, validade)) {
+      context.addIssue({
+        code: 'custom',
+        path: ['validade'],
+        message: 'A validade do aviso deve ser igual ou posterior à publicação.',
+      });
+    }
   }),
 });
 
@@ -370,7 +412,15 @@ const periodosLetivos = defineCollection({
     dataInicial: portalDateSchema,
     dataFinal: portalDateSchema,
     valorTotalEtapa: z.number().nonnegative(),
-    ordem: z.number().int(),
+    ordem: z.number().int().positive(),
+  }).superRefine(({ dataInicial, dataFinal }, context) => {
+    if (!isChronologicalInterval(dataInicial, dataFinal)) {
+      context.addIssue({
+        code: 'custom',
+        path: ['dataFinal'],
+        message: 'A data final deve ser igual ou posterior à data inicial.',
+      });
+    }
   }),
 });
 
@@ -387,6 +437,12 @@ const itensCronograma = defineCollection({
     publicacao: portalDateSchema.optional(),
     ordem: z.number().int().optional(),
     destaqueNovidades: destaqueNovidadesSchema.optional(),
+  }).superRefine(({ publicacao, destaqueNovidades }, context) => {
+    validatePublicationHighlightOrder(
+      publicacao,
+      destaqueNovidades,
+      (issue) => context.addIssue(issue),
+    );
   }),
 });
 
@@ -409,6 +465,36 @@ const atividadesListas = defineCollection({
     gabaritoResolucao: z.array(recursoVinculadoSchema).min(1).optional(),
     dataLiberacaoGabarito: portalDateSchema.optional(),
     destaqueNovidades: destaqueNovidadesSchema.optional(),
+  }).superRefine(({
+    publicacao,
+    gabaritoResolucao,
+    dataLiberacaoGabarito,
+    destaqueNovidades,
+  }, context) => {
+    if (dataLiberacaoGabarito && !gabaritoResolucao) {
+      context.addIssue({
+        code: 'custom',
+        path: ['dataLiberacaoGabarito'],
+        message: 'dataLiberacaoGabarito exige gabaritoResolucao.',
+      });
+    }
+
+    if (
+      dataLiberacaoGabarito
+      && comparePortalDates(dataLiberacaoGabarito, publicacao) < 0
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['dataLiberacaoGabarito'],
+        message: 'A liberação programada deve ser igual ou posterior à publicação.',
+      });
+    }
+
+    validatePublicationHighlightOrder(
+      publicacao,
+      destaqueNovidades,
+      (issue) => context.addIssue(issue),
+    );
   }),
 });
 
@@ -431,6 +517,12 @@ const paraEstudar = defineCollection({
     tags: z.array(z.string()),
     publicacao: portalDateSchema,
     destaqueNovidades: destaqueNovidadesSchema.optional(),
+  }).superRefine(({ publicacao, destaqueNovidades }, context) => {
+    validatePublicationHighlightOrder(
+      publicacao,
+      destaqueNovidades,
+      (issue) => context.addIssue(issue),
+    );
   }),
 });
 
@@ -450,6 +542,12 @@ const trabalhos = defineCollection({
     recursosAdicionais: z.array(recursoVinculadoSchema).min(1).optional(),
     tags: z.array(z.string()),
     destaqueNovidades: destaqueNovidadesSchema.optional(),
+  }).superRefine(({ publicacao, destaqueNovidades }, context) => {
+    validatePublicationHighlightOrder(
+      publicacao,
+      destaqueNovidades,
+      (issue) => context.addIssue(issue),
+    );
   }),
 });
 
@@ -468,6 +566,12 @@ const materiais = defineCollection({
     arquivoLink: recursoVinculadoSchema,
     tags: z.array(z.string()).optional(),
     destaqueNovidades: destaqueNovidadesSchema.optional(),
+  }).superRefine(({ publicacao, destaqueNovidades }, context) => {
+    validatePublicationHighlightOrder(
+      publicacao,
+      destaqueNovidades,
+      (issue) => context.addIssue(issue),
+    );
   }),
 });
 
@@ -477,7 +581,7 @@ const links = defineCollection({
     id: z.string(),
     titulo: z.string(),
     descricao: z.string(),
-    url: z.url(),
+    url: httpUrlSchema,
     finalidade: z.string().trim().min(1),
     tipo: z.string().trim().min(1),
     acesso: z.enum(['Gratuito', 'Pago']).optional(),
@@ -492,6 +596,12 @@ const links = defineCollection({
     observacaoProfessor: z.string().optional(),
     tags: z.array(z.string()).optional(),
     destaqueNovidades: destaqueNovidadesSchema.optional(),
+  }).superRefine(({ publicacao, destaqueNovidades }, context) => {
+    validatePublicationHighlightOrder(
+      publicacao,
+      destaqueNovidades,
+      (issue) => context.addIssue(issue),
+    );
   }),
 });
 
@@ -547,7 +657,12 @@ const oportunidades = defineCollection({
     resultadoUrl: httpUrlSchema.optional(),
     destaqueNovidades: destaqueNovidadesSchema.optional(),
     condicaoUso: textoObrigatorioSchema.optional(),
-  }).superRefine(({ marcos, direcionamento }, context) => {
+  }).superRefine(({
+    publicacao,
+    marcos,
+    direcionamento,
+    destaqueNovidades,
+  }, context) => {
     const aberturas = marcos.filter(({ tipo }) => tipo === 'Abertura de inscrições');
     const encerramentos = marcos.filter(({ tipo }) => tipo === 'Encerramento de inscrições');
     const realizacoes = marcos.filter(({ tipo }) => tipo === 'Realização');
@@ -633,6 +748,12 @@ const oportunidades = defineCollection({
         });
       }
     }
+
+    validatePublicationHighlightOrder(
+      publicacao,
+      destaqueNovidades,
+      (issue) => context.addIssue(issue),
+    );
   }),
 });
 
@@ -654,7 +775,12 @@ const matematicaAlem = defineCollection({
     destaqueNovidades: destaqueNovidadesSchema.optional(),
     destaqueHome: z.boolean().optional(),
     arquivado: z.boolean().optional(),
-  }).superRefine(({ origem, fontes }, context) => {
+  }).superRefine(({
+    publicacao,
+    origem,
+    fontes,
+    destaqueNovidades,
+  }, context) => {
     if (origem === 'Curadoria' && !fontes?.length) {
       context.addIssue({
         code: 'custom',
@@ -662,6 +788,12 @@ const matematicaAlem = defineCollection({
         message: 'Conteúdo de Curadoria exige ao menos uma fonte.',
       });
     }
+
+    validatePublicationHighlightOrder(
+      publicacao,
+      destaqueNovidades,
+      (issue) => context.addIssue(issue),
+    );
   }),
 });
 

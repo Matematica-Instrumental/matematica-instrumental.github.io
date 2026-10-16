@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import TurmaLayout from '../../../../../layouts/TurmaLayout.astro';
 import TurmaDashboard from '../../../../../components/turma/TurmaDashboard.astro';
+import { assertCurrentContentIntegrity } from '../../../../../utils/contentIntegrityBuild';
 import {
   formatarDataResumo,
   formatarDuracaoVideo,
@@ -47,6 +48,7 @@ function formatarPrimeiraClassificacao(
 }
 
 export async function getStaticPaths() {
+  await assertCurrentContentIntegrity();
   const turmas = await getCollection('turmas');
 
   return turmas.map((entry) => ({

@@ -16,6 +16,7 @@ import type { LinksViewGroup } from '../../../../../components/turma/LinksView.a
 import type { StudyViewItem } from '../../../../../components/turma/StudyView.astro';
 import type { VideosViewItem } from '../../../../../components/turma/VideosView.astro';
 import type { WorksViewItem } from '../../../../../components/turma/WorksView.astro';
+import { assertCurrentContentIntegrity } from '../../../../../utils/contentIntegrityBuild';
 import {
   formatarDataResumo,
   formatarDuracaoVideo,
@@ -41,6 +42,7 @@ interface Props {
 }
 
 export async function getStaticPaths() {
+  await assertCurrentContentIntegrity();
   const turmas = await getCollection('turmas');
 
   return turmas.flatMap((entry) => {

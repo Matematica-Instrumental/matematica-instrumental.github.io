@@ -35,7 +35,7 @@ Avisos, Provas, Oportunidades e Matemática além da sala ficam fora do menu at�
 
 ## Blocos reutilizados
 
-**Classificação** (lista, pelo menos 1): Área · Subárea · Conteúdo — três textos obrigatórios. Exemplo: Álgebra · Funções · Função afim.
+**Classificação** (lista, pelo menos 1): Área · Subárea · Conteúdo — três menus com a lista fixa da seção "Vocabulário de classificação". Exemplo: Álgebra · Funções · Função afim. O Pages CMS não filtra um menu pelo outro; o build verifica se a combinação existe na lista.
 
 **Destaque em Novidades** (opcional): Início · Fim — duas datas; o fim deve ser igual ou posterior ao início e à publicação.
 
@@ -226,7 +226,45 @@ Lista mostra: Título · Finalidade · Tipo.
 - Não calcula a soma do Cronograma na tela; o aviso aparece no log do build (DEC-039 ajustada pela DEC-106).
 - Excluir um registro usado por outro (por exemplo, uma turma ainda referenciada) faz o build falhar até a referência ser corrigida.
 
-## Pontos para validação
-1. Classificação Área → Subárea → Conteúdo: na Fase 1 fica como texto livre, como no schema atual. Uma lista fixa de áreas e subáreas exigiria aprovação de vocabulário controlado.
-2. Ano/Série aparece como menu fechado em todas as telas, embora alguns schemas aceitem texto livre. O menu evita grafias diferentes.
-3. Ordem do menu lateral e colunas mostradas em cada lista.
+## Vocabulário de classificação
+
+Lista fixa aprovada pelo professor em 26/10/2026 quanto ao formato (vocabulário controlado, conforme exigido pelo Modelo de Conteúdo). O conteúdo da lista abaixo é uma **proposta em validação**, baseada nas unidades temáticas da BNCC para o Ensino Fundamental — Anos Finais e nos conteúdos usuais do Ensino Médio. Novos itens entram por edição deste documento e do `.pages.yml`; o build recusa combinações fora da lista.
+
+### Números
+- **Conjuntos numéricos:** Números naturais · Números inteiros · Números racionais · Números irracionais · Números reais · Números complexos
+- **Operações e propriedades:** Operações fundamentais · Expressões numéricas · Potenciação · Radiciação · Notação científica
+- **Divisibilidade:** Múltiplos e divisores · Critérios de divisibilidade · Números primos · MMC e MDC
+- **Frações e decimais:** Frações · Números decimais · Dízimas periódicas
+- **Proporcionalidade:** Razão e proporção · Regra de três · Porcentagem
+- **Matemática financeira:** Acréscimos e descontos · Juros simples · Juros compostos
+
+### Álgebra
+- **Expressões algébricas:** Expressões algébricas · Produtos notáveis · Fatoração
+- **Equações e inequações:** Equações do 1º grau · Inequações do 1º grau · Sistemas lineares · Equações do 2º grau · Equações exponenciais · Equações logarítmicas
+- **Funções:** Noção de função · Função afim · Função quadrática · Função modular · Função exponencial · Logaritmo e função logarítmica
+- **Sequências:** Sequências e padrões · Progressão aritmética · Progressão geométrica
+- **Matrizes e determinantes:** Matrizes · Determinantes
+- **Polinômios:** Polinômios · Equações polinomiais
+
+### Geometria
+- **Geometria plana:** Ângulos · Retas paralelas e transversais · Triângulos · Quadriláteros · Polígonos · Circunferência e círculo · Congruência · Semelhança · Teorema de Tales · Teorema de Pitágoras
+- **Transformações geométricas:** Simetrias · Translação, rotação e reflexão
+- **Trigonometria:** Trigonometria no triângulo retângulo · Lei dos senos e lei dos cossenos · Ciclo trigonométrico · Funções trigonométricas
+- **Geometria espacial:** Poliedros · Prismas · Pirâmides · Cilindro · Cone · Esfera
+- **Geometria analítica:** Plano cartesiano · Ponto e reta · Circunferência no plano cartesiano · Cônicas
+
+### Grandezas e Medidas
+- **Unidades de medida:** Comprimento · Massa · Capacidade · Tempo · Temperatura · Conversão de unidades
+- **Perímetro e área:** Perímetro · Área de figuras planas
+- **Volume:** Volume e capacidade · Volume de sólidos
+- **Grandezas compostas:** Velocidade · Densidade · Escalas
+
+### Probabilidade e Estatística
+- **Contagem:** Princípio fundamental da contagem · Permutação · Arranjo · Combinação · Binômio de Newton
+- **Probabilidade:** Espaço amostral e eventos · Probabilidade simples · Probabilidade condicional
+- **Estatística:** Coleta e organização de dados · Tabelas e gráficos · Medidas de tendência central · Medidas de dispersão · Pesquisa estatística
+
+## Pontos aprovados em 26/10/2026
+1. Classificação por lista fixa (vocabulário acima, em validação).
+2. Ano/Série como menu fechado em todas as telas.
+3. Ordem do menu lateral e colunas das listas como descritas.

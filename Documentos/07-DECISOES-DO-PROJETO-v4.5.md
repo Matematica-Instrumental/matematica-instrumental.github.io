@@ -293,6 +293,8 @@ O acesso será feito exclusivamente com a conta GitHub **`Matematica-Instrumenta
 
 **Fase 2 (posterior):** Avisos, Provas, Oportunidades e Matemática além da sala.
 
+A classificação Área → Subárea → Conteúdo passa a usar **vocabulário controlado** (lista fixa), mantido em `CMS-TELAS-E-CAMPOS-v1.0.md` e refletido no `.pages.yml`. O build recusa combinações fora da lista. Ano/Série aparece como menu fechado em todas as telas do CMS.
+
 A lista de telas, campos, rótulos e ajudas do CMS funciona como mockup desta frente e está em `CMS-TELAS-E-CAMPOS-v1.0.md`. O `.pages.yml` somente será criado depois da aprovação dessa lista.
 
 ### Arquivos e imagens

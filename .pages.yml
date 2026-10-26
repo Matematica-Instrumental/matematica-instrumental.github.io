@@ -1,0 +1,1284 @@
+# Configuração do Pages CMS (DEC-106 a DEC-109).
+# Telas e campos aprovados em Documentos/CMS-TELAS-E-CAMPOS-v1.0.md.
+# Os schemas de Site/src/content.config.ts continuam sendo a fonte de verdade:
+# conteúdo inválido faz o build falhar e o site anterior continua no ar.
+media:
+- name: arquivos
+  label: Arquivos
+  input: Site/public/arquivos
+  output: /arquivos
+  categories:
+  - document
+  - spreadsheet
+  - image
+  - compressed
+  rename: safe
+content:
+- name: turmas
+  label: Turmas
+  type: collection
+  path: Site/src/content/turmas
+  format: yaml
+  filename: '{fields.id}.yaml'
+  view:
+    fields:
+    - nome
+    - anoLetivo
+    - arquivada
+    primary: nome
+  fields:
+  - name: id
+    label: Identificador
+    type: string
+    required: true
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+    description: 'Ex.: ensino-medio-1o-ano-turma-a-2026. Vira o nome do arquivo; não altere depois de
+      criado.'
+  - name: nome
+    label: Nome
+    type: string
+    required: true
+    description: 'Ex.: Turma A — 2026.'
+  - name: slug
+    label: Endereço da página
+    type: string
+    required: true
+    description: 'Minúsculas e hífens, com o ano. Ex.: turma-a-2026. Não altere depois de publicada.'
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+  - name: segmento
+    label: Segmento
+    type: select
+    required: true
+    options:
+      values:
+      - Ensino Fundamental — Anos Finais
+      - Ensino Médio
+  - name: anoSerie
+    label: Ano/Série
+    type: select
+    required: true
+    description: Deve pertencer ao segmento.
+    options:
+      values:
+      - 6º ano
+      - 7º ano
+      - 8º ano
+      - 9º ano
+      - 1º ano
+      - 2º ano
+      - 3º ano
+  - name: turma
+    label: Turma
+    type: string
+    required: true
+    description: 'Ex.: A.'
+  - name: anoLetivo
+    label: Ano letivo
+    type: number
+    required: true
+    description: 'Ex.: 2026.'
+  - name: descricao
+    label: Descrição
+    type: text
+    required: true
+  - name: arquivada
+    label: Arquivada
+    type: boolean
+    description: Marque ao fim do ano letivo.
+  - name: ordem
+    label: Ordem
+    type: number
+    required: true
+    description: Posição na lista de turmas.
+- name: regimesLetivos
+  label: Regimes letivos
+  type: collection
+  path: Site/src/content/regimes-letivos
+  format: yaml
+  filename: '{fields.id}.yaml'
+  view:
+    fields:
+    - nome
+    - anoLetivo
+    - tipo
+    primary: nome
+  fields:
+  - name: id
+    label: Identificador
+    type: string
+    required: true
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+    description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+  - name: nome
+    label: Nome
+    type: string
+    required: true
+    description: 'Ex.: Bimestres 2026.'
+  - name: anoLetivo
+    label: Ano letivo
+    type: number
+    required: true
+  - name: tipo
+    label: Tipo
+    type: select
+    required: true
+    description: bimestral = 4 períodos; trimestral = 3; semestral = 2.
+    options:
+      values:
+      - bimestral
+      - trimestral
+      - semestral
+  - name: turmas
+    label: Turmas
+    type: reference
+    description: Deixe vazio se o regime vale para todas as turmas do ano.
+    options:
+      collection: turmas
+      value: '{fields.slug}'
+      label: '{fields.nome} — {fields.anoLetivo}'
+      search: nome
+      multiple: true
+- name: periodosLetivos
+  label: Períodos letivos
+  type: collection
+  path: Site/src/content/periodos-letivos
+  format: yaml
+  filename: '{fields.id}.yaml'
+  view:
+    fields:
+    - nome
+    - dataInicial
+    - dataFinal
+    primary: nome
+  fields:
+  - name: id
+    label: Identificador
+    type: string
+    required: true
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+    description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+  - name: regimeLetivo
+    label: Regime letivo
+    type: reference
+    required: true
+    options:
+      collection: regimesLetivos
+      value: '{fields.id}'
+      label: '{fields.nome}'
+      search: nome
+  - name: nome
+    label: Nome
+    type: string
+    required: true
+    description: 'Ex.: 1º Bimestre.'
+  - name: dataInicial
+    label: Data inicial
+    type: date
+    required: true
+    options:
+      format: yyyy-MM-dd
+  - name: dataFinal
+    label: Data final
+    type: date
+    required: true
+    description: Igual ou posterior à inicial; sem sobrepor outro período do regime.
+    options:
+      format: yyyy-MM-dd
+  - name: valorTotalEtapa
+    label: Valor total da etapa
+    type: number
+    required: true
+    description: Pontos da etapa. Se a soma do cronograma passar disso, o build avisa sem bloquear.
+    options:
+      min: 0
+      step: 0.1
+  - name: ordem
+    label: Ordem
+    type: number
+    required: true
+    description: 1, 2, 3… na ordem das datas.
+    options:
+      min: 1
+- name: itensCronograma
+  label: Cronograma (itens)
+  type: collection
+  path: Site/src/content/itens-cronograma
+  format: yaml
+  filename: '{fields.id}.yaml'
+  view:
+    fields:
+    - dataPrazo
+    - descricaoConteudo
+    primary: descricaoConteudo
+  fields:
+  - name: id
+    label: Identificador
+    type: string
+    required: true
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+    description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+  - name: periodoLetivo
+    label: Período letivo
+    type: reference
+    required: true
+    options:
+      collection: periodosLetivos
+      value: '{fields.id}'
+      label: '{fields.nome}'
+      search: nome
+  - name: turmas
+    label: Turmas
+    type: reference
+    required: true
+    options:
+      collection: turmas
+      value: '{fields.slug}'
+      label: '{fields.nome} — {fields.anoLetivo}'
+      search: nome
+      multiple: true
+  - name: dataPrazo
+    label: Data/Prazo
+    type: date
+    required: true
+    description: No dia seguinte o item aparece como cumprido.
+    options:
+      format: yyyy-MM-dd
+  - name: tipo
+    label: Tipo
+    type: reference
+    required: true
+    description: Para incluir opções, use Listas → Tipos de cronograma.
+    options:
+      collection: tiposCronograma
+      value: '{fields.id}'
+      label: '{fields.nome}'
+      search: nome
+  - name: descricaoConteudo
+    label: Descrição/Conteúdo
+    type: text
+    required: true
+  - name: valorIndividual
+    label: Valor
+    type: number
+    description: Sem valor, o item não entra na soma.
+    options:
+      min: 0
+      step: 0.1
+  - name: publicacao
+    label: Publicação
+    type: date
+    description: Preencha para aparecer em Novidades.
+    options:
+      format: yyyy-MM-dd
+  - name: ordem
+    label: Ordem
+    type: number
+    description: Desempate entre itens da mesma data.
+  - name: destaqueNovidades
+    label: Destaque em Novidades
+    type: object
+    description: Opcional. O fim deve ser igual ou posterior ao início e à publicação.
+    fields:
+    - name: inicio
+      label: Início
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+    - name: fim
+      label: Fim
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+- name: atividadesListas
+  label: Atividades e listas
+  type: collection
+  path: Site/src/content/atividades-listas
+  format: yaml
+  filename: '{fields.id}.yaml'
+  view:
+    fields:
+    - titulo
+    - tipo
+    - publicacao
+    primary: titulo
+  fields:
+  - name: id
+    label: Identificador
+    type: string
+    required: true
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+    description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+  - name: tipo
+    label: Tipo
+    type: select
+    required: true
+    options:
+      values:
+      - Atividade
+      - Lista de exercícios
+  - name: titulo
+    label: Título
+    type: string
+    required: true
+  - name: descricao
+    label: Descrição
+    type: text
+  - name: assunto
+    label: Assunto
+    type: string
+    required: true
+  - name: segmento
+    label: Segmento
+    type: select
+    required: true
+    options:
+      values:
+      - Ensino Fundamental — Anos Finais
+      - Ensino Médio
+  - name: anoSerie
+    label: Ano/Série
+    type: select
+    required: true
+    options:
+      values:
+      - 6º ano
+      - 7º ano
+      - 8º ano
+      - 9º ano
+      - 1º ano
+      - 2º ano
+      - 3º ano
+  - name: turmas
+    label: Turmas
+    type: reference
+    required: true
+    options:
+      collection: turmas
+      value: '{fields.slug}'
+      label: '{fields.nome} — {fields.anoLetivo}'
+      search: nome
+      multiple: true
+  - name: publicacao
+    label: Publicação
+    type: date
+    required: true
+    options:
+      format: yyyy-MM-dd
+  - name: prazo
+    label: Prazo
+    type: date
+    options:
+      format: yyyy-MM-dd
+  - name: recursos
+    label: Recursos
+    type: object
+    fields:
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+    - name: arquivo
+      label: Arquivo enviado
+      type: file
+      options:
+        media: arquivos
+      description: Envie o PDF (até 100 MB). Deixe vazio se usar um link. Todo arquivo enviado fica público.
+    - name: url
+      label: Link
+      type: string
+      description: Link do Google Drive ou outro endereço https://. Deixe vazio se enviar um arquivo.
+    list: true
+    required: true
+    description: Pelo menos um. Envie o PDF ou cole o link do Drive.
+  - name: videosRelacionados
+    label: Vídeos relacionados
+    type: reference
+    options:
+      collection: videos
+      value: '{fields.id}'
+      label: '{fields.titulo}'
+      search: titulo
+      multiple: true
+  - name: tags
+    label: Etiquetas
+    type: string
+    list: true
+  - name: gabaritoResolucao
+    label: Gabarito/resolução
+    type: object
+    fields:
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+    - name: arquivo
+      label: Arquivo enviado
+      type: file
+      options:
+        media: arquivos
+      description: Envie o PDF (até 100 MB). Deixe vazio se usar um link. Todo arquivo enviado fica público.
+    - name: url
+      label: Link
+      type: string
+      description: Link do Google Drive ou outro endereço https://. Deixe vazio se enviar um arquivo.
+    list: true
+  - name: dataLiberacaoGabarito
+    label: Liberar gabarito em
+    type: date
+    description: Exige gabarito; igual ou posterior à publicação.
+    options:
+      format: yyyy-MM-dd
+  - name: destaqueNovidades
+    label: Destaque em Novidades
+    type: object
+    description: Opcional. O fim deve ser igual ou posterior ao início e à publicação.
+    fields:
+    - name: inicio
+      label: Início
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+    - name: fim
+      label: Fim
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+- name: paraEstudar
+  label: Para estudar
+  type: collection
+  path: Site/src/content/para-estudar
+  format: yaml
+  filename: '{fields.id}.yaml'
+  view:
+    fields:
+    - titulo
+    - objetivo
+    - publicacao
+    primary: titulo
+  fields:
+  - name: id
+    label: Identificador
+    type: string
+    required: true
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+    description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+  - name: titulo
+    label: Título
+    type: string
+    required: true
+  - name: objetivo
+    label: Objetivo
+    type: string
+    required: true
+    description: 'Ex.: Prova do 2º bimestre, ENEM, OBMEP.'
+  - name: tipoObjetivo
+    label: Tipo do objetivo
+    type: string
+  - name: dataObjetivo
+    label: Data do objetivo
+    type: date
+    options:
+      format: yyyy-MM-dd
+  - name: resumoOrientacao
+    label: Resumo da orientação
+    type: text
+    required: true
+  - name: assunto
+    label: Assunto
+    type: string
+    required: true
+  - name: segmento
+    label: Segmento
+    type: select
+    required: true
+    options:
+      values:
+      - Ensino Fundamental — Anos Finais
+      - Ensino Médio
+  - name: anoSerie
+    label: Ano/Série
+    type: select
+    required: true
+    options:
+      values:
+      - 6º ano
+      - 7º ano
+      - 8º ano
+      - 9º ano
+      - 1º ano
+      - 2º ano
+      - 3º ano
+  - name: turmas
+    label: Turmas
+    type: reference
+    required: true
+    options:
+      collection: turmas
+      value: '{fields.slug}'
+      label: '{fields.nome} — {fields.anoLetivo}'
+      search: nome
+      multiple: true
+  - name: recursos
+    label: Recursos
+    type: object
+    fields:
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+    - name: arquivo
+      label: Arquivo enviado
+      type: file
+      options:
+        media: arquivos
+      description: Envie o PDF (até 100 MB). Deixe vazio se usar um link. Todo arquivo enviado fica público.
+    - name: url
+      label: Link
+      type: string
+      description: Link do Google Drive ou outro endereço https://. Deixe vazio se enviar um arquivo.
+    list: true
+    required: true
+    description: Pelo menos um.
+  - name: videosRelacionados
+    label: Vídeos relacionados
+    type: reference
+    options:
+      collection: videos
+      value: '{fields.id}'
+      label: '{fields.titulo}'
+      search: titulo
+      multiple: true
+  - name: leiturasRelacionadas
+    label: Leituras relacionadas
+    type: object
+    fields:
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+    - name: arquivo
+      label: Arquivo enviado
+      type: file
+      options:
+        media: arquivos
+      description: Envie o PDF (até 100 MB). Deixe vazio se usar um link. Todo arquivo enviado fica público.
+    - name: url
+      label: Link
+      type: string
+      description: Link do Google Drive ou outro endereço https://. Deixe vazio se enviar um arquivo.
+    list: true
+  - name: tags
+    label: Etiquetas
+    type: string
+    list: true
+  - name: publicacao
+    label: Publicação
+    type: date
+    required: true
+    options:
+      format: yyyy-MM-dd
+  - name: destaqueNovidades
+    label: Destaque em Novidades
+    type: object
+    description: Opcional. O fim deve ser igual ou posterior ao início e à publicação.
+    fields:
+    - name: inicio
+      label: Início
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+    - name: fim
+      label: Fim
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+- name: trabalhos
+  label: Trabalhos
+  type: collection
+  path: Site/src/content/trabalhos
+  format: yaml
+  filename: '{fields.id}.yaml'
+  view:
+    fields:
+    - titulo
+    - publicacao
+    primary: titulo
+  fields:
+  - name: id
+    label: Identificador
+    type: string
+    required: true
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+    description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+  - name: titulo
+    label: Título
+    type: string
+    required: true
+  - name: descricao
+    label: Descrição
+    type: text
+  - name: assunto
+    label: Assunto
+    type: string
+    required: true
+  - name: segmento
+    label: Segmento
+    type: select
+    required: true
+    options:
+      values:
+      - Ensino Fundamental — Anos Finais
+      - Ensino Médio
+  - name: anoSerie
+    label: Ano/Série
+    type: select
+    required: true
+    options:
+      values:
+      - 6º ano
+      - 7º ano
+      - 8º ano
+      - 9º ano
+      - 1º ano
+      - 2º ano
+      - 3º ano
+  - name: turmas
+    label: Turmas
+    type: reference
+    required: true
+    options:
+      collection: turmas
+      value: '{fields.slug}'
+      label: '{fields.nome} — {fields.anoLetivo}'
+      search: nome
+      multiple: true
+  - name: publicacao
+    label: Publicação
+    type: date
+    required: true
+    options:
+      format: yyyy-MM-dd
+  - name: marco
+    label: Marco
+    type: object
+    required: true
+    fields:
+    - name: tipo
+      label: Tipo
+      type: select
+      required: true
+      options:
+        values:
+        - Entrega
+        - Apresentação
+    - name: data
+      label: Data
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+  - name: documentoTrabalho
+    label: Documento do trabalho
+    type: object
+    fields:
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+    - name: arquivo
+      label: Arquivo enviado
+      type: file
+      options:
+        media: arquivos
+      description: Envie o PDF (até 100 MB). Deixe vazio se usar um link. Todo arquivo enviado fica público.
+    - name: url
+      label: Link
+      type: string
+      description: Link do Google Drive ou outro endereço https://. Deixe vazio se enviar um arquivo.
+    required: true
+  - name: recursosAdicionais
+    label: Recursos adicionais
+    type: object
+    fields:
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+    - name: arquivo
+      label: Arquivo enviado
+      type: file
+      options:
+        media: arquivos
+      description: Envie o PDF (até 100 MB). Deixe vazio se usar um link. Todo arquivo enviado fica público.
+    - name: url
+      label: Link
+      type: string
+      description: Link do Google Drive ou outro endereço https://. Deixe vazio se enviar um arquivo.
+    list: true
+  - name: tags
+    label: Etiquetas
+    type: string
+    list: true
+  - name: destaqueNovidades
+    label: Destaque em Novidades
+    type: object
+    description: Opcional. O fim deve ser igual ou posterior ao início e à publicação.
+    fields:
+    - name: inicio
+      label: Início
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+    - name: fim
+      label: Fim
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+- name: materiais
+  label: Materiais
+  type: collection
+  path: Site/src/content/materiais
+  format: yaml
+  filename: '{fields.id}.yaml'
+  view:
+    fields:
+    - titulo
+    - publicacao
+    primary: titulo
+  fields:
+  - name: id
+    label: Identificador
+    type: string
+    required: true
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+    description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+  - name: titulo
+    label: Título
+    type: string
+    required: true
+  - name: descricao
+    label: Descrição
+    type: text
+  - name: tipo
+    label: Tipo
+    type: reference
+    required: true
+    description: Para incluir opções, use Listas → Tipos de material.
+    options:
+      collection: tiposMaterial
+      value: '{fields.id}'
+      label: '{fields.nome}'
+      search: nome
+  - name: classificacoes
+    label: Classificações
+    type: reference
+    required: true
+    description: Digite parte do conteúdo para buscar. Para incluir opções, use Listas → Classificações.
+    options:
+      collection: classificacoes
+      value: '{fields.id}'
+      label: '{fields.area} · {fields.subarea} · {fields.conteudo}'
+      search: area,subarea,conteudo
+      multiple: true
+  - name: publicacao
+    label: Publicação
+    type: date
+    required: true
+    options:
+      format: yyyy-MM-dd
+  - name: segmento
+    label: Segmento
+    type: select
+    required: true
+    options:
+      values:
+      - Ensino Fundamental — Anos Finais
+      - Ensino Médio
+  - name: anoSerie
+    label: Ano/Série
+    type: select
+    required: true
+    options:
+      values:
+      - 6º ano
+      - 7º ano
+      - 8º ano
+      - 9º ano
+      - 1º ano
+      - 2º ano
+      - 3º ano
+  - name: turmas
+    label: Turmas
+    type: reference
+    required: true
+    options:
+      collection: turmas
+      value: '{fields.slug}'
+      label: '{fields.nome} — {fields.anoLetivo}'
+      search: nome
+      multiple: true
+  - name: arquivoLink
+    label: Arquivo/link
+    type: object
+    fields:
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+    - name: arquivo
+      label: Arquivo enviado
+      type: file
+      options:
+        media: arquivos
+      description: Envie o PDF (até 100 MB). Deixe vazio se usar um link. Todo arquivo enviado fica público.
+    - name: url
+      label: Link
+      type: string
+      description: Link do Google Drive ou outro endereço https://. Deixe vazio se enviar um arquivo.
+    required: true
+    description: Envie o arquivo ou cole o link do Drive.
+  - name: tags
+    label: Etiquetas
+    type: string
+    list: true
+  - name: destaqueNovidades
+    label: Destaque em Novidades
+    type: object
+    description: Opcional. O fim deve ser igual ou posterior ao início e à publicação.
+    fields:
+    - name: inicio
+      label: Início
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+    - name: fim
+      label: Fim
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+- name: videos
+  label: Vídeos
+  type: collection
+  path: Site/src/content/videos
+  format: yaml
+  filename: '{fields.id}.yaml'
+  view:
+    fields:
+    - titulo
+    - prioridade
+    - publicacao
+    primary: titulo
+  fields:
+  - name: id
+    label: Identificador
+    type: string
+    required: true
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+    description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+  - name: titulo
+    label: Título
+    type: string
+    required: true
+  - name: descricao
+    label: Descrição
+    type: text
+    required: true
+  - name: url
+    label: Link do vídeo
+    type: string
+    required: true
+    description: Endereço https:// do vídeo.
+  - name: provedor
+    label: Plataforma
+    type: select
+    required: true
+    options:
+      values:
+      - YouTube
+      - Vimeo
+      - Outro
+  - name: miniaturaUrl
+    label: Miniatura
+    type: string
+    required: true
+    description: Link https:// da imagem de capa.
+  - name: duracaoSegundos
+    label: Duração em segundos
+    type: number
+    required: true
+    description: 'Ex.: 12 min 30 s = 750.'
+    options:
+      min: 1
+  - name: prioridade
+    label: Prioridade
+    type: select
+    required: true
+    options:
+      values:
+      - Essencial
+      - Recomendado
+      - Complementar
+  - name: classificacoes
+    label: Classificações
+    type: reference
+    required: true
+    description: Digite parte do conteúdo para buscar. Para incluir opções, use Listas → Classificações.
+    options:
+      collection: classificacoes
+      value: '{fields.id}'
+      label: '{fields.area} · {fields.subarea} · {fields.conteudo}'
+      search: area,subarea,conteudo
+      multiple: true
+  - name: segmento
+    label: Segmento
+    type: select
+    required: true
+    options:
+      values:
+      - Ensino Fundamental — Anos Finais
+      - Ensino Médio
+  - name: anoSerie
+    label: Ano/Série
+    type: select
+    required: true
+    options:
+      values:
+      - 6º ano
+      - 7º ano
+      - 8º ano
+      - 9º ano
+      - 1º ano
+      - 2º ano
+      - 3º ano
+  - name: turmas
+    label: Turmas
+    type: reference
+    description: Deixe vazio para mostrar em todas as turmas do mesmo ano.
+    options:
+      collection: turmas
+      value: '{fields.slug}'
+      label: '{fields.nome} — {fields.anoLetivo}'
+      search: nome
+      multiple: true
+  - name: tags
+    label: Etiquetas
+    type: string
+    list: true
+  - name: publicacao
+    label: Publicação
+    type: date
+    required: true
+    options:
+      format: yyyy-MM-dd
+  - name: destaqueNovidades
+    label: Destaque em Novidades
+    type: object
+    description: Opcional. O fim deve ser igual ou posterior ao início e à publicação.
+    fields:
+    - name: inicio
+      label: Início
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+    - name: fim
+      label: Fim
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+- name: links
+  label: Links
+  type: collection
+  path: Site/src/content/links
+  format: yaml
+  filename: '{fields.id}.yaml'
+  view:
+    fields:
+    - titulo
+    - publicacao
+    primary: titulo
+  fields:
+  - name: id
+    label: Identificador
+    type: string
+    required: true
+    pattern:
+      regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+      message: Use minúsculas, números e hífens, sem acentos.
+    description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+  - name: titulo
+    label: Título
+    type: string
+    required: true
+  - name: descricao
+    label: Descrição
+    type: text
+    required: true
+  - name: url
+    label: Link
+    type: string
+    required: true
+    description: Endereço https://. PDFs e arquivos vão em Materiais.
+  - name: finalidade
+    label: Finalidade
+    type: reference
+    required: true
+    description: Agrupa os links na página. Para incluir opções, use Listas → Finalidades de link.
+    options:
+      collection: finalidadesLink
+      value: '{fields.id}'
+      label: '{fields.nome}'
+      search: nome
+  - name: tipo
+    label: Tipo
+    type: reference
+    required: true
+    description: Para incluir opções, use Listas → Tipos de link.
+    options:
+      collection: tiposLink
+      value: '{fields.id}'
+      label: '{fields.nome}'
+      search: nome
+  - name: acesso
+    label: Acesso
+    type: select
+    options:
+      values:
+      - Gratuito
+      - Pago
+  - name: classificacoes
+    label: Classificações
+    type: reference
+    description: Digite parte do conteúdo para buscar. Para incluir opções, use Listas → Classificações.
+    options:
+      collection: classificacoes
+      value: '{fields.id}'
+      label: '{fields.area} · {fields.subarea} · {fields.conteudo}'
+      search: area,subarea,conteudo
+      multiple: true
+  - name: publicacao
+    label: Publicação
+    type: date
+    required: true
+    options:
+      format: yyyy-MM-dd
+  - name: segmento
+    label: Segmento
+    type: select
+    required: true
+    options:
+      values:
+      - Ensino Fundamental — Anos Finais
+      - Ensino Médio
+  - name: anoSerie
+    label: Ano/Série
+    type: select
+    options:
+      values:
+      - 6º ano
+      - 7º ano
+      - 8º ano
+      - 9º ano
+      - 1º ano
+      - 2º ano
+      - 3º ano
+  - name: turmas
+    label: Turmas
+    type: reference
+    options:
+      collection: turmas
+      value: '{fields.slug}'
+      label: '{fields.nome} — {fields.anoLetivo}'
+      search: nome
+      multiple: true
+  - name: observacaoProfessor
+    label: Observação do professor
+    type: text
+  - name: tags
+    label: Etiquetas
+    type: string
+    list: true
+  - name: destaqueNovidades
+    label: Destaque em Novidades
+    type: object
+    description: Opcional. O fim deve ser igual ou posterior ao início e à publicação.
+    fields:
+    - name: inicio
+      label: Início
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+    - name: fim
+      label: Fim
+      type: date
+      required: true
+      options:
+        format: yyyy-MM-dd
+- name: listas
+  label: Listas
+  type: group
+  items:
+  - name: classificacoes
+    label: Classificações
+    type: collection
+    path: Site/src/content/classificacoes
+    format: yaml
+    filename: '{fields.id}.yaml'
+    view:
+      fields:
+      - area
+      - subarea
+      - conteudo
+      primary: conteudo
+    fields:
+    - name: id
+      label: Identificador
+      type: string
+      required: true
+      pattern:
+        regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+        message: Use minúsculas, números e hífens, sem acentos.
+      description: 'Ex.: funcao-afim. Vira o nome do arquivo; não altere depois de criado.'
+    - name: area
+      label: Área
+      type: string
+      required: true
+      description: 'Ex.: Álgebra.'
+    - name: subarea
+      label: Subárea
+      type: string
+      required: true
+      description: 'Ex.: Funções.'
+    - name: conteudo
+      label: Conteúdo
+      type: string
+      required: true
+      description: 'Ex.: Função afim.'
+  - name: tiposCronograma
+    label: Tipos de cronograma
+    type: collection
+    path: Site/src/content/tipos-cronograma
+    format: yaml
+    filename: '{fields.id}.yaml'
+    view:
+      fields:
+      - nome
+      primary: nome
+    fields:
+    - name: id
+      label: Identificador
+      type: string
+      required: true
+      pattern:
+        regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+        message: Use minúsculas, números e hífens, sem acentos.
+      description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+      description: 'Pode renomear: o site atualiza em todo lugar.'
+  - name: tiposMaterial
+    label: Tipos de material
+    type: collection
+    path: Site/src/content/tipos-material
+    format: yaml
+    filename: '{fields.id}.yaml'
+    view:
+      fields:
+      - nome
+      primary: nome
+    fields:
+    - name: id
+      label: Identificador
+      type: string
+      required: true
+      pattern:
+        regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+        message: Use minúsculas, números e hífens, sem acentos.
+      description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+      description: 'Pode renomear: o site atualiza em todo lugar.'
+  - name: finalidadesLink
+    label: Finalidades de link
+    type: collection
+    path: Site/src/content/finalidades-link
+    format: yaml
+    filename: '{fields.id}.yaml'
+    view:
+      fields:
+      - nome
+      primary: nome
+    fields:
+    - name: id
+      label: Identificador
+      type: string
+      required: true
+      pattern:
+        regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+        message: Use minúsculas, números e hífens, sem acentos.
+      description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+      description: 'Pode renomear: o site atualiza em todo lugar.'
+  - name: tiposLink
+    label: Tipos de link
+    type: collection
+    path: Site/src/content/tipos-link
+    format: yaml
+    filename: '{fields.id}.yaml'
+    view:
+      fields:
+      - nome
+      primary: nome
+    fields:
+    - name: id
+      label: Identificador
+      type: string
+      required: true
+      pattern:
+        regex: ^[a-z0-9]+(-[a-z0-9]+)*$
+        message: Use minúsculas, números e hífens, sem acentos.
+      description: Minúsculas e hífens, sem acentos. Vira o nome do arquivo; não altere depois de criado.
+    - name: nome
+      label: Nome
+      type: string
+      required: true
+      description: 'Pode renomear: o site atualiza em todo lugar.'

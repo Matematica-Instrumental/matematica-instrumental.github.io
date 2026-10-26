@@ -89,16 +89,14 @@ A suíte verifica regras de schema e de conjunto, incluindo URLs e caminhos segu
 
 Não remova essa rota ou suas fixtures sem decisão e documentação que autorizem a mudança.
 
-## Serviços ainda não configurados
+## Publicação e CMS
 
-No estado atual:
-
-- não há repositório remoto configurado;
-- GitHub Pages não está configurado;
-- GitHub Actions não está configurado;
-- Pages CMS não está configurado.
-
-Não confunda a compatibilidade técnica já testada com `BASE_URL` com uma configuração de publicação concluída.
+- Repositório público `Matematica-Instrumental/matematica-instrumental.github.io`, branch `main`.
+- GitHub Actions (`.github/workflows/deploy.yml`) roda `npm test` e `npm run build` e publica no GitHub Pages em `https://matematica-instrumental.github.io/` a cada push em `main`, por execução manual e diariamente.
+- Pages CMS configurado por `.pages.yml` na raiz (DEC-106 a DEC-109). Cada gravação no CMS gera um commit em `main` e dispara o deploy.
+- Listas suspensas (classificações, tipos de cronograma e de material, finalidades e tipos de link) ficam em coleções próprias em `src/content/` e são referenciadas por identificador.
+- Arquivos enviados pelo CMS ficam em `public/arquivos/` e são públicos.
+- Quando a soma de um período do Cronograma passa do total da etapa, o build emite um aviso no log do Actions, sem bloquear.
 
 ## Segurança e direitos
 

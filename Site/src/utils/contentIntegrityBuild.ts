@@ -1,22 +1,29 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import {
   assertContentIntegrity,
+  findCronogramaSumWarnings,
   type ContentReferenceIntegrityRecord,
+  type ListEntryIntegrityRecord,
 } from './contentIntegrity';
 
-const videoSources = import.meta.glob('../content/videos/**/*.{yml,yaml}');
-const avisoSources = import.meta.glob('../content/avisos/**/*.{yml,yaml}');
-const regimeLetivoSources = import.meta.glob('../content/regimes-letivos/**/*.{yml,yaml}');
-const periodoLetivoSources = import.meta.glob('../content/periodos-letivos/**/*.{yml,yaml}');
-const itemCronogramaSources = import.meta.glob('../content/itens-cronograma/**/*.{yml,yaml}');
-const atividadeListaSources = import.meta.glob('../content/atividades-listas/**/*.{yml,yaml}');
-const paraEstudarSources = import.meta.glob('../content/para-estudar/**/*.{yml,yaml}');
-const trabalhoSources = import.meta.glob('../content/trabalhos/**/*.{yml,yaml}');
-const materialSources = import.meta.glob('../content/materiais/**/*.{yml,yaml}');
-const linkSources = import.meta.glob('../content/links/**/*.{yml,yaml}');
-const provaSources = import.meta.glob('../content/provas/**/*.{yml,yaml}');
-const oportunidadeSources = import.meta.glob('../content/oportunidades/**/*.{yml,yaml}');
-const matematicaAlemSources = import.meta.glob('../content/matematica-alem/**/*.{yml,yaml}');
+const videoSources = import.meta.glob('../content/videos/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const avisoSources = import.meta.glob('../content/avisos/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const regimeLetivoSources = import.meta.glob('../content/regimes-letivos/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const periodoLetivoSources = import.meta.glob('../content/periodos-letivos/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const itemCronogramaSources = import.meta.glob('../content/itens-cronograma/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const atividadeListaSources = import.meta.glob('../content/atividades-listas/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const paraEstudarSources = import.meta.glob('../content/para-estudar/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const trabalhoSources = import.meta.glob('../content/trabalhos/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const materialSources = import.meta.glob('../content/materiais/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const linkSources = import.meta.glob('../content/links/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const provaSources = import.meta.glob('../content/provas/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const oportunidadeSources = import.meta.glob('../content/oportunidades/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const matematicaAlemSources = import.meta.glob('../content/matematica-alem/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const classificacaoSources = import.meta.glob('../content/classificacoes/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const tipoCronogramaSources = import.meta.glob('../content/tipos-cronograma/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const tipoMaterialSources = import.meta.glob('../content/tipos-material/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const finalidadeLinkSources = import.meta.glob('../content/finalidades-link/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
+const tipoLinkSources = import.meta.glob('../content/tipos-link/**/*.{yml,yaml}', { query: '?raw', import: 'default' });
 
 function optionalCollection<K extends keyof App.ContentEntryMap>(
   collection: K,
@@ -94,6 +101,11 @@ export function assertCurrentContentIntegrity(): Promise<void> {
       provas,
       oportunidades,
       matematicaAlem,
+      classificacoes,
+      tiposCronograma,
+      tiposMaterial,
+      finalidadesLink,
+      tiposLink,
     ] = await Promise.all([
       getCollection('turmas'),
       optionalCollection('videos', videoSources),
@@ -109,6 +121,11 @@ export function assertCurrentContentIntegrity(): Promise<void> {
       optionalCollection('provas', provaSources),
       optionalCollection('oportunidades', oportunidadeSources),
       optionalCollection('matematicaAlem', matematicaAlemSources),
+      optionalCollection('classificacoes', classificacaoSources),
+      optionalCollection('tiposCronograma', tipoCronogramaSources),
+      optionalCollection('tiposMaterial', tipoMaterialSources),
+      optionalCollection('finalidadesLink', finalidadeLinkSources),
+      optionalCollection('tiposLink', tipoLinkSources),
     ]);
     const entriesByCollection = {
       turmas,
@@ -125,7 +142,28 @@ export function assertCurrentContentIntegrity(): Promise<void> {
       provas,
       oportunidades,
       matematicaAlem,
+      classificacoes,
+      tiposCronograma,
+      tiposMaterial,
+      finalidadesLink,
+      tiposLink,
     };
+    const listCollections = {
+      classificacoes,
+      tiposCronograma,
+      tiposMaterial,
+      finalidadesLink,
+      tiposLink,
+    };
+    const listEntries: ListEntryIntegrityRecord[] = Object.entries(
+      listCollections,
+    ).flatMap(([collection, entries]) =>
+      entries.map(({ id, data }) => ({
+        collection,
+        entryId: id,
+        declaredId: data.id,
+      })),
+    );
     const knownIds = Object.fromEntries(
       Object.entries(entriesByCollection).map(([collection, entries]) => [
         collection,
@@ -157,6 +195,13 @@ export function assertCurrentContentIntegrity(): Promise<void> {
     appendEntryReferences(references, 'trabalhos', trabalhos, 'turmas', 'turmas');
     appendEntryReferences(references, 'materiais', materiais, 'turmas', 'turmas');
     appendEntryReferences(references, 'links', links, 'turmas', 'turmas');
+    appendEntryReferences(references, 'videos', videos, 'classificacoes', 'classificacoes');
+    appendEntryReferences(references, 'materiais', materiais, 'classificacoes', 'classificacoes');
+    appendEntryReferences(references, 'links', links, 'classificacoes', 'classificacoes');
+    appendEntryReferences(references, 'itensCronograma', itensCronograma, 'tipo', 'tiposCronograma');
+    appendEntryReferences(references, 'materiais', materiais, 'tipo', 'tiposMaterial');
+    appendEntryReferences(references, 'links', links, 'finalidade', 'finalidadesLink');
+    appendEntryReferences(references, 'links', links, 'tipo', 'tiposLink');
 
     assertContentIntegrity({
       turmas: turmas.map(({ id, data }) => ({
@@ -184,7 +229,26 @@ export function assertCurrentContentIntegrity(): Promise<void> {
       })),
       knownIds: { ...knownIds, ...declaredIds },
       references,
+      listEntries,
     });
+
+    // DEC-039 ajustada pela DEC-106: soma acima do total apenas avisa no log.
+    const cronogramaWarnings = findCronogramaSumWarnings(
+      periodosLetivos.map(({ id, data }) => ({
+        id,
+        nome: data.nome,
+        valorTotalEtapa: data.valorTotalEtapa,
+      })),
+      itensCronograma.map(({ data }) => ({
+        periodoLetivoId: getReferenceId(data.periodoLetivo),
+        turmaIds: data.turmas.map(getReferenceId),
+        valorIndividual: data.valorIndividual,
+      })),
+    );
+
+    for (const warning of cronogramaWarnings) {
+      console.warn(`::warning title=Cronograma::${warning.message}`);
+    }
   })();
 
   return currentContentIntegrityPromise;

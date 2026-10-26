@@ -46,6 +46,32 @@ export interface ContentReferenceIntegrityRecord {
   targetId: string;
 }
 
+export interface ListEntryIntegrityRecord {
+  collection: string;
+  entryId: string;
+  declaredId: string;
+}
+
+export interface CronogramaPeriodoSumRecord {
+  id: string;
+  nome: string;
+  valorTotalEtapa: number;
+}
+
+export interface CronogramaItemSumRecord {
+  periodoLetivoId: string;
+  turmaIds: readonly string[];
+  valorIndividual?: number;
+}
+
+export interface CronogramaSumWarning {
+  periodoLetivoId: string;
+  turmaId: string;
+  soma: number;
+  valorTotalEtapa: number;
+  message: string;
+}
+
 export interface ContentIntegrityInput {
   turmas?: readonly TurmaIntegrityRecord[];
   regimesLetivos?: readonly RegimeLetivoIntegrityRecord[];
@@ -53,6 +79,7 @@ export interface ContentIntegrityInput {
   itensCronograma?: readonly ItemCronogramaIntegrityRecord[];
   knownIds?: Readonly<Record<string, readonly string[]>>;
   references?: readonly ContentReferenceIntegrityRecord[];
+  listEntries?: readonly ListEntryIntegrityRecord[];
 }
 
 export interface ContentIntegrityIssue {
@@ -449,6 +476,16 @@ export function validateContentIntegrity(
 
   validateReferences(input.references ?? [], idsByCollection, issues);
 
+  for (const entry of input.listEntries ?? []) {
+    if (entry.entryId !== entry.declaredId) {
+      issues.push({
+        code: 'list-entry-id-mismatch',
+        path: `${entry.collection}.${entry.entryId}.id`,
+        message: `O identificador "${entry.declaredId}" deve ser igual ao nome do arquivo "${entry.entryId}".`,
+      });
+    }
+  }
+
   return issues.sort((a, b) =>
     a.path.localeCompare(b.path, 'pt-BR')
     || a.code.localeCompare(b.code, 'pt-BR')
@@ -467,4 +504,52 @@ export function assertContentIntegrity(input: ContentIntegrityInput): void {
     `Falha na integridade global do conteúdo (${issues.length} erro(s)):`,
     ...issues.map((issue) => `- [${issue.code}] ${issue.path}: ${issue.message}`),
   ].join('\n'));
+}
+
+function formatCronogramaValue(value: number): string {
+  return Number(value.toFixed(2)).toLocaleString('pt-BR');
+}
+
+export function findCronogramaSumWarnings(
+  periodos: readonly CronogramaPeriodoSumRecord[],
+  itens: readonly CronogramaItemSumRecord[],
+): CronogramaSumWarning[] {
+  const somas = new Map<string, number>();
+
+  for (const item of itens) {
+    if (item.valorIndividual === undefined) {
+      continue;
+    }
+
+    for (const turmaId of item.turmaIds) {
+      const chave = `${item.periodoLetivoId}\u0000${turmaId}`;
+
+      somas.set(chave, (somas.get(chave) ?? 0) + item.valorIndividual);
+    }
+  }
+
+  const periodoPorId = new Map(periodos.map((periodo) => [periodo.id, periodo]));
+  const warnings: CronogramaSumWarning[] = [];
+
+  for (const [chave, soma] of somas) {
+    const [periodoLetivoId, turmaId] = chave.split('\u0000');
+    const periodo = periodoPorId.get(periodoLetivoId);
+
+    if (!periodo || soma <= periodo.valorTotalEtapa + 1e-9) {
+      continue;
+    }
+
+    warnings.push({
+      periodoLetivoId,
+      turmaId,
+      soma,
+      valorTotalEtapa: periodo.valorTotalEtapa,
+      message: `Cronograma: a soma dos itens de "${periodo.nome}" na turma "${turmaId}" é ${formatCronogramaValue(soma)}, acima do total da etapa (${formatCronogramaValue(periodo.valorTotalEtapa)}).`,
+    });
+  }
+
+  return warnings.sort((a, b) =>
+    a.periodoLetivoId.localeCompare(b.periodoLetivoId, 'pt-BR')
+    || a.turmaId.localeCompare(b.turmaId, 'pt-BR'),
+  );
 }

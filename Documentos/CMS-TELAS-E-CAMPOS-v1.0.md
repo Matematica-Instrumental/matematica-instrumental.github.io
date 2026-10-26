@@ -13,7 +13,7 @@ Descrever, antes de qualquer código, como o professor verá o Pages CMS: o menu
 - Datas aparecem com seletor de data e são gravadas como `AAAA-MM-DD`, sem horário.
 - Campos de seleção com lista fechada aparecem como menu; campos de texto livre aparecem como caixa de texto.
 - Referências a outros registros (turmas, vídeos, regime, período) aparecem como busca por nome. Em Turmas, o valor gravado é o `slug` (por exemplo `turma-a-2026`), que é o identificador usado pelo site.
-- "Recurso" é sempre um par **Nome** + **Link** (HTTP(S) ou caminho interno iniciado por `/`). Não há envio de arquivos: PDFs e documentos ficam no Google Drive.
+- "Recurso" é sempre um par **Nome** + **Arquivo ou link** (DEC-109): o botão "Enviar arquivo" grava o PDF em `/arquivos/…`; também é possível colar um link do Drive. Até 100 MB por arquivo. Todo arquivo enviado fica público.
 - O CMS não mostra erros de regra de negócio na tela. Se algo estiver inválido, o build no GitHub Actions falha, o site anterior continua no ar e o erro aparece no log.
 
 ## Menu lateral
@@ -132,7 +132,7 @@ Lista mostra: Título · Tipo · Publicação.
 | Turmas (obr.) | `turmas` | busca, várias | |
 | Publicação (obr.) | `publicacao` | data | |
 | Prazo (opc.) | `prazo` | data | |
-| Recursos (obr., 1 ou mais) | `recursos` | lista de Recurso | Link do Drive da atividade ou lista. |
+| Recursos (obr., 1 ou mais) | `recursos` | lista de Recurso | Envie o PDF da atividade ou cole o link do Drive. |
 | Vídeos relacionados (opc.) | `videosRelacionados` | busca, várias | |
 | Etiquetas (obr., pode ficar vazia) | `tags` | lista de textos | |
 | Gabarito/resolução (opc.) | `gabaritoResolucao` | lista de Recurso | |
@@ -191,7 +191,7 @@ Lista mostra: Título · Tipo · Publicação.
 | Publicação (obr.) | `publicacao` | data | |
 | Segmento (obr.) · Ano/Série (obr.) | `segmento` · `anoSerie` | menu | |
 | Turmas (obr.) | `turmas` | busca, várias | |
-| Arquivo/link (obr.) | `arquivoLink` | Recurso | Link do Drive. |
+| Arquivo/link (obr.) | `arquivoLink` | Recurso | Envie o arquivo ou cole o link do Drive. |
 | Etiquetas (opc.) | `tags` | lista de textos | |
 | Destaque em Novidades (opc.) | `destaqueNovidades` | bloco | |
 

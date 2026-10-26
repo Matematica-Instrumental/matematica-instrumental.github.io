@@ -1,7 +1,7 @@
 # Registro de Decisões do Projeto
 
 Versão: 4.5<br>
-Status: APROVADO — DEC-106 · EM VALIDAÇÃO — DEC-107 E DEC-108<br>
+Status: APROVADO — DEC-106 E DEC-109 · EM VALIDAÇÃO — DEC-107 E DEC-108<br>
 Última atualização: 26/10/2026
 
 - DEC-001 — Site independente do ChatGPT.
@@ -299,7 +299,7 @@ A lista de telas, campos, rótulos e ajudas do CMS funciona como mockup desta fr
 
 ### Arquivos e imagens
 
-O CMS não fará upload de arquivos pedagógicos. PDFs, listas, gabaritos e demais materiais continuam no Google Drive (DEC-003) e entram no portal somente como links HTTP(S). A biblioteca de mídia do Pages CMS será usada apenas para imagens de Matemática além da sala, quando a Fase 2 chegar, limitada a `Site/src/assets/editorial/`.
+*(Alterado pela DEC-109.)* Na redação original, o CMS não faria upload de arquivos pedagógicos e os materiais entrariam somente como links do Google Drive. A biblioteca de mídia do Pages CMS será usada apenas para imagens de Matemática além da sala, quando a Fase 2 chegar, limitada a `Site/src/assets/editorial/`.
 
 ### Soma do Cronograma (ajuste da DEC-039)
 
@@ -348,8 +348,24 @@ Um **Curso** é um agrupamento com objetivo específico, por exemplo um preparat
 - O curso tem **data de início** e **data de fim**, obrigatórias, e é arquivado como uma turma.
 - O curso pode ser ligado a um **Ano/Série** (por exemplo 9º ano, 1º, 2º ou 3º ano). O Segmento é deduzido do Ano/Série. Sem ligação, o curso é de público geral.
 - O nome da turma (campo `turma`, como "A") não se aplica a cursos.
-- O endereço segue o padrão de turmas: `/turmas/<slug>/`, com o ano no slug.
+- O endereço segue o padrão de turmas. Curso ligado a um ano: `/turmas/<segmento>/<ano-serie>/<slug>/`. Curso de público geral: `/turmas/cursos/<slug>/`. O slug inclui o ano.
 
 ### Pendências antes do código
 
 Mockup da página Turmas com os cursos (curso ligado a um ano aparece no grupo desse ano com o selo "Curso"; curso de público geral aparece no grupo "Cursos") e ajuste da Arquitetura do Site e do Modelo de Conteúdo.
+
+- DEC-109 — Envio de arquivos pelo CMS, com link do Drive como alternativa.
+
+### Regra
+
+Escolha do professor em 26/10/2026. Todo campo de Recurso aceita **um arquivo enviado pelo CMS** ou **um link** (Google Drive ou outro endereço HTTP(S)). Os arquivos enviados ficam em `Site/public/arquivos/` e são publicados em `/arquivos/<nome-do-arquivo>`. Remover o arquivo no CMS o retira do site no próximo build.
+
+### Limites e cuidados
+
+- Limite do GitHub: 100 MB por arquivo; uso total recomendado abaixo de 1 GB. Arquivos maiores ou numerosos ficam no Drive.
+- O repositório é público: todo arquivo enviado fica público e permanece no histórico do Git mesmo depois de removido. Não enviar arquivos com nomes, notas ou dados de alunos.
+- Nomes de arquivo em minúsculas, sem acentos e com hífens (por exemplo `lista-funcao-afim-2026.pdf`).
+
+### Precedência
+
+A DEC-109 ajusta a DEC-003 (arquivos pedagógicos no Google Drive), que passa a ser a alternativa e não a única via, e substitui o trecho "Arquivos e imagens" da DEC-106 quanto a upload. As imagens de Matemática além da sala continuam em `Site/src/assets/editorial/`. Nenhuma mudança de schema é necessária: os campos de Recurso já aceitam caminho interno iniciado por `/`.

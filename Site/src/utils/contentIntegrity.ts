@@ -13,9 +13,10 @@ export interface DestaqueNovidadesInterval {
 
 export interface TurmaIntegrityRecord {
   id: string;
+  tipo?: 'Turma' | 'Curso';
   slug: string;
-  segmento: string;
-  anoSerie: string;
+  segmento?: string;
+  anoSerie?: string;
   anoLetivo: number;
 }
 
@@ -202,8 +203,16 @@ export function normalizeContentRouteSegment(value: string): string {
 }
 
 export function getTurmaIntegrityCanonicalPath(
-  turma: Pick<TurmaIntegrityRecord, 'segmento' | 'anoSerie' | 'slug'>,
+  turma: Pick<TurmaIntegrityRecord, 'tipo' | 'segmento' | 'anoSerie' | 'slug'>,
 ): string {
+  if (turma.tipo === 'Curso') {
+    return `/turmas/cursos/${turma.slug}/`;
+  }
+
+  if (!turma.segmento || !turma.anoSerie) {
+    throw new Error(`A turma "${turma.slug}" exige segmento e ano/série.`);
+  }
+
   return [
     '/turmas',
     normalizeContentRouteSegment(turma.segmento),
@@ -214,7 +223,7 @@ export function getTurmaIntegrityCanonicalPath(
 }
 
 function getTurmaGroupIdentity(
-  turma: Pick<TurmaIntegrityRecord, 'segmento' | 'anoSerie'>,
+  turma: { segmento: string; anoSerie: string },
 ): string {
   return [
     normalizeContentRouteSegment(turma.segmento),
@@ -289,7 +298,14 @@ function validateTurmas(
       });
     }
 
-    const normalizedGroup = getTurmaGroupIdentity(turma);
+    if (turma.tipo === 'Curso' || !turma.segmento || !turma.anoSerie) {
+      continue;
+    }
+
+    const normalizedGroup = getTurmaGroupIdentity({
+      segmento: turma.segmento,
+      anoSerie: turma.anoSerie,
+    });
     const rawGroup = `${turma.segmento}\u0000${turma.anoSerie}`;
     const firstRawGroup = rawGroupByNormalizedGroup.get(normalizedGroup);
 

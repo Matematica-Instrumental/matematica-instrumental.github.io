@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import TurmaInicioPagina from '../../../../components/turma/TurmaInicioPagina.astro';
+import { assertCurrentContentIntegrity } from '../../../../utils/contentIntegrityBuild';
+import { turmaEhCurso, validateTurmaSlug } from '../../../../utils/turmaRoutes';
+
+// DEC-108: cursos usam a página da turma em /turmas/cursos/<slug>/.
+export async function getStaticPaths() {
+  await assertCurrentContentIntegrity();
+  const cursos = await getCollection('turmas', ({ data }) => turmaEhCurso(data));
+
+  return cursos.map((entry) => ({
+    params: { curso: validateTurmaSlug(entry.data.slug) },
+    props: { turma: entry.data },
+  }));
+}
+
+const { turma } = Astro.props;
+---
+
+<TurmaInicioPagina turma={turma} />

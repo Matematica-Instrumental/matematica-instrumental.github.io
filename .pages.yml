@@ -23,6 +23,7 @@ content:
   view:
     fields:
     - nome
+    - tipo
     - anoLetivo
     - arquivada
     primary: nome
@@ -36,11 +37,20 @@ content:
       message: Use minúsculas, números e hífens, sem acentos.
     description: 'Ex.: ensino-medio-1o-ano-turma-a-2026. Vira o nome do arquivo; não altere depois de
       criado.'
+  - name: tipo
+    label: Tipo
+    type: select
+    required: true
+    description: Curso aparece no grupo Cursos da página Turmas (DEC-108).
+    options:
+      values:
+      - Turma
+      - Curso
   - name: nome
     label: Nome
     type: string
     required: true
-    description: 'Ex.: Turma A — 2026.'
+    description: 'Ex.: Turma A — 2026; Preparatório CEFET 2027.'
   - name: slug
     label: Endereço da página
     type: string
@@ -52,7 +62,7 @@ content:
   - name: segmento
     label: Segmento
     type: select
-    required: true
+    description: Obrigatório em Turma. Em Curso, é deduzido do Ano/Série.
     options:
       values:
       - Ensino Fundamental — Anos Finais
@@ -60,8 +70,7 @@ content:
   - name: anoSerie
     label: Ano/Série
     type: select
-    required: true
-    description: Deve pertencer ao segmento.
+    description: Obrigatório em Turma. Em Curso, aparece como "Indicado para"; vazio = Público geral.
     options:
       values:
       - 6º ano
@@ -74,13 +83,24 @@ content:
   - name: turma
     label: Turma
     type: string
-    required: true
-    description: 'Ex.: A.'
+    description: 'Obrigatório em Turma. Ex.: A. Não se aplica a Curso.'
   - name: anoLetivo
     label: Ano letivo
     type: number
     required: true
     description: 'Ex.: 2026.'
+  - name: dataInicio
+    label: Início
+    type: date
+    description: Obrigatório em Curso.
+    options:
+      format: yyyy-MM-dd
+  - name: dataFim
+    label: Fim
+    type: date
+    description: Obrigatório em Curso. Igual ou posterior ao início.
+    options:
+      format: yyyy-MM-dd
   - name: descricao
     label: Descrição
     type: text

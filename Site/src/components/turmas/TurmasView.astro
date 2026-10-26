@@ -1,5 +1,8 @@
 ---
-import type { SegmentoTurmasViewData } from '../../utils/turmaContent';
+import type {
+  CursoGlobalViewData,
+  SegmentoTurmasViewData,
+} from '../../utils/turmaContent';
 import {
   getTurmasGrupoAnchor,
   normalizeTurmaRouteSegment,
@@ -7,9 +10,10 @@ import {
 
 interface Props {
   segmentos: readonly SegmentoTurmasViewData[];
+  cursos?: readonly CursoGlobalViewData[];
 }
 
-const { segmentos } = Astro.props;
+const { segmentos, cursos = [] } = Astro.props;
 ---
 
 <main class="turmas-page">
@@ -19,7 +23,7 @@ const { segmentos } = Astro.props;
     </header>
 
     {
-      segmentos.length === 0 ? (
+      segmentos.length === 0 && cursos.length === 0 ? (
         <p class="empty-state">Nenhuma turma disponível no momento.</p>
       ) : (
         <div class="segment-list">
@@ -107,6 +111,65 @@ const { segmentos } = Astro.props;
               </div>
             </section>
           ))}
+
+          {cursos.length > 0 && (
+            <section
+              class="segment-group segment-group--cursos"
+              id="turmas-cursos"
+              aria-labelledby="turmas-cursos-titulo"
+            >
+              <header class="segment-group__heading">
+                <span class="hierarchy-label">Cursos avulsos</span>
+                <h2 id="turmas-cursos-titulo">Cursos</h2>
+              </header>
+
+              <div class="year-list">
+                <div class="year-group">
+                  <div class="class-list">
+                    {cursos.map((curso) => (
+                      <a
+                        class:list={[
+                          'class-card',
+                          { 'class-card--archived': curso.arquivada },
+                        ]}
+                        href={curso.href}
+                      >
+                        <div class="class-card__header">
+                          <div>
+                            <span class="hierarchy-label">Curso</span>
+                            <h4>{curso.nome}</h4>
+                          </div>
+
+                          <svg
+                            class="class-card__arrow"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path d="m9 6 6 6-6 6" />
+                          </svg>
+                        </div>
+
+                        <p class="class-card__school-year">{curso.periodo}</p>
+                        <p class="class-card__audience">{curso.indicacao}</p>
+
+                        {curso.arquivada && (
+                          <p class="class-card__archived-message">
+                            Curso arquivado — período encerrado
+                          </p>
+                        )}
+
+                        {curso.descricao && (
+                          <p class="class-card__description">
+                            {curso.descricao}
+                          </p>
+                        )}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
         </div>
       )
     }
@@ -160,7 +223,8 @@ const { segmentos } = Astro.props;
     box-shadow: var(--shadow-surface-light);
   }
 
-  .segment-group--medio {
+  .segment-group--medio,
+  .segment-group--cursos {
     --segment-color: var(--color-accent-dark);
     --segment-soft: rgba(242, 195, 53, 0.12);
   }
@@ -273,6 +337,14 @@ const { segmentos } = Astro.props;
   .class-card__school-year {
     margin: 10px 0 0;
     color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 700;
+  }
+
+  .class-card__audience {
+    margin: 6px 0 0;
+    color: var(--color-primary-bright);
     font-size: 13px;
     line-height: 1.35;
     font-weight: 700;

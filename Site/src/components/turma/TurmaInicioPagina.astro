@@ -1,0 +1,141 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import TurmaLayout from '../../layouts/TurmaLayout.astro';
+import TurmaDashboard from './TurmaDashboard.astro';
+import {
+  formatarDataResumo,
+  formatarDuracaoVideo,
+  formatarReferenciaPublicacao,
+  getApresentacaoTurma,
+  getTurmaDashboardData,
+} from '../../utils/turmaContent';
+import {
+  getTurmaContactHref,
+  getTurmaViewHref,
+} from '../../utils/turmaRoutes';
+
+interface Props {
+  turma: CollectionEntry<'turmas'>['data'];
+}
+
+interface ClassificacaoResumo {
+  area: string;
+  subarea: string;
+  conteudo: string;
+}
+
+function formatarClassificacao(
+  classificacao: ClassificacaoResumo,
+): string {
+  return [
+    classificacao.area,
+    classificacao.subarea,
+    classificacao.conteudo,
+  ].join(' → ');
+}
+
+function formatarPrimeiraClassificacao(
+  classificacoes: ClassificacaoResumo[],
+): string {
+  const [classificacao] = classificacoes;
+
+  if (!classificacao) {
+    throw new Error('O conteúdo exige ao menos uma classificação matemática.');
+  }
+
+  return formatarClassificacao(classificacao);
+}
+
+const { turma } = Astro.props;
+const dados = await getTurmaDashboardData(turma);
+const apresentacao = getApresentacaoTurma(turma);
+
+const atividades = dados.atividades.map((atividade) => ({
+  tipo: atividade.tipo,
+  publicacao: formatarReferenciaPublicacao(atividade.publicacao),
+  titulo: atividade.titulo,
+  assunto: atividade.assunto,
+  prazo: atividade.prazo
+    ? formatarDataResumo(atividade.prazo)
+    : undefined,
+}));
+
+const estudos = dados.paraEstudar.map((item) => ({
+  objetivo: item.objetivo,
+  publicacao: formatarReferenciaPublicacao(item.publicacao),
+  titulo: item.titulo,
+  assunto: item.assunto,
+  dataObjetivo: item.dataObjetivo
+    ? formatarDataResumo(item.dataObjetivo)
+    : undefined,
+}));
+
+const trabalhos = dados.trabalhos.map((trabalho) => ({
+  publicacao: formatarReferenciaPublicacao(trabalho.publicacao),
+  titulo: trabalho.titulo,
+  assunto: trabalho.assunto,
+  tipoData: trabalho.marco.tipo,
+  data: formatarDataResumo(trabalho.marco.data),
+}));
+
+const materiais = dados.materiais.map((material) => ({
+  tipo: material.tipo,
+  publicacao: formatarReferenciaPublicacao(material.publicacao),
+  titulo: material.titulo,
+  caminho: formatarPrimeiraClassificacao(material.classificacoes),
+  abrirHref: material.arquivoLink.url,
+}));
+
+const videos = dados.videos.map((video) => ({
+  prioridade: video.prioridade,
+  duracao: formatarDuracaoVideo(video.duracaoSegundos),
+  titulo: video.titulo,
+  caminho: formatarPrimeiraClassificacao(video.classificacoes),
+  assistirHref: video.url,
+}));
+
+const links = dados.links.flatMap(({ itens }) =>
+  itens.map((link) => ({
+    finalidade: link.finalidade,
+    tipo: link.tipo,
+    titulo: link.titulo,
+    caminho: link.classificacoes?.[0]
+      ? formatarClassificacao(link.classificacoes[0])
+      : undefined,
+    nota: link.observacaoProfessor,
+    acessarHref: link.url,
+  })),
+);
+
+const cronogramasHref = getTurmaViewHref(turma, 'cronogramas');
+const atividadesHref = getTurmaViewHref(turma, 'atividades');
+const paraEstudarHref = getTurmaViewHref(turma, 'paraEstudar');
+const trabalhosHref = getTurmaViewHref(turma, 'trabalhos');
+const materiaisHref = getTurmaViewHref(turma, 'materiais');
+const videosHref = getTurmaViewHref(turma, 'videos');
+const linksHref = getTurmaViewHref(turma, 'links');
+const contatoHref = getTurmaContactHref(turma);
+---
+
+<TurmaLayout
+  title={`${apresentacao.tituloPagina} | Matemática Instrumental`}
+  description={turma.descricao}
+>
+  <TurmaDashboard
+    breadcrumb={apresentacao.breadcrumb}
+    identity={apresentacao.identity}
+    alerts={{ avisos: dados.avisos }}
+    navigation={{ turma, activeView: 'inicio' }}
+    commitments={{
+      compromissos: dados.proximosCompromissos,
+      cronogramaHref: cronogramasHref,
+    }}
+    activities={{ itens: atividades, verTodosHref: atividadesHref }}
+    study={{ itens: estudos, verTodosHref: paraEstudarHref }}
+    works={{ itens: trabalhos, verTodosHref: trabalhosHref }}
+    materials={{ itens: materiais, verTodosHref: materiaisHref }}
+    videos={{ itens: videos, verTodosHref: videosHref }}
+    links={{ itens: links, verTodosHref: linksHref }}
+    contact={{ href: contatoHref }}
+  />
+</TurmaLayout>

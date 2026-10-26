@@ -1,11 +1,14 @@
 ﻿---
 interface Props {
   segmento: string;
-  anoSerie: string;
+  anoSerie?: string;
   turma: string;
   anoLetivo: number;
   descricao: string;
   arquivada?: boolean;
+  titulo?: string;
+  periodo?: string;
+  mensagemArquivada?: string;
 }
 
 const {
@@ -15,6 +18,9 @@ const {
   anoLetivo,
   descricao,
   arquivada = false,
+  titulo = anoSerie ? `${anoSerie} — ${turma}` : turma,
+  periodo = `Ano letivo ${anoLetivo}`,
+  mensagemArquivada = 'Turma arquivada — ano letivo encerrado',
 } = Astro.props;
 ---
 
@@ -22,17 +28,17 @@ const {
   <span class="turma-identity__segment">{segmento}</span>
 
   <h1 id="turma-title">
-    {anoSerie} — {turma}
+    {titulo}
   </h1>
 
   <p class="turma-identity__school-year">
-    Ano letivo {anoLetivo}
+    {periodo}
   </p>
 
   {
     arquivada && (
       <p class="turma-identity__archived">
-        Turma arquivada — ano letivo encerrado
+        {mensagemArquivada}
       </p>
     )
   }

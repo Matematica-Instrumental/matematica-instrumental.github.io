@@ -3,7 +3,7 @@ import { applyAstroBaseUrl } from '../../utils/turmaRoutes';
 
 interface Props {
   segmento: string;
-  anoSerie: string;
+  anoSerie?: string;
   turma: string;
 }
 
@@ -27,8 +27,12 @@ const turmasHref = applyAstroBaseUrl('/turmas/');
   <span class="breadcrumb__item">{segmento}</span>
   <span class="breadcrumb__separator" aria-hidden="true">›</span>
 
-  <span class="breadcrumb__item">{anoSerie}</span>
-  <span class="breadcrumb__separator" aria-hidden="true">›</span>
+  {anoSerie && (
+    <>
+      <span class="breadcrumb__item">{anoSerie}</span>
+      <span class="breadcrumb__separator" aria-hidden="true">›</span>
+    </>
+  )}
 
   <span class="breadcrumb__current" aria-current="page">{turma}</span>
 </nav>

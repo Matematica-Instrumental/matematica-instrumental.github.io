@@ -31,11 +31,23 @@ Descrever, antes de qualquer código, como o professor verá o Pages CMS: o menu
 | 9 | Vídeos | `Site/src/content/videos` | 1 |
 | 10 | Links | `Site/src/content/links` | 1 |
 
+Grupo **Listas** (DEC-107), no fim do menu:
+
+| Item do menu | Pasta | Campos |
+|---|---|---|
+| Classificações | `Site/src/content/classificacoes` | Identificador · Área · Subárea · Conteúdo |
+| Tipos de cronograma | `Site/src/content/tipos-cronograma` | Identificador · Nome |
+| Tipos de material | `Site/src/content/tipos-material` | Identificador · Nome |
+| Finalidades de link | `Site/src/content/finalidades-link` | Identificador · Nome |
+| Tipos de link | `Site/src/content/tipos-link` | Identificador · Nome |
+
+Para incluir uma opção, clique em "Adicionar" na lista. Para renomear, edite o Nome (não o Identificador). Para remover, apague o registro; se ele ainda estiver em uso, o build avisa onde.
+
 Avisos, Provas, Oportunidades e Matemática além da sala ficam fora do menu até a Fase 2.
 
 ## Blocos reutilizados
 
-**Classificação** (lista, pelo menos 1): Área · Subárea · Conteúdo — três menus com a lista fixa da seção "Vocabulário de classificação". Exemplo: Álgebra · Funções · Função afim. O Pages CMS não filtra um menu pelo outro; o build verifica se a combinação existe na lista.
+**Classificação** (lista, pelo menos 1): busca por nome na lista **Classificações** (por exemplo, digitar "afim" mostra Álgebra · Funções · Função afim).
 
 **Destaque em Novidades** (opcional): Início · Fim — duas datas; o fim deve ser igual ou posterior ao início e à publicação.
 
@@ -53,11 +65,14 @@ Lista mostra: Nome · Ano letivo · Arquivada.
 | Rótulo | Campo | Tipo | Ajuda |
 |---|---|---|---|
 | Identificador (obr.) | `id` | texto | Ex.: `ensino-medio-1o-ano-turma-a-2026`. |
-| Nome (obr.) | `nome` | texto | Ex.: Turma A — 2026. |
+| Tipo (obr.) | `tipo` | menu | Turma · Curso (DEC-108). |
+| Nome (obr.) | `nome` | texto | Ex.: Turma A — 2026; Preparatório CEFET 2027. |
 | Endereço da página (obr.) | `slug` | texto | Minúsculas e hífens, com o ano. Ex.: `turma-a-2026`. Não alterar depois de publicada. |
-| Segmento (obr.) | `segmento` | menu | |
-| Ano/Série (obr.) | `anoSerie` | menu | Deve pertencer ao segmento. |
-| Turma (obr.) | `turma` | texto | Ex.: A. |
+| Segmento (obr. em Turma) | `segmento` | menu | Em Curso, deduzido do Ano/Série. |
+| Ano/Série (obr. em Turma, opc. em Curso) | `anoSerie` | menu | Curso sem Ano/Série é de público geral. |
+| Turma (obr. em Turma) | `turma` | texto | Ex.: A. Não se aplica a Curso. |
+| Início (obr. em Curso) | `dataInicio` | data | |
+| Fim (obr. em Curso) | `dataFim` | data | Igual ou posterior ao início. |
 | Ano letivo (obr.) | `anoLetivo` | número | Ex.: 2026. |
 | Descrição (obr.) | `descricao` | texto longo | |
 | Arquivada (opc.) | `arquivada` | sim/não | Marque ao fim do ano letivo. A turma sai das listas ativas. |
@@ -96,7 +111,7 @@ Lista mostra: Data/Prazo · Tipo · Descrição.
 | Período letivo (obr.) | `periodoLetivo` | busca | |
 | Turmas (obr.) | `turmas` | busca, várias | |
 | Data/Prazo (obr.) | `dataPrazo` | data | No dia seguinte o item aparece como cumprido. |
-| Tipo (obr.) | `tipo` | texto | Ex.: Prova, Trabalho, Lista. |
+| Tipo (obr.) | `tipo` | busca na lista Tipos de cronograma | |
 | Descrição/Conteúdo (obr.) | `descricaoConteudo` | texto longo | |
 | Valor (opc.) | `valorIndividual` | número | Sem valor, o item não entra na soma. Se a soma passar do total da etapa, o build avisa no log, sem bloquear. |
 | Publicação (opc.) | `publicacao` | data | Preencha para aparecer em Novidades. |
@@ -171,7 +186,7 @@ Lista mostra: Título · Tipo · Publicação.
 | Identificador (obr.) | `id` | texto | |
 | Título (obr.) | `titulo` | texto | |
 | Descrição (opc.) | `descricao` | texto longo | |
-| Tipo (obr.) | `tipo` | texto | Ex.: Apostila, Resumo, Mapa mental. |
+| Tipo (obr.) | `tipo` | busca na lista Tipos de material | |
 | Classificações (obr.) | `classificacoes` | lista de Classificação | |
 | Publicação (obr.) | `publicacao` | data | |
 | Segmento (obr.) · Ano/Série (obr.) | `segmento` · `anoSerie` | menu | |
@@ -209,8 +224,8 @@ Lista mostra: Título · Finalidade · Tipo.
 | Título (obr.) | `titulo` | texto | |
 | Descrição (obr.) | `descricao` | texto longo | |
 | Link (obr.) | `url` | texto | HTTP(S). PDFs e arquivos do Drive vão em Materiais. |
-| Finalidade (obr.) | `finalidade` | texto | Agrupa os links na página. Ex.: Calculadoras. |
-| Tipo (obr.) | `tipo` | texto | Ex.: Simulador, Plataforma. |
+| Finalidade (obr.) | `finalidade` | busca na lista Finalidades de link | Agrupa os links na página. |
+| Tipo (obr.) | `tipo` | busca na lista Tipos de link | |
 | Acesso (opc.) | `acesso` | menu | Gratuito · Pago. |
 | Classificações (opc.) | `classificacoes` | lista de Classificação | |
 | Publicação (obr.) | `publicacao` | data | |
@@ -228,7 +243,7 @@ Lista mostra: Título · Finalidade · Tipo.
 
 ## Vocabulário de classificação
 
-Lista fixa aprovada pelo professor em 26/10/2026 quanto ao formato (vocabulário controlado, conforme exigido pelo Modelo de Conteúdo). O conteúdo da lista abaixo é uma **proposta em validação**, baseada nas unidades temáticas da BNCC para o Ensino Fundamental — Anos Finais e nos conteúdos usuais do Ensino Médio. Novos itens entram por edição deste documento e do `.pages.yml`; o build recusa combinações fora da lista.
+Lista fixa aprovada pelo professor em 26/10/2026 quanto ao formato (vocabulário controlado, conforme exigido pelo Modelo de Conteúdo). A lista abaixo é a **carga inicial proposta**, baseada nas unidades temáticas da BNCC para o Ensino Fundamental — Anos Finais e nos conteúdos usuais do Ensino Médio. Depois de implantada, ela é mantida pelo professor no menu **Listas → Classificações** do CMS (DEC-107), sem edição deste documento.
 
 ### Números
 - **Conjuntos numéricos:** Números naturais · Números inteiros · Números racionais · Números irracionais · Números reais · Números complexos
@@ -265,6 +280,7 @@ Lista fixa aprovada pelo professor em 26/10/2026 quanto ao formato (vocabulário
 - **Estatística:** Coleta e organização de dados · Tabelas e gráficos · Medidas de tendência central · Medidas de dispersão · Pesquisa estatística
 
 ## Pontos aprovados em 26/10/2026
-1. Classificação por lista fixa (vocabulário acima, em validação).
+1. Classificação por lista fixa, editável no CMS (DEC-107; carga inicial acima, em validação).
 2. Ano/Série como menu fechado em todas as telas.
 3. Ordem do menu lateral e colunas das listas como descritas.
+4. Facilidade de manutenção: nomes de turmas, opções de listas suspensas e cursos editáveis no CMS (DEC-107 e DEC-108).

@@ -1,7 +1,7 @@
 # Registro de Decisões do Projeto
 
 Versão: 4.5<br>
-Status: APROVADO — DEC-106<br>
+Status: APROVADO — DEC-106 · EM VALIDAÇÃO — DEC-107 E DEC-108<br>
 Última atualização: 26/10/2026
 
 - DEC-001 — Site independente do ChatGPT.
@@ -293,7 +293,7 @@ O acesso será feito exclusivamente com a conta GitHub **`Matematica-Instrumenta
 
 **Fase 2 (posterior):** Avisos, Provas, Oportunidades e Matemática além da sala.
 
-A classificação Área → Subárea → Conteúdo passa a usar **vocabulário controlado** (lista fixa), mantido em `CMS-TELAS-E-CAMPOS-v1.0.md` e refletido no `.pages.yml`. O build recusa combinações fora da lista. Ano/Série aparece como menu fechado em todas as telas do CMS.
+A classificação Área → Subárea → Conteúdo passa a usar **vocabulário controlado** (lista fixa), mantido no próprio CMS conforme a DEC-107. O build recusa combinações fora da lista. Ano/Série aparece como menu fechado em todas as telas do CMS.
 
 A lista de telas, campos, rótulos e ajudas do CMS funciona como mockup desta frente e está em `CMS-TELAS-E-CAMPOS-v1.0.md`. O `.pages.yml` somente será criado depois da aprovação dessa lista.
 
@@ -312,3 +312,44 @@ A opção **Restrict to Domain** do Formspree não está disponível no plano gr
 ### Estado e precedência
 
 Esta decisão é documental. Ela não cria `.pages.yml`, não instala o Pages CMS e não altera código. A DEC-106 complementa a DEC-105, ajusta a DEC-039 quanto ao local do aviso e preserva as DEC-003, DEC-076 e DEC-099.
+
+- DEC-107 — Listas suspensas editáveis no CMS. *(EM VALIDAÇÃO)*
+
+### Motivação
+
+O professor precisa manter o portal sem programação: renomear turmas, incluir ou remover opções de listas suspensas e ajustar nomes sem alterar código.
+
+### Regra
+
+As listas de opções usadas pelos formulários do CMS passam a ser coleções de conteúdo próprias, editáveis no menu **Listas** do Pages CMS:
+
+- **Classificações:** cada registro é uma combinação Área · Subárea · Conteúdo, com identificador próprio;
+- **Tipos de item de cronograma** (por exemplo Prova, Trabalho, Lista);
+- **Tipos de material** (por exemplo Apostila, Resumo);
+- **Finalidades de link** e **Tipos de link**.
+
+Os registros de conteúdo guardam apenas o identificador da opção. Renomear uma opção atualiza o nome em todo o site no próximo build. Remover uma opção ainda usada faz o build falhar, indicando onde ela é usada; o site anterior permanece no ar até a correção.
+
+Segmento, Ano/Série e os enums com regra de negócio (regime bimestral/trimestral/semestral, prioridade de vídeo, tipo de atividade, marco de trabalho, acesso de link) permanecem fixos no código, pois alterações neles mudam o comportamento das páginas.
+
+### Impacto técnico
+
+Os campos `classificacoes`, `itensCronograma.tipo`, `materiais.tipo`, `links.finalidade` e `links.tipo` passam a ser referências às novas coleções. A carga inicial das listas vem do vocabulário de `CMS-TELAS-E-CAMPOS-v1.0.md`. A implementação ocorre no PR do `.pages.yml`, depois da aprovação.
+
+- DEC-108 — Cursos como turmas especiais. *(EM VALIDAÇÃO)*
+
+### Definição
+
+Um **Curso** é um agrupamento com objetivo específico, por exemplo um preparatório para concurso ou vestibular. Ele é cadastrado na tela **Turmas** do CMS com o campo **Tipo = Curso** e usa a mesma página e as mesmas visões da turma (Início, Cronogramas, Atividades e listas, Para estudar, Trabalhos, Materiais, Vídeos e Links).
+
+### Regras
+
+- O curso aparece dentro de **Turmas**, e não em um item novo do menu global.
+- O curso tem **data de início** e **data de fim**, obrigatórias, e é arquivado como uma turma.
+- O curso pode ser ligado a um **Ano/Série** (por exemplo 9º ano, 1º, 2º ou 3º ano). O Segmento é deduzido do Ano/Série. Sem ligação, o curso é de público geral.
+- O nome da turma (campo `turma`, como "A") não se aplica a cursos.
+- O endereço segue o padrão de turmas: `/turmas/<slug>/`, com o ano no slug.
+
+### Pendências antes do código
+
+Mockup da página Turmas com os cursos (curso ligado a um ano aparece no grupo desse ano com o selo "Curso"; curso de público geral aparece no grupo "Cursos") e ajuste da Arquitetura do Site e do Modelo de Conteúdo.

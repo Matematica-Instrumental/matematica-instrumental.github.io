@@ -32,7 +32,7 @@ Em 26/10/2026 a DEC-105 foi implementada: o repositório público `Matematica-In
 
 A DEC-106 definiu o Pages CMS gratuito como ambiente de manutenção: gravação direta em `main`, acesso somente pela conta `Matematica-Instrumental`, Fase 1 com Turmas, regimes e períodos, itens de Cronograma, Atividades e listas, Para estudar, Trabalhos, Materiais, Vídeos, Links e classificações, e Fase 2 com Avisos, Provas, Oportunidades e Matemática além da sala. Não haverá upload de arquivos pedagógicos. O aviso da soma do Cronograma (DEC-039) passa a ser emitido pelo build, sem bloquear o deploy. Restrict to Domain do Formspree foi declarado indisponível no plano gratuito e não será usado.
 
-Foram criados `06-ARQUITETURA-TECNICA-v2.9.md`, `07-DECISOES-DO-PROJETO-v4.5.md`, `08-CHECKLIST-DE-ACEITE-v4.5.md` e `CMS-TELAS-E-CAMPOS-v1.0.md`. Nenhum código foi alterado nesta atualização.
+Foram criados `06-ARQUITETURA-TECNICA-v2.9.md`, `07-DECISOES-DO-PROJETO-v4.5.md`, `08-CHECKLIST-DE-ACEITE-v4.5.md` e `CMS-TELAS-E-CAMPOS-v1.0.md`. As DEC-107 (listas suspensas editáveis no CMS) e DEC-108 (cursos como turmas especiais) foram registradas como EM VALIDAÇÃO. Nenhum código foi alterado nesta atualização.
 
 ## Atualização v5.7
 

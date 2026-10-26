@@ -1,7 +1,7 @@
 # Telas e Campos do CMS — Fase 1
 
 Versão: 1.0<br>
-Status: EM VALIDAÇÃO — MOCKUP DA FRENTE DE CMS (DEC-106)<br>
+Status: APROVADO — MOCKUP DA FRENTE DE CMS (DEC-106 A DEC-109)<br>
 Última atualização: 26/10/2026
 
 ## Objetivo
@@ -243,7 +243,7 @@ Lista mostra: Título · Finalidade · Tipo.
 
 ## Vocabulário de classificação
 
-Lista fixa aprovada pelo professor em 26/10/2026 quanto ao formato (vocabulário controlado, conforme exigido pelo Modelo de Conteúdo). A lista abaixo é a **carga inicial proposta**, baseada nas unidades temáticas da BNCC para o Ensino Fundamental — Anos Finais e nos conteúdos usuais do Ensino Médio. Depois de implantada, ela é mantida pelo professor no menu **Listas → Classificações** do CMS (DEC-107), sem edição deste documento.
+Lista fixa aprovada pelo professor em 26/10/2026 quanto ao formato (vocabulário controlado, conforme exigido pelo Modelo de Conteúdo). A lista abaixo é a **carga inicial aprovada**, baseada nas unidades temáticas da BNCC para o Ensino Fundamental — Anos Finais e nos conteúdos usuais do Ensino Médio. Depois de implantada, ela é mantida pelo professor no menu **Listas → Classificações** do CMS (DEC-107), sem edição deste documento.
 
 ### Números
 - **Conjuntos numéricos:** Números naturais · Números inteiros · Números racionais · Números irracionais · Números reais · Números complexos
@@ -280,7 +280,7 @@ Lista fixa aprovada pelo professor em 26/10/2026 quanto ao formato (vocabulário
 - **Estatística:** Coleta e organização de dados · Tabelas e gráficos · Medidas de tendência central · Medidas de dispersão · Pesquisa estatística
 
 ## Pontos aprovados em 26/10/2026
-1. Classificação por lista fixa, editável no CMS (DEC-107; carga inicial acima, em validação).
+1. Classificação por lista fixa, editável no CMS (DEC-107; carga inicial acima).
 2. Ano/Série como menu fechado em todas as telas.
 3. Ordem do menu lateral e colunas das listas como descritas.
 4. Facilidade de manutenção: nomes de turmas, opções de listas suspensas e cursos editáveis no CMS (DEC-107 e DEC-108).

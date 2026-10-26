@@ -22,9 +22,9 @@ Em caso de conflito entre propostas antigas, conversas, mockups rejeitados e doc
 
 Os documentos v1.2 permanecem vigentes nas matérias que não foram alteradas por versões ou decisões posteriores. O `02-ARQUITETURA-DO-SITE-v3.7.md` substitui as versões anteriores da Arquitetura do Site. O `03-DESIGN-SYSTEM-v2.7.md` substitui as versões anteriores do Design System. O `04-MODELO-DE-CONTEUDO-v2.5.md` substitui as versões anteriores do Modelo de Conteúdo. O `05-REGRAS-DE-AUTOMACAO-v2.5.md` substitui as versões anteriores das Regras de Automação. O `06-ARQUITETURA-TECNICA-v2.9.md` substitui as versões anteriores da Arquitetura Técnica. O `07-DECISOES-DO-PROJETO-v4.5.md` substitui as versões anteriores do registro de decisões. O `08-CHECKLIST-DE-ACEITE-v4.5.md` substitui as versões anteriores do Checklist de Aceite. O `09-MOCKUPS-APROVADOS-v3.2.md` substitui as versões anteriores do registro de mockups aprovados.
 
-## Documento em validação
+## Documento complementar
 
-- `CMS-TELAS-E-CAMPOS-v1.0.md` — **EM VALIDAÇÃO.** Telas, campos, rótulos e ajudas do Pages CMS (Fase 1). Funciona como mockup da frente de CMS e precisa ser aprovado antes da criação do `.pages.yml`.
+- `CMS-TELAS-E-CAMPOS-v1.0.md` — **APROVADO em 26/10/2026.** Telas, campos, rótulos, listas editáveis e carga inicial de classificações do Pages CMS (Fase 1). Funciona como mockup da frente de CMS. Mockup da página Turmas com cursos em `Referencias/Mockups/cms/`.
 
 ## Atualização v5.8
 
@@ -32,7 +32,7 @@ Em 26/10/2026 a DEC-105 foi implementada: o repositório público `Matematica-In
 
 A DEC-106 definiu o Pages CMS gratuito como ambiente de manutenção: gravação direta em `main`, acesso somente pela conta `Matematica-Instrumental`, Fase 1 com Turmas, regimes e períodos, itens de Cronograma, Atividades e listas, Para estudar, Trabalhos, Materiais, Vídeos, Links e classificações, e Fase 2 com Avisos, Provas, Oportunidades e Matemática além da sala. A DEC-109 permite enviar arquivos pelo CMS, mantendo o link do Drive como alternativa. O aviso da soma do Cronograma (DEC-039) passa a ser emitido pelo build, sem bloquear o deploy. Restrict to Domain do Formspree foi declarado indisponível no plano gratuito e não será usado.
 
-Foram criados `06-ARQUITETURA-TECNICA-v2.9.md`, `07-DECISOES-DO-PROJETO-v4.5.md`, `08-CHECKLIST-DE-ACEITE-v4.5.md` e `CMS-TELAS-E-CAMPOS-v1.0.md`. As DEC-107 (listas suspensas editáveis no CMS) e DEC-108 (cursos como turmas especiais) foram registradas como EM VALIDAÇÃO. Nenhum código foi alterado nesta atualização.
+Foram criados `06-ARQUITETURA-TECNICA-v2.9.md`, `07-DECISOES-DO-PROJETO-v4.5.md`, `08-CHECKLIST-DE-ACEITE-v4.5.md` e `CMS-TELAS-E-CAMPOS-v1.0.md`. As DEC-107 (listas suspensas editáveis no CMS) e DEC-108 (cursos como turmas especiais) foram aprovadas, junto com o mockup da página Turmas com o grupo Cursos. Nenhum código foi alterado nesta atualização.
 
 ## Atualização v5.7
 

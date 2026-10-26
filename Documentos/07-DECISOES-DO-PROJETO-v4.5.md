@@ -1,7 +1,7 @@
 # Registro de Decisões do Projeto
 
 Versão: 4.5<br>
-Status: APROVADO — DEC-106 E DEC-109 · EM VALIDAÇÃO — DEC-107 E DEC-108<br>
+Status: APROVADO — DEC-106 A DEC-109<br>
 Última atualização: 26/10/2026
 
 - DEC-001 — Site independente do ChatGPT.
@@ -313,7 +313,7 @@ A opção **Restrict to Domain** do Formspree não está disponível no plano gr
 
 Esta decisão é documental. Ela não cria `.pages.yml`, não instala o Pages CMS e não altera código. A DEC-106 complementa a DEC-105, ajusta a DEC-039 quanto ao local do aviso e preserva as DEC-003, DEC-076 e DEC-099.
 
-- DEC-107 — Listas suspensas editáveis no CMS. *(EM VALIDAÇÃO)*
+- DEC-107 — Listas suspensas editáveis no CMS.
 
 ### Motivação
 
@@ -336,7 +336,7 @@ Segmento, Ano/Série e os enums com regra de negócio (regime bimestral/trimestr
 
 Os campos `classificacoes`, `itensCronograma.tipo`, `materiais.tipo`, `links.finalidade` e `links.tipo` passam a ser referências às novas coleções. A carga inicial das listas vem do vocabulário de `CMS-TELAS-E-CAMPOS-v1.0.md`. A implementação ocorre no PR do `.pages.yml`, depois da aprovação.
 
-- DEC-108 — Cursos como turmas especiais. *(EM VALIDAÇÃO)*
+- DEC-108 — Cursos como turmas especiais.
 
 ### Definição
 
@@ -350,9 +350,9 @@ Um **Curso** é um agrupamento com objetivo específico, por exemplo um preparat
 - O nome da turma (campo `turma`, como "A") não se aplica a cursos.
 - Endereço de todo curso: `/turmas/cursos/<slug>/`. O slug inclui o ano.
 
-### Pendências antes do código
+### Aprovação
 
-Aprovação do mockup da página Turmas com o grupo Cursos (`Referencias/Mockups/cms/turmas-cursos-{1440,834,390}.png`) e ajuste da Arquitetura do Site e do Modelo de Conteúdo.
+Aprovados pelo professor em 26/10/2026: a DEC-107, a DEC-108, a carga inicial de classificações e o mockup da página Turmas com o grupo Cursos (`Referencias/Mockups/cms/turmas-cursos-{1440,834,390}.png`). A Arquitetura do Site e o Modelo de Conteúdo serão atualizados no PR de implementação.
 
 - DEC-109 — Envio de arquivos pelo CMS, com link do Drive como alternativa.
 

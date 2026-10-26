@@ -102,7 +102,7 @@ O ambiente de manutenção é o **Pages CMS** (DEC-106), gratuito, configurado p
 - Acesso somente pela conta GitHub `Matematica-Instrumental`, com o GitHub App instalado apenas no repositório do portal.
 - Arquivos (DEC-109): enviados pelo CMS para `Site/public/arquivos/`, publicados em `/arquivos/…`, até 100 MB cada; links do Google Drive continuam aceitos. Todo arquivo enviado é público.
 - Imagens de Matemática além da sala (Fase 2) em `Site/src/assets/editorial/`.
-- Listas suspensas editáveis no CMS (DEC-107) e cursos como turmas especiais (DEC-108), em validação.
+- Listas suspensas editáveis no CMS (DEC-107) e cursos como turmas especiais (DEC-108), aprovadas.
 - Os nomes de arquivo criados pelo CMS seguem o campo `id` do registro, pois o carregador do Astro usa o nome do arquivo como identificador. Em Turmas, o identificador usado pelas referências é o `slug`.
 
 Escopo da Fase 1:

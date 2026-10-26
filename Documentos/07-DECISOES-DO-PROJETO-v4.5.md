@@ -344,15 +344,15 @@ Um **Curso** é um agrupamento com objetivo específico, por exemplo um preparat
 
 ### Regras
 
-- O curso aparece dentro de **Turmas**, e não em um item novo do menu global.
+- O curso aparece na página **Turmas**, num grupo próprio **Cursos**, depois dos segmentos, e não em um item novo do menu global. Cursos nunca aparecem dentro de Ensino Fundamental ou Ensino Médio (ajuste do professor em 26/10/2026).
 - O curso tem **data de início** e **data de fim**, obrigatórias, e é arquivado como uma turma.
-- O curso pode ser ligado a um **Ano/Série** (por exemplo 9º ano, 1º, 2º ou 3º ano). O Segmento é deduzido do Ano/Série. Sem ligação, o curso é de público geral.
+- O curso pode indicar um **Ano/Série** (por exemplo 9º ano, 1º, 2º ou 3º ano). O cartão mostra "Indicado para: <ano> — <segmento>"; sem indicação, mostra "Público geral".
 - O nome da turma (campo `turma`, como "A") não se aplica a cursos.
-- O endereço segue o padrão de turmas. Curso ligado a um ano: `/turmas/<segmento>/<ano-serie>/<slug>/`. Curso de público geral: `/turmas/cursos/<slug>/`. O slug inclui o ano.
+- Endereço de todo curso: `/turmas/cursos/<slug>/`. O slug inclui o ano.
 
 ### Pendências antes do código
 
-Mockup da página Turmas com os cursos (curso ligado a um ano aparece no grupo desse ano com o selo "Curso"; curso de público geral aparece no grupo "Cursos") e ajuste da Arquitetura do Site e do Modelo de Conteúdo.
+Aprovação do mockup da página Turmas com o grupo Cursos (`Referencias/Mockups/cms/turmas-cursos-{1440,834,390}.png`) e ajuste da Arquitetura do Site e do Modelo de Conteúdo.
 
 - DEC-109 — Envio de arquivos pelo CMS, com link do Drive como alternativa.
 

@@ -69,7 +69,7 @@ Lista mostra: Nome · Ano letivo · Arquivada.
 | Nome (obr.) | `nome` | texto | Ex.: Turma A — 2026; Preparatório CEFET 2027. |
 | Endereço da página (obr.) | `slug` | texto | Minúsculas e hífens, com o ano. Ex.: `turma-a-2026`. Não alterar depois de publicada. |
 | Segmento (obr. em Turma) | `segmento` | menu | Em Curso, deduzido do Ano/Série. |
-| Ano/Série (obr. em Turma, opc. em Curso) | `anoSerie` | menu | Curso sem Ano/Série é de público geral. |
+| Ano/Série (obr. em Turma, opc. em Curso) | `anoSerie` | menu | Em Curso, aparece como "Indicado para"; sem Ano/Série, "Público geral". Cursos ficam sempre no grupo Cursos. |
 | Turma (obr. em Turma) | `turma` | texto | Ex.: A. Não se aplica a Curso. |
 | Início (obr. em Curso) | `dataInicio` | data | |
 | Fim (obr. em Curso) | `dataFim` | data | Igual ou posterior ao início. |

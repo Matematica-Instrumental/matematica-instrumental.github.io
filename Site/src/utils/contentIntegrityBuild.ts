@@ -206,6 +206,7 @@ export function assertCurrentContentIntegrity(): Promise<void> {
     assertContentIntegrity({
       turmas: turmas.map(({ id, data }) => ({
         id,
+        tipo: data.tipo,
         slug: data.slug,
         segmento: data.segmento,
         anoSerie: data.anoSerie,

@@ -1,7 +1,7 @@
 # Modelo de Conteúdo
 
 Versão: 2.6<br>
-Status: APROVADO — LISTAS EDITÁVEIS E ARQUIVOS PELO CMS (DEC-107 E DEC-109)<br>
+Status: APROVADO — LISTAS EDITÁVEIS, ARQUIVOS E CURSOS (DEC-107 A DEC-109)<br>
 Última atualização: 26/10/2026
 
 
@@ -30,6 +30,14 @@ Recurso vinculado passa a ter `nome` obrigatório e exatamente um destes campos:
 
 ### Etiquetas
 `tags`, quando obrigatório, aceita ausência e é tratado como lista vazia, pois o Pages CMS omite listas vazias ao salvar.
+
+### Curso (DEC-108)
+Turma ganha o campo `tipo`: `Turma` (padrão quando ausente) ou `Curso`.
+
+- **Turma:** `segmento`, `anoSerie` e `turma` continuam obrigatórios.
+- **Curso:** `dataInicio` e `dataFim` são obrigatórios, com fim igual ou posterior ao início; `anoSerie` é opcional e, quando presente, o `segmento` é deduzido dele; `turma` não se aplica.
+
+`anoLetivo`, `slug` com o ano, `descricao`, `arquivada` e `ordem` valem para os dois tipos. A rota de curso é `/turmas/cursos/<slug>/`, e slug e rota continuam únicos no conjunto.
 
 ## Princípio
 Evitar um único arquivo gigante. Usar registros independentes e reutilizáveis.

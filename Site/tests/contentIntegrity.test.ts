@@ -254,3 +254,23 @@ test('W. detecta identificador de lista diferente do nome do arquivo', () => {
     [['list-entry-id-mismatch', 'tiposMaterial.resumo.id']],
   );
 });
+
+test('X. aceita curso sem segmento e detecta rota de curso duplicada', () => {
+  const curso = {
+    id: 'curso-1',
+    tipo: 'Curso' as const,
+    slug: 'preparatorio-cefet-2027',
+    anoLetivo: 2027,
+  };
+
+  assert.deepEqual(validateContentIntegrity({ turmas: [curso] }), []);
+
+  const issues = validateContentIntegrity({
+    turmas: [curso, { ...curso, id: 'curso-2' }],
+  });
+
+  assert.equal(
+    issues.some(({ code }) => code === 'duplicate-turma-route'),
+    true,
+  );
+});

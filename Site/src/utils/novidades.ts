@@ -281,16 +281,19 @@ function formatarTemporalidade(
     : '';
 }
 
-function compararTurmas(a: TurmaEntry, b: TurmaEntry): number {
-  const indiceSegmentoA = ORDEM_INSTITUCIONAL_SEGMENTOS.indexOf(
-    a.data.segmento,
-  );
-  const indiceSegmentoB = ORDEM_INSTITUCIONAL_SEGMENTOS.indexOf(
-    b.data.segmento,
-  );
+function indiceSegmentoTurma(turma: TurmaEntry): number {
+  // Cursos (DEC-108) vêm depois dos segmentos.
+  return turma.data.tipo === 'Curso' || !turma.data.segmento
+    ? ORDEM_INSTITUCIONAL_SEGMENTOS.length
+    : ORDEM_INSTITUCIONAL_SEGMENTOS.indexOf(turma.data.segmento);
+}
 
-  return indiceSegmentoA - indiceSegmentoB
-    || collatorNaturalPtBr.compare(a.data.anoSerie, b.data.anoSerie)
+function compararTurmas(a: TurmaEntry, b: TurmaEntry): number {
+  return indiceSegmentoTurma(a) - indiceSegmentoTurma(b)
+    || collatorNaturalPtBr.compare(
+      a.data.tipo === 'Curso' ? '' : a.data.anoSerie ?? '',
+      b.data.tipo === 'Curso' ? '' : b.data.anoSerie ?? '',
+    )
     || a.data.ordem - b.data.ordem
     || collatorPtBr.compare(a.data.nome, b.data.nome)
     || collatorPtBr.compare(a.data.slug, b.data.slug);
@@ -326,7 +329,9 @@ function descreverTurmas(turmas: TurmaEntry[]): string {
   const grupos = new Map<string, string[]>();
 
   for (const turma of turmas) {
-    const chave = `${turma.data.segmento}\u0000${turma.data.anoSerie}`;
+    const chave = turma.data.tipo === 'Curso'
+      ? 'Curso\u0000Curso'
+      : `${turma.data.segmento}\u0000${turma.data.anoSerie}`;
     const nomes = grupos.get(chave) ?? [];
 
     nomes.push(turma.data.nome);

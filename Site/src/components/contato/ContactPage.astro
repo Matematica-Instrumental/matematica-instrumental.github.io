@@ -11,7 +11,9 @@ const { validation = false } = Astro.props;
 const turmas = await getCollection('turmas');
 const contextosTurma = turmas.map(({ data }) => ({
   slug: data.slug,
-  nomeExibicao: `${data.anoSerie} — ${data.nome}`,
+  nomeExibicao: data.tipo === 'Curso' || !data.anoSerie
+    ? data.nome
+    : `${data.anoSerie} — ${data.nome}`,
 }));
 const eyebrow = validation ? 'Referência visual aprovada' : 'Comunicação privada';
 ---

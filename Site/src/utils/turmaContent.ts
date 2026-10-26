@@ -207,7 +207,7 @@ export interface TurmaDashboardData {
 export type TurmaContentContext = Pick<
   CollectionEntry<'turmas'>['data'],
   'id' | 'slug' | 'segmento' | 'anoSerie' | 'anoLetivo'
->;
+> & Partial<Pick<CollectionEntry<'turmas'>['data'], 'tipo'>>;
 
 export type TurmaGlobalSource = Pick<
   CollectionEntry<'turmas'>['data'],
@@ -220,7 +220,19 @@ export type TurmaGlobalSource = Pick<
   | 'descricao'
   | 'arquivada'
   | 'ordem'
->;
+> & Partial<Pick<
+  CollectionEntry<'turmas'>['data'],
+  'tipo' | 'dataInicio' | 'dataFim'
+>>;
+
+export interface CursoGlobalViewData {
+  nome: string;
+  periodo: string;
+  indicacao: string;
+  descricao?: string;
+  arquivada: boolean;
+  href: string;
+}
 
 export interface TurmaGlobalViewData {
   nome: string;
@@ -241,8 +253,9 @@ export interface SegmentoTurmasViewData {
 }
 
 export interface TurmaHomeSource {
-  segmento: string;
-  anoSerie: string;
+  tipo?: 'Turma' | 'Curso';
+  segmento?: string;
+  anoSerie?: string;
   arquivada?: boolean;
 }
 
@@ -308,9 +321,21 @@ function compararTurmasGlobais(
     || ordenacaoPtBr.compare(turmaA.nome, turmaB.nome);
 }
 
-function agruparTurmasPorSegmentoEAno<
-  T extends Pick<TurmaHomeSource, 'segmento' | 'anoSerie'>,
->(turmas: readonly T[]) {
+type ComSegmentoEAno<T> = T & { segmento: string; anoSerie: string };
+
+function turmaEhRegular<T extends TurmaHomeSource>(
+  turma: T,
+): turma is ComSegmentoEAno<T> {
+  return turma.tipo !== 'Curso'
+    && Boolean(turma.segmento)
+    && Boolean(turma.anoSerie);
+}
+
+function agruparTurmasPorSegmentoEAno<T extends TurmaHomeSource>(
+  todasAsTurmas: readonly T[],
+) {
+  const turmas = todasAsTurmas.filter(turmaEhRegular);
+
   return ORDEM_INSTITUCIONAL_SEGMENTOS.flatMap((segmento) => {
     const turmasDoSegmento = turmas.filter(
       (turma) => turma.segmento === segmento,
@@ -386,12 +411,133 @@ export function prepararSegmentosTurmas(
   );
 }
 
+export function formatarDataCompleta(data: PortalDate): string {
+  const [ano, mes, dia] = data.split('-');
+
+  return `${dia}/${mes}/${ano}`;
+}
+
+export function formatarPeriodoCurso(
+  dataInicio: PortalDate,
+  dataFim: PortalDate,
+): string {
+  return `De ${formatarDataCompleta(dataInicio)} a ${formatarDataCompleta(dataFim)}`;
+}
+
+export function formatarIndicacaoCurso(
+  turma: Pick<TurmaGlobalSource, 'segmento' | 'anoSerie'>,
+): string {
+  if (!turma.anoSerie || !turma.segmento) {
+    return 'Público geral';
+  }
+
+  const segmento = turma.segmento === 'Ensino Fundamental — Anos Finais'
+    ? 'Ensino Fundamental'
+    : turma.segmento;
+
+  return `Indicado para: ${turma.anoSerie} — ${segmento}`;
+}
+
+export function prepararCursosTurmas(
+  turmas: readonly TurmaGlobalSource[],
+): CursoGlobalViewData[] {
+  return turmas
+    .filter((turma) => turma.tipo === 'Curso')
+    .sort(compararTurmasGlobais)
+    .map((curso) => {
+      if (!curso.dataInicio || !curso.dataFim) {
+        throw new Error(`O curso "${curso.id}" exige data de início e de fim.`);
+      }
+
+      return {
+        nome: curso.nome,
+        periodo: formatarPeriodoCurso(curso.dataInicio, curso.dataFim),
+        indicacao: formatarIndicacaoCurso(curso),
+        descricao: curso.descricao || undefined,
+        arquivada: Boolean(curso.arquivada),
+        href: getTurmaHref(curso),
+      };
+    });
+}
+
+export interface ApresentacaoTurma {
+  tituloPagina: string;
+  breadcrumb: {
+    segmento: string;
+    anoSerie?: string;
+    turma: string;
+  };
+  identity: {
+    segmento: string;
+    anoSerie?: string;
+    turma: string;
+    anoLetivo: number;
+    descricao: string;
+    arquivada?: boolean;
+    titulo?: string;
+    periodo?: string;
+    mensagemArquivada?: string;
+  };
+}
+
+export function getApresentacaoTurma(
+  turma: TurmaGlobalSource,
+): ApresentacaoTurma {
+  if (turma.tipo === 'Curso') {
+    return {
+      tituloPagina: turma.nome,
+      breadcrumb: { segmento: 'Cursos', turma: turma.nome },
+      identity: {
+        segmento: `Curso · ${formatarIndicacaoCurso(turma)}`,
+        turma: turma.nome,
+        anoLetivo: turma.anoLetivo,
+        descricao: turma.descricao,
+        arquivada: turma.arquivada,
+        titulo: turma.nome,
+        periodo: turma.dataInicio && turma.dataFim
+          ? formatarPeriodoCurso(turma.dataInicio, turma.dataFim)
+          : undefined,
+        mensagemArquivada: 'Curso arquivado — período encerrado',
+      },
+    };
+  }
+
+  if (!turma.segmento || !turma.anoSerie) {
+    throw new Error(`A turma "${turma.id}" exige segmento e ano/série.`);
+  }
+
+  return {
+    tituloPagina: `${turma.anoSerie} — ${turma.nome}`,
+    breadcrumb: {
+      segmento: turma.segmento,
+      anoSerie: turma.anoSerie,
+      turma: turma.nome,
+    },
+    identity: {
+      segmento: turma.segmento,
+      anoSerie: turma.anoSerie,
+      turma: turma.nome,
+      anoLetivo: turma.anoLetivo,
+      descricao: turma.descricao,
+      arquivada: turma.arquivada,
+    },
+  };
+}
+
 export async function getSegmentosTurmasGlobais(): Promise<
   SegmentoTurmasViewData[]
 > {
   const turmas = await getCollection('turmas');
 
   return prepararSegmentosTurmas(turmas.map(({ data }) => data));
+}
+
+export async function getCursosTurmasGlobais(): Promise<
+  CursoGlobalViewData[]
+> {
+  const turmas = await getCollection('turmas');
+
+  return prepararCursosTurmas(turmas.map(({ data }) => data));
 }
 
 async function lerListaNomeada(
@@ -540,6 +686,12 @@ function conteudoEhAplicavelATurma(
   },
   turma: TurmaContentContext,
 ): boolean {
+  // Cursos só recebem conteúdo que os referencia explicitamente (DEC-108).
+  if (turma.tipo === 'Curso') {
+    return conteudo.turmas !== undefined
+      && referenciaIncluiTurma(conteudo.turmas, turma.slug);
+  }
+
   return conteudo.segmento === turma.segmento
     && (conteudo.anoSerie === undefined || conteudo.anoSerie === turma.anoSerie)
     && (
@@ -666,7 +818,8 @@ export async function getCronogramasDaTurma(
     data.anoLetivo === turma.anoLetivo
     && (
       data.turmas === undefined
-      || referenciaIncluiTurma(data.turmas, turma.slug)
+        ? turma.tipo !== 'Curso'
+        : referenciaIncluiTurma(data.turmas, turma.slug)
     ),
   );
 

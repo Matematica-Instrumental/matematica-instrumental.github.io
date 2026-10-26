@@ -4,9 +4,16 @@ import {
 } from './contentIntegrity';
 
 export interface TurmaRouteData {
-  segmento: string;
-  anoSerie: string;
+  tipo?: 'Turma' | 'Curso';
+  segmento?: string;
+  anoSerie?: string;
   slug: string;
+}
+
+export const CURSOS_ROUTE_SEGMENT = 'cursos';
+
+export function turmaEhCurso(turma: Pick<TurmaRouteData, 'tipo'>): boolean {
+  return turma.tipo === 'Curso';
 }
 
 export const TURMA_VIEWS = [
@@ -64,6 +71,12 @@ export function validateTurmaSlug(slug: string): string {
 export function getTurmaRouteParams(
   turma: TurmaRouteData,
 ): TurmaRouteParams {
+  if (turmaEhCurso(turma) || !turma.segmento || !turma.anoSerie) {
+    throw new Error(
+      `A turma "${turma.slug}" não usa a rota por segmento e ano/série.`,
+    );
+  }
+
   return {
     segmento: normalizeTurmaRouteSegment(turma.segmento),
     anoSerie: normalizeTurmaRouteSegment(turma.anoSerie),
@@ -72,6 +85,10 @@ export function getTurmaRouteParams(
 }
 
 export function getTurmaCanonicalPath(turma: TurmaRouteData): string {
+  if (turmaEhCurso(turma)) {
+    return `/turmas/${CURSOS_ROUTE_SEGMENT}/${validateTurmaSlug(turma.slug)}/`;
+  }
+
   const params = getTurmaRouteParams(turma);
 
   return `/turmas/${params.segmento}/${params.anoSerie}/${params.turma}/`;

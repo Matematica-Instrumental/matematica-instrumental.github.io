@@ -1,11 +1,17 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TurmasView from '../../components/turmas/TurmasView.astro';
-import { getSegmentosTurmasGlobais } from '../../utils/turmaContent';
+import {
+  getCursosTurmasGlobais,
+  getSegmentosTurmasGlobais,
+} from '../../utils/turmaContent';
 
-const segmentos = await getSegmentosTurmasGlobais();
+const [segmentos, cursos] = await Promise.all([
+  getSegmentosTurmasGlobais(),
+  getCursosTurmasGlobais(),
+]);
 ---
 
 <BaseLayout title="Turmas | Matemática Instrumental">
-  <TurmasView segmentos={segmentos} />
+  <TurmasView segmentos={segmentos} cursos={cursos} />
 </BaseLayout>

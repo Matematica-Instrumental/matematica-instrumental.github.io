@@ -91,6 +91,14 @@ const tipoMarcoOportunidadeSchema = z.enum([
 
 const textoObrigatorioSchema = z.string().trim().min(1);
 
+function getSegmentoDoAnoSerie(
+  anoSerie: z.infer<typeof anoSerieProvaSchema>,
+): z.infer<typeof segmentoSchema> {
+  return ['6º ano', '7º ano', '8º ano', '9º ano'].includes(anoSerie)
+    ? 'Ensino Fundamental — Anos Finais'
+    : 'Ensino Médio';
+}
+
 const urlRecursoSchema = textoObrigatorioSchema.refine(
   isSafeLinkedResourceTarget,
   {
@@ -342,18 +350,31 @@ const turmas = defineCollection({
   }),
   schema: z.object({
     id: z.string(),
+    // DEC-108: Curso usa a mesma página da Turma, fora dos segmentos.
+    tipo: z.enum(['Turma', 'Curso']).default('Turma'),
     nome: z.string(),
     slug: textoObrigatorioSchema.refine(isValidTurmaSlug, {
       message: 'Use somente minúsculas ASCII e kebab-case, sem espaços, acentos ou barras.',
     }),
-    segmento: segmentoSchema,
-    anoSerie: anoSerieProvaSchema,
-    turma: z.string(),
+    segmento: segmentoSchema.optional(),
+    anoSerie: anoSerieProvaSchema.optional(),
+    turma: z.string().optional(),
     anoLetivo: z.number().int(),
+    dataInicio: portalDateSchema.optional(),
+    dataFim: portalDateSchema.optional(),
     descricao: z.string(),
     arquivada: z.boolean().optional(),
     ordem: z.number().int(),
-  }).superRefine(({ slug, anoLetivo, segmento, anoSerie }, context) => {
+  }).superRefine(({
+    tipo,
+    slug,
+    anoLetivo,
+    segmento,
+    anoSerie,
+    turma,
+    dataInicio,
+    dataFim,
+  }, context) => {
     if (!slug.split('-').includes(String(anoLetivo))) {
       context.addIssue({
         code: 'custom',
@@ -362,18 +383,58 @@ const turmas = defineCollection({
       });
     }
 
-    const anosSeriesPermitidos = segmento === 'Ensino Fundamental — Anos Finais'
-      ? ['6º ano', '7º ano', '8º ano', '9º ano']
-      : ['1º ano', '2º ano', '3º ano'];
+    if (tipo === 'Curso') {
+      if (!dataInicio || !dataFim) {
+        context.addIssue({
+          code: 'custom',
+          path: [dataInicio ? 'dataFim' : 'dataInicio'],
+          message: 'Curso exige data de início e data de fim.',
+        });
+      } else if (!isChronologicalInterval(dataInicio, dataFim)) {
+        context.addIssue({
+          code: 'custom',
+          path: ['dataFim'],
+          message: 'A data de fim do curso deve ser igual ou posterior ao início.',
+        });
+      }
 
-    if (!anosSeriesPermitidos.includes(anoSerie)) {
+      if (segmento && anoSerie && getSegmentoDoAnoSerie(anoSerie) !== segmento) {
+        context.addIssue({
+          code: 'custom',
+          path: ['anoSerie'],
+          message: `O Ano/Série "${anoSerie}" não pertence ao Segmento "${segmento}".`,
+        });
+      }
+
+      return;
+    }
+
+    for (const [campo, valor] of [
+      ['segmento', segmento],
+      ['anoSerie', anoSerie],
+      ['turma', turma],
+    ] as const) {
+      if (!valor) {
+        context.addIssue({
+          code: 'custom',
+          path: [campo],
+          message: `Turma exige o campo ${campo}.`,
+        });
+      }
+    }
+
+    if (segmento && anoSerie && getSegmentoDoAnoSerie(anoSerie) !== segmento) {
       context.addIssue({
         code: 'custom',
         path: ['anoSerie'],
         message: `O Ano/Série "${anoSerie}" não pertence ao Segmento "${segmento}".`,
       });
     }
-  }),
+  }).transform((turma) => ({
+    ...turma,
+    segmento: turma.segmento
+      ?? (turma.anoSerie ? getSegmentoDoAnoSerie(turma.anoSerie) : undefined),
+  })),
 });
 
 const videos = defineCollection({

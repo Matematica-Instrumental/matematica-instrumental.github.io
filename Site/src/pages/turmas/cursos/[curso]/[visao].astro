@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import TurmaVisaoPagina from '../../../../components/turma/TurmaVisaoPagina.astro';
+import { assertCurrentContentIntegrity } from '../../../../utils/contentIntegrityBuild';
+import {
+  TURMA_INTERNAL_VIEWS,
+  turmaEhCurso,
+  validateTurmaSlug,
+} from '../../../../utils/turmaRoutes';
+
+export async function getStaticPaths() {
+  await assertCurrentContentIntegrity();
+  const cursos = await getCollection('turmas', ({ data }) => turmaEhCurso(data));
+
+  return cursos.flatMap((entry) =>
+    TURMA_INTERNAL_VIEWS.map((view) => ({
+      params: {
+        curso: validateTurmaSlug(entry.data.slug),
+        visao: view.slug,
+      },
+      props: {
+        turma: entry.data,
+        activeView: view.id,
+      },
+    })),
+  );
+}
+
+const { turma, activeView } = Astro.props;
+---
+
+<TurmaVisaoPagina turma={turma} activeView={activeView} />

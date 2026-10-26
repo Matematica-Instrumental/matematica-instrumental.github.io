@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  findCronogramaSumWarnings,
   isChronologicalInterval,
   isHttpUrl,
   isSafeInternalPath,
@@ -209,5 +210,47 @@ test('T. detecta referência inexistente', () => {
   assert.equal(
     issues.some(({ code }) => code === 'missing-content-reference'),
     true,
+  );
+});
+
+test('U. avisa quando a soma do cronograma passa do total da etapa', () => {
+  const warnings = findCronogramaSumWarnings(
+    [{ id: 'p1', nome: '1º Bimestre', valorTotalEtapa: 25 }],
+    [
+      { periodoLetivoId: 'p1', turmaIds: ['turma-a-2026'], valorIndividual: 15 },
+      { periodoLetivoId: 'p1', turmaIds: ['turma-a-2026'], valorIndividual: 12.5 },
+      { periodoLetivoId: 'p1', turmaIds: ['turma-a-2026'] },
+    ],
+  );
+
+  assert.equal(warnings.length, 1);
+  assert.equal(warnings[0].soma, 27.5);
+  assert.match(warnings[0].message, /1º Bimestre/);
+});
+
+test('V. não avisa quando a soma é igual ao total ou por turma separada', () => {
+  const warnings = findCronogramaSumWarnings(
+    [{ id: 'p1', nome: '1º Bimestre', valorTotalEtapa: 25 }],
+    [
+      { periodoLetivoId: 'p1', turmaIds: ['turma-a-2026'], valorIndividual: 0.1 },
+      { periodoLetivoId: 'p1', turmaIds: ['turma-a-2026'], valorIndividual: 24.9 },
+      { periodoLetivoId: 'p1', turmaIds: ['turma-b-2026'], valorIndividual: 20 },
+    ],
+  );
+
+  assert.deepEqual(warnings, []);
+});
+
+test('W. detecta identificador de lista diferente do nome do arquivo', () => {
+  const issues = validateContentIntegrity({
+    listEntries: [
+      { collection: 'tiposMaterial', entryId: 'apostila', declaredId: 'apostila' },
+      { collection: 'tiposMaterial', entryId: 'resumo', declaredId: 'resumos' },
+    ],
+  });
+
+  assert.deepEqual(
+    issues.map(({ code, path }) => [code, path]),
+    [['list-entry-id-mismatch', 'tiposMaterial.resumo.id']],
   );
 });

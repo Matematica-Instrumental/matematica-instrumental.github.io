@@ -58,6 +58,26 @@ const linkSources = import.meta.glob(
   '../content/links/**/*.{yml,yaml}',
   { query: '?raw', import: 'default' },
 );
+const classificacaoSources = import.meta.glob(
+  '../content/classificacoes/**/*.{yml,yaml}',
+  { query: '?raw', import: 'default' },
+);
+const tipoCronogramaSources = import.meta.glob(
+  '../content/tipos-cronograma/**/*.{yml,yaml}',
+  { query: '?raw', import: 'default' },
+);
+const tipoMaterialSources = import.meta.glob(
+  '../content/tipos-material/**/*.{yml,yaml}',
+  { query: '?raw', import: 'default' },
+);
+const finalidadeLinkSources = import.meta.glob(
+  '../content/finalidades-link/**/*.{yml,yaml}',
+  { query: '?raw', import: 'default' },
+);
+const tipoLinkSources = import.meta.glob(
+  '../content/tipos-link/**/*.{yml,yaml}',
+  { query: '?raw', import: 'default' },
+);
 
 export interface AvisoDaTurma {
   estado: 'Novo' | 'Atenção' | 'Destaque';
@@ -130,11 +150,43 @@ export type TrabalhoDaTurma =
     atenuado: boolean;
   };
 
-export type MaterialDaTurma = CollectionEntry<'materiais'>['data'];
+export interface ClassificacaoMatematica {
+  area: string;
+  subarea: string;
+  conteudo: string;
+}
 
-export type VideoDaTurma = CollectionEntry<'videos'>['data'];
+export type MaterialDaTurma = Omit<
+  CollectionEntry<'materiais'>['data'],
+  'classificacoes' | 'tipo'
+> & {
+  classificacoes: ClassificacaoMatematica[];
+  tipo: string;
+};
 
-export type LinkDaTurma = CollectionEntry<'links'>['data'];
+export type VideoDaTurma = Omit<
+  CollectionEntry<'videos'>['data'],
+  'classificacoes'
+> & {
+  classificacoes: ClassificacaoMatematica[];
+};
+
+export type LinkDaTurma = Omit<
+  CollectionEntry<'links'>['data'],
+  'classificacoes' | 'finalidade' | 'tipo'
+> & {
+  classificacoes?: ClassificacaoMatematica[];
+  finalidade: string;
+  tipo: string;
+};
+
+export interface ListasDoPortal {
+  classificacoes: Map<string, ClassificacaoMatematica>;
+  tiposCronograma: Map<string, string>;
+  tiposMaterial: Map<string, string>;
+  finalidadesLink: Map<string, string>;
+  tiposLink: Map<string, string>;
+}
 
 export interface GrupoLinksDaTurma {
   finalidade: string;
@@ -342,6 +394,79 @@ export async function getSegmentosTurmasGlobais(): Promise<
   return prepararSegmentosTurmas(turmas.map(({ data }) => data));
 }
 
+async function lerListaNomeada(
+  collection: 'tiposCronograma' | 'tiposMaterial' | 'finalidadesLink' | 'tiposLink',
+  sources: Record<string, unknown>,
+): Promise<Map<string, string>> {
+  if (Object.keys(sources).length === 0) {
+    return new Map();
+  }
+
+  const entries = await getCollection(collection);
+
+  return new Map(entries.map(({ id, data }) => [id, data.nome]));
+}
+
+let listasDoPortalPromise: Promise<ListasDoPortal> | undefined;
+
+export function getListasDoPortal(): Promise<ListasDoPortal> {
+  listasDoPortalPromise ??= (async () => {
+    const [
+      classificacoes,
+      tiposCronograma,
+      tiposMaterial,
+      finalidadesLink,
+      tiposLink,
+    ] = await Promise.all([
+      Object.keys(classificacaoSources).length > 0
+        ? getCollection('classificacoes')
+        : Promise.resolve([]),
+      lerListaNomeada('tiposCronograma', tipoCronogramaSources),
+      lerListaNomeada('tiposMaterial', tipoMaterialSources),
+      lerListaNomeada('finalidadesLink', finalidadeLinkSources),
+      lerListaNomeada('tiposLink', tipoLinkSources),
+    ]);
+
+    return {
+      classificacoes: new Map(classificacoes.map(({ id, data }) => [
+        id,
+        { area: data.area, subarea: data.subarea, conteudo: data.conteudo },
+      ])),
+      tiposCronograma,
+      tiposMaterial,
+      finalidadesLink,
+      tiposLink,
+    };
+  })();
+
+  return listasDoPortalPromise;
+}
+
+function resolverItemDeLista<T>(
+  lista: Map<string, T>,
+  referencia: { id: string },
+  nomeLista: string,
+): T {
+  const item = lista.get(referencia.id);
+
+  if (item === undefined) {
+    throw new Error(
+      `A opção "${referencia.id}" não existe na lista ${nomeLista}.`,
+    );
+  }
+
+  return item;
+}
+
+function resolverClassificacoes(
+  listas: ListasDoPortal,
+  referencias: Array<{ id: string }>,
+): ClassificacaoMatematica[] {
+  return referencias.map((referencia) =>
+    resolverItemDeLista(listas.classificacoes, referencia, 'Classificações'),
+  );
+}
+
 export function formatarDataResumo(data: PortalDate): string {
   const [, mes, dia] = data.split('-');
 
@@ -488,6 +613,7 @@ export async function getProximosCompromissosDaTurma(
 
   const hoje = options.hoje ?? getPortalToday();
   const limite = options.limite ?? LIMITE_AVISOS_E_COMPROMISSOS;
+  const listas = await getListasDoPortal();
   const itens = await getCollection('itensCronograma', ({ data }) =>
     referenciaIncluiTurma(data.turmas, turmaId)
     && compromissoEstaVigente(data.dataPrazo, hoje),
@@ -512,7 +638,11 @@ export async function getProximosCompromissosDaTurma(
     .slice(0, limite)
     .map(({ data }) => ({
       data: data.dataPrazo,
-      tipo: data.tipo,
+      tipo: resolverItemDeLista(
+        listas.tiposCronograma,
+        data.tipo,
+        'Tipos de cronograma',
+      ),
       descricao: data.descricaoConteudo,
       valor: data.valorIndividual,
     }));
@@ -531,6 +661,7 @@ export async function getCronogramasDaTurma(
   }
 
   const hoje = options.hoje ?? getPortalToday();
+  const listas = await getListasDoPortal();
   const regimes = await getCollection('regimesLetivos', ({ data }) =>
     data.anoLetivo === turma.anoLetivo
     && (
@@ -603,7 +734,11 @@ export async function getCronogramasDaTurma(
       .filter((item) => item.data.periodoLetivo.id === id)
       .map((item) => ({
         data: item.data.dataPrazo,
-        tipo: item.data.tipo,
+        tipo: resolverItemDeLista(
+          listas.tiposCronograma,
+          item.data.tipo,
+          'Tipos de cronograma',
+        ),
         descricao: item.data.descricaoConteudo,
         valor: item.data.valorIndividual,
         passado: itemCronogramaEstaPassado(item.data.dataPrazo, hoje),
@@ -846,12 +981,21 @@ export async function getMateriaisDaTurma(
     return [];
   }
 
+  const listas = await getListasDoPortal();
   const materiais = await getCollection('materiais', ({ data }) =>
     referenciaIncluiTurma(data.turmas, turmaId),
   );
 
   return ordenarMateriaisPorPublicacaoNoMesmoConteudo(
-    materiais.map(({ data }) => data),
+    materiais.map(({ data }) => ({
+      ...data,
+      classificacoes: resolverClassificacoes(listas, data.classificacoes),
+      tipo: resolverItemDeLista(
+        listas.tiposMaterial,
+        data.tipo,
+        'Tipos de material',
+      ),
+    })),
   );
 }
 
@@ -862,6 +1006,7 @@ export async function getVideosDaTurma(
     return [];
   }
 
+  const listas = await getListasDoPortal();
   const videos = await getCollection('videos', ({ data }) =>
     conteudoEhAplicavelATurma(data, turma),
   );
@@ -876,7 +1021,10 @@ export async function getVideosDaTurma(
       return porPublicacao
         || ordenacaoPtBr.compare(a.data.titulo, b.data.titulo);
     })
-    .map(({ data }) => data);
+    .map(({ data }) => ({
+      ...data,
+      classificacoes: resolverClassificacoes(listas, data.classificacoes),
+    }));
 }
 
 export async function getLinksDaTurma(
@@ -886,16 +1034,29 @@ export async function getLinksDaTurma(
     return [];
   }
 
+  const listas = await getListasDoPortal();
   const links = await getCollection('links', ({ data }) =>
     conteudoEhAplicavelATurma(data, turma),
   );
   const grupos = new Map<string, LinkDaTurma[]>();
 
   for (const { data } of links) {
-    const itens = grupos.get(data.finalidade) ?? [];
+    const link: LinkDaTurma = {
+      ...data,
+      classificacoes: data.classificacoes
+        ? resolverClassificacoes(listas, data.classificacoes)
+        : undefined,
+      finalidade: resolverItemDeLista(
+        listas.finalidadesLink,
+        data.finalidade,
+        'Finalidades de link',
+      ),
+      tipo: resolverItemDeLista(listas.tiposLink, data.tipo, 'Tipos de link'),
+    };
+    const itens = grupos.get(link.finalidade) ?? [];
 
-    itens.push(data);
-    grupos.set(data.finalidade, itens);
+    itens.push(link);
+    grupos.set(link.finalidade, itens);
   }
 
   return [...grupos.entries()]

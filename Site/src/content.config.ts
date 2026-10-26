@@ -116,14 +116,27 @@ const portalDateSchema = z
 
 const recursoVinculadoSchema = z.strictObject({
   nome: textoObrigatorioSchema,
-  url: urlRecursoSchema,
-});
+  url: urlRecursoSchema.optional(),
+  arquivo: urlRecursoSchema.optional(),
+}).superRefine(({ url, arquivo }, context) => {
+  if (Boolean(url) === Boolean(arquivo)) {
+    context.addIssue({
+      code: 'custom',
+      path: ['url'],
+      message: 'Informe um link ou um arquivo enviado, mas não os dois.',
+    });
+  }
+}).transform(({ nome, url, arquivo }) => ({
+  nome,
+  url: (url ?? arquivo) as string,
+}));
 
-const classificacaoMatematicaSchema = z.strictObject({
-  area: z.string(),
-  subarea: z.string(),
-  conteudo: z.string(),
-});
+const identificadorListaSchema = textoObrigatorioSchema.regex(
+  /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+  {
+    message: 'Use somente minúsculas ASCII, números e hífens no identificador.',
+  },
+);
 
 const marcoTrabalhoSchema = z.strictObject({
   tipo: z.enum(['Entrega', 'Apresentação']),
@@ -297,6 +310,31 @@ function optionalYamlGlob(base: string): Loader {
   };
 }
 
+const classificacoes = defineCollection({
+  loader: optionalYamlGlob('./src/content/classificacoes'),
+  schema: z.strictObject({
+    id: identificadorListaSchema,
+    area: textoObrigatorioSchema,
+    subarea: textoObrigatorioSchema,
+    conteudo: textoObrigatorioSchema,
+  }),
+});
+
+function defineListaNomeada(base: string) {
+  return defineCollection({
+    loader: optionalYamlGlob(base),
+    schema: z.strictObject({
+      id: identificadorListaSchema,
+      nome: textoObrigatorioSchema,
+    }),
+  });
+}
+
+const tiposCronograma = defineListaNomeada('./src/content/tipos-cronograma');
+const tiposMaterial = defineListaNomeada('./src/content/tipos-material');
+const finalidadesLink = defineListaNomeada('./src/content/finalidades-link');
+const tiposLink = defineListaNomeada('./src/content/tipos-link');
+
 const turmas = defineCollection({
   loader: glob({
     base: './src/content/turmas',
@@ -353,11 +391,12 @@ const videos = defineCollection({
       'Recomendado',
       'Complementar',
     ]),
-    classificacoes: z.array(classificacaoMatematicaSchema).min(1),
+    classificacoes: z.array(reference('classificacoes')).min(1),
     segmento: segmentoSchema,
     anoSerie: z.string(),
     turmas: z.array(reference('turmas')).min(1).optional(),
-    tags: z.array(z.string()),
+    // O Pages CMS omite listas vazias ao salvar.
+    tags: z.array(z.string()).default([]),
     publicacao: portalDateSchema,
     destaqueNovidades: destaqueNovidadesSchema.optional(),
   }).superRefine(({ publicacao, destaqueNovidades }, context) => {
@@ -431,7 +470,7 @@ const itensCronograma = defineCollection({
     periodoLetivo: reference('periodosLetivos'),
     turmas: z.array(reference('turmas')).min(1),
     dataPrazo: portalDateSchema,
-    tipo: z.string(),
+    tipo: reference('tiposCronograma'),
     descricaoConteudo: z.string(),
     valorIndividual: z.number().nonnegative().optional(),
     publicacao: portalDateSchema.optional(),
@@ -461,7 +500,8 @@ const atividadesListas = defineCollection({
     prazo: portalDateSchema.optional(),
     recursos: z.array(recursoVinculadoSchema).min(1),
     videosRelacionados: z.array(reference('videos')).min(1).optional(),
-    tags: z.array(z.string()),
+    // O Pages CMS omite listas vazias ao salvar.
+    tags: z.array(z.string()).default([]),
     gabaritoResolucao: z.array(recursoVinculadoSchema).min(1).optional(),
     dataLiberacaoGabarito: portalDateSchema.optional(),
     destaqueNovidades: destaqueNovidadesSchema.optional(),
@@ -514,7 +554,8 @@ const paraEstudar = defineCollection({
     recursos: z.array(recursoVinculadoSchema).min(1),
     videosRelacionados: z.array(reference('videos')).min(1).optional(),
     leiturasRelacionadas: z.array(recursoVinculadoSchema).min(1).optional(),
-    tags: z.array(z.string()),
+    // O Pages CMS omite listas vazias ao salvar.
+    tags: z.array(z.string()).default([]),
     publicacao: portalDateSchema,
     destaqueNovidades: destaqueNovidadesSchema.optional(),
   }).superRefine(({ publicacao, destaqueNovidades }, context) => {
@@ -540,7 +581,8 @@ const trabalhos = defineCollection({
     marco: marcoTrabalhoSchema,
     documentoTrabalho: recursoVinculadoSchema,
     recursosAdicionais: z.array(recursoVinculadoSchema).min(1).optional(),
-    tags: z.array(z.string()),
+    // O Pages CMS omite listas vazias ao salvar.
+    tags: z.array(z.string()).default([]),
     destaqueNovidades: destaqueNovidadesSchema.optional(),
   }).superRefine(({ publicacao, destaqueNovidades }, context) => {
     validatePublicationHighlightOrder(
@@ -557,8 +599,8 @@ const materiais = defineCollection({
     id: z.string(),
     titulo: z.string(),
     descricao: z.string().optional(),
-    tipo: z.string(),
-    classificacoes: z.array(classificacaoMatematicaSchema).min(1),
+    tipo: reference('tiposMaterial'),
+    classificacoes: z.array(reference('classificacoes')).min(1),
     publicacao: portalDateSchema,
     segmento: segmentoSchema,
     anoSerie: z.string(),
@@ -582,11 +624,11 @@ const links = defineCollection({
     titulo: z.string(),
     descricao: z.string(),
     url: httpUrlSchema,
-    finalidade: z.string().trim().min(1),
-    tipo: z.string().trim().min(1),
+    finalidade: reference('finalidadesLink'),
+    tipo: reference('tiposLink'),
     acesso: z.enum(['Gratuito', 'Pago']).optional(),
     classificacoes: z
-      .array(classificacaoMatematicaSchema)
+      .array(reference('classificacoes'))
       .min(1)
       .optional(),
     publicacao: portalDateSchema,
@@ -798,6 +840,11 @@ const matematicaAlem = defineCollection({
 });
 
 export const collections = {
+  classificacoes,
+  tiposCronograma,
+  tiposMaterial,
+  finalidadesLink,
+  tiposLink,
   turmas,
   videos,
   avisos,
